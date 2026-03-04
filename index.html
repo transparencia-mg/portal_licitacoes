@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Licitações - Acordo Judicial de Brumadinho</title>
+    <title>Licitações - Portal da Transparência MG</title>
     
     <!-- ==================== ESTILOS E BIBLIOTECAS ==================== -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Bibliotecas para PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -35,7 +34,7 @@
 
         /* ==================== ESTILOS GERAIS ==================== */
         body {
-            font-family: 'Montserrat', 'Open Sans', sans-serif;
+            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--background-light);
             padding-bottom: 15px;
             overflow-y: hidden !important;
@@ -262,6 +261,18 @@
             font-size: 14px;
             text-transform: uppercase;
             white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .table-fixed-header-container table thead th:hover {
+            background-color: var(--primary-darker) !important;
+        }
+        
+        .table-fixed-header-container table thead th i {
+            font-size: 14px;
+            margin-left: 5px;
+            vertical-align: middle;
         }
         
         .table {
@@ -299,6 +310,7 @@
         .badge-ativo { background-color: #d4edda; color: #155724; }
         .badge-concluido { background-color: #cce5ff; color: #004085; }
         .badge-cancelado { background-color: #f8d7da; color: #721c24; }
+        .badge-emergencial { background-color: #fff3cd; color: #856404; }
 
         /* ==================== BOTÕES ==================== */
         .btn-primary-custom, .btn-pesquisa {
@@ -535,15 +547,19 @@
         .metadata-item { font-size: 13px; padding: 8px 0; border-bottom: 1px dashed #eee; }
         .metadata-item strong { color: var(--primary-dark); width: 200px; display: inline-block; }
         
-        .edital-info {
+        .emergencial-badge {
             background-color: #fff3cd;
-            border: 1px solid #ffeeba;
             color: #856404;
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin: 10px 0;
-            font-size: 13px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
             font-weight: 600;
+        }
+        
+        .sort-icon {
+            font-size: 14px;
+            margin-left: 5px;
+            vertical-align: middle;
         }
     </style>
 </head>
@@ -555,8 +571,8 @@
             <div class="nav-tabs-container">
                 <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
                     <li class="nav-item"><button class="nav-link active" id="visao-geral-tab" data-bs-toggle="tab" data-bs-target="#visao-geral"><i class="material-icons">bar_chart</i>Visão Geral</button></li>
-                    <li class="nav-item"><button class="nav-link" id="consulta-licitacao-tab" data-bs-toggle="tab" data-bs-target="#consulta-licitacao"><i class="material-icons">gavel</i>Consulta por Licitação</button></li>
-                    <li class="nav-item"><button class="nav-link" id="consulta-item-tab" data-bs-toggle="tab" data-bs-target="#consulta-item"><i class="material-icons">inventory</i>Consulta por Item</button></li>
+                    <li class="nav-item"><button class="nav-link" id="consulta-licitacao-tab" data-bs-toggle="tab" data-bs-target="#consulta-licitacao"><i class="material-icons">gavel</i>Consulta Licitações</button></li>
+                    <li class="nav-item"><button class="nav-link" id="consulta-item-tab" data-bs-toggle="tab" data-bs-target="#consulta-item"><i class="material-icons">inventory</i>Consulta Itens</button></li>
                     <li class="nav-item"><button class="nav-link" id="downloads-tab" data-bs-toggle="tab" data-bs-target="#downloads"><i class="material-icons">download</i>Downloads</button></li>
                 </ul>
             </div>
@@ -633,45 +649,86 @@
         // ============================================
         // CONFIGURAÇÕES E VARIÁVEIS GLOBAIS
         // ============================================
-const GITHUB_BASE = 'https://raw.githubusercontent.com/transparencia-mg/portal_licitacoes/main/dataset/data/';
+        const GITHUB_BASE = 'https://raw.githubusercontent.com/transparencia-mg/portal_licitacoes/main/dataset/data/';
 
-// Arquivos por ano (serão carregados dinamicamente)
-const ARQUIVOS_POR_ANO = {
-    2025: {
-        visaoGeral: 'visaogeral2025.csv',
-        licitacoes: 'licitacoes2025.csv',
-        links: 'links2025.csv',
-        itens: 'item2025.csv'
-    },
-    2026: {
-        visaoGeral: 'visaogeral2026.csv',
-        licitacoes: 'licitacoes2026.csv',
-        links: 'links2026.csv',
-        itens: 'item2026.csv'
-    }
-};
+        // Arquivos por ano
+        const ARQUIVOS_POR_ANO = {
+            2025: {
+                licitacoes: 'licitacoes2025.csv',
+                itens: 'item2025.csv',
+                links: 'links2025.csv'
+            },
+            2026: {
+                licitacoes: 'licitacoes2026.csv',
+                itens: 'item2026.csv',
+                links: 'links2026.csv'
+            }
+        };
 
-let dadosConsolidados = {
-    licitacoes: [],
-    itens: [],
-    links: [],
-    visaoGeral: []
-};
+        // ============================================
+        // MAPEAMENTO COMPLETO DAS COLUNAS
+        // ============================================
+        const MAPA_COLUNAS = {
+            // Licitações
+            'ano_criacao_pedido': 'Ano Criação Pedido',
+            'procedimento_contratacao_grupo': 'Procedimento Contratação - Grupo',
+            'procedimento_contratacao_detalhamento_1': 'Procedimento Contratação - Detalhamento 1',
+            'procedimento_contratacao_especializacao': 'Procedimento Contratação - Especialização',
+            'codigo_orgao_entidade_compra': 'Código Órgão/Entidade Compra',
+            'nome_orgao_entidade_compra': 'Nome Órgão/Entidade Compra',
+            'numero_processo_formatado': 'Número Processo - Formatado',
+            'nome_empresarial_nome_fornecedor': 'Nome Empresarial/Nome Fornecedor',
+            'cnpj_cpf_fornecedor_formatado': 'CNPJ/CPF Fornecedor - Formatado',
+            'data_criacao_pedido': 'Data Criação Pedido',
+            'data_licitacao': 'Data Licitação',
+            'objeto_contrato': 'Objeto Contrato',
+            'situacao_processo': 'Situação Processo',
+            'criterio_julgamento': 'Critério Julgamento',
+            'valor_total_homologado': 'Valor Total Homologado',
+            
+            // Itens
+            'ano_criacao_processo': 'Ano Criação Processo',
+            'situacao_item_processo': 'Situação Item Processo',
+            'codigo_elemento_item_despesa': 'Código Elemento Item Despesa',
+            'nome_elemento_item_despesa': 'Nome Elemento Item Despesa',
+            'codigo_item_material_servico_formatado': 'Código Item Material/Serviço - Formatado',
+            'item_material_servico': 'Item Material/Serviço',
+            'quantidade_item_pedido': 'Quantidade Item Pedido',
+            'valor_unitario_referencia_item_pedido': 'Valor Unitário Referência Item Pedido',
+            'valor_total_referencia_item_pedido': 'Valor Total Referência Item Pedido',
+            
+            // Links/Contratos
+            'numero_contrato': 'Número Contrato',
+            'descricao_tipo_de_contrato': 'Descrição Tipo de Contrato',
+            'edital_retificacao_arquivos': 'Edital_Retificação Arquivos',
+            'contrato_termoaditivo_arquivos': 'Contrato_TermoAditivo Arquivos',
+            'numero_parecer_juridico': 'Número Parecer Jurídico'
+        };
 
-let anosDisponiveis = [2026, 2025];
-        
-        let dadosFiltrados = [];
-        let dadosItensFiltrados = [];
+        let dadosConsolidados = {
+            licitacoes: [],
+            itens: [],
+            links: []
+        };
+
+        let anosDisponiveis = [2026, 2025];
+        let dadosFiltrados = {
+            licitacoes: [],
+            itens: []
+        };
         let metricaGeral = {};
 
+        // Variáveis de ordenação
+        let sortConfig = {
+            licitacoes: { column: 'Data Criação Pedido', direction: 'desc' },
+            itens: { column: 'Ano Criação Processo', direction: 'desc' }
+        };
+
         // Variáveis de paginação
-        let paginaAtual = 1;
-        let itensPorPagina = 50;
-        let totalPaginas = 1;
-        
-        let paginaAtualItens = 1;
-        let itensPorPaginaItens = 50;
-        let totalPaginasItens = 1;
+        let paginacao = {
+            licitacoes: { paginaAtual: 1, itensPorPagina: 50, totalPaginas: 1 },
+            itens: { paginaAtual: 1, itensPorPagina: 50, totalPaginas: 1 }
+        };
 
         const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
         const chartPalette = ['#1a3a5c','#2c5f8a','#3a7cb8','#5a9fd4','#7ab8e0','#9dd1ec','#bde4f5','#d4a017','#c0392b','#27ae60'];
@@ -689,7 +746,6 @@ let anosDisponiveis = [2026, 2025];
 
         // ==================== FUNÇÕES DE SCROLL E IFRAME ====================
         function removeAllScrollIssues() {
-            console.log('Removendo problemas de scroll duplo...');
             const elements = [
                 document.body,
                 document.documentElement,
@@ -719,7 +775,6 @@ let anosDisponiveis = [2026, 2025];
         }
 
         function iframeUpdateHeight() {
-            console.log('Atualizando altura do iframe...');
             document.body.style.display = 'none';
             document.body.offsetHeight;
             document.body.style.display = '';
@@ -734,13 +789,10 @@ let anosDisponiveis = [2026, 2025];
             );
             
             const finalHeight = scrollHeight + 10;
-            console.log('Altura calculada:', finalHeight);
             
             try {
                 window.parent.postMessage({ iframeHeight: finalHeight }, '*');
-            } catch (error) {
-                // Ignora erro se não estiver em iframe
-            }
+            } catch (error) {}
             
             return finalHeight;
         }
@@ -752,11 +804,9 @@ let anosDisponiveis = [2026, 2025];
             if (elementoData) {
                 elementoData.textContent = dataFormatada;
             }
-            console.log('Data de atualização definida:', dataFormatada);
         }
 
         function setupEventListeners() {
-            // Dropdown de compartilhamento - fechar ao clicar fora
             window.addEventListener('click', (e) => {
                 if (!e.target.closest('.share-dropdown')) {
                     document.querySelectorAll('.share-options').forEach(opt => opt.classList.remove('show'));
@@ -793,86 +843,136 @@ let anosDisponiveis = [2026, 2025];
         // FUNÇÕES AUXILIARES
         // ============================================
         function formatarMoeda(valor) {
-            if (valor === undefined || valor === null) return 'R$ 0,00';
-            const num = typeof valor === 'string' ? parseFloat(valor.replace(',', '.')) : valor;
+            if (valor === undefined || valor === null || valor === '') return 'R$ 0,00';
+            let valorStr = valor.toString().replace(',', '.');
+            const num = parseFloat(valorStr);
+            if (isNaN(num)) return 'R$ 0,00';
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
         }
         
         function formatarData(dataStr) {
             if (!dataStr || dataStr === '0000-00-00 00:00:00') return '-';
+            if (dataStr.includes('/')) return dataStr;
             const partes = dataStr.split(' ')[0].split('-');
             if (partes.length < 3) return dataStr;
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
         
-        function formatarAnoMes(anoMes) {
-            if (!anoMes || anoMes.length < 6) return anoMes;
-            return `${anoMes.substring(0,4)}/${anoMes.substring(4,6)}`;
-        }
-        
-        function parseCSV(texto) {
+        // ============================================
+        // FUNÇÃO parseCSV CORRIGIDA COM MAPEAMENTO
+        // ============================================
+        function parseCSV(texto, tipo) {
             const linhas = texto.trim().split('\n');
-            const cabecalhos = linhas[0].split(';').map(h => h.trim().replace(/^\uFEFF/, ''));
+            let cabecalhos = linhas[0].split(';').map(h => h.trim().replace(/^\uFEFF/, '').replace(/"/g, ''));
+            
             const dados = [];
+            
             for (let i = 1; i < linhas.length; i++) {
                 if (!linhas[i].trim()) continue;
-                const valores = linhas[i].split(';');
-                const linha = {};
+                
+                // Lidar com aspas e pontos e vírgula dentro de campos
+                let linha = linhas[i];
+                const valores = [];
+                let campoAtual = '';
+                let dentroAspas = false;
+                
+                for (let char of linha) {
+                    if (char === '"') {
+                        dentroAspas = !dentroAspas;
+                    } else if (char === ';' && !dentroAspas) {
+                        valores.push(campoAtual);
+                        campoAtual = '';
+                    } else {
+                        campoAtual += char;
+                    }
+                }
+                valores.push(campoAtual);
+                
+                const linhaObj = {};
                 cabecalhos.forEach((cab, idx) => {
-                    let valor = valores[idx]?.trim() || '';
-                    linha[cab] = valor;
+                    let valor = valores[idx] || '';
+                    
+                    // Mapear para nome amigável se existir no mapa
+                    const nomeAmigavel = MAPA_COLUNAS[cab] || cab;
+                    
+                    // Tratar valores nulos
+                    if (valor === 'INEXISTENTE' || valor === '') {
+                        valor = null;
+                    }
+                    
+                    // Converter números com vírgula
+                    if (typeof valor === 'string' && valor.includes(',') && !isNaN(parseFloat(valor.replace(',', '.')))) {
+                        valor = parseFloat(valor.replace(',', '.'));
+                    }
+                    
+                    linhaObj[nomeAmigavel] = valor;
                 });
-                dados.push(linha);
+                
+                // Adicionar ano referência
+                if (tipo === 'licitacoes' && linhaObj['Ano Criação Pedido']) {
+                    linhaObj['Ano Referência'] = linhaObj['Ano Criação Pedido'];
+                } else if (tipo === 'itens' && linhaObj['Ano Criação Processo']) {
+                    linhaObj['Ano Referência'] = linhaObj['Ano Criação Processo'];
+                }
+                
+                dados.push(linhaObj);
             }
             return dados;
         }
 
-        function extrairAnoProcesso(processo) {
-            if (!processo) return null;
-            const match = processo.match(/\/(\d{4})/);
-            return match ? match[1] : null;
+        function verificarEmergencial(processo) {
+            if (!processo) return false;
+            const procedimento = processo['Procedimento Contratação - Grupo'] || '';
+            const detalhamento = processo['Procedimento Contratação - Detalhamento 1'] || '';
+            return procedimento.toLowerCase().includes('dispensa') || 
+                   procedimento.toLowerCase().includes('inexigibilidade') ||
+                   detalhamento.toLowerCase().includes('dispensa') ||
+                   detalhamento.toLowerCase().includes('inexigibilidade');
         }
 
         function calcularMetricas(dados) {
-            const totalProcessos = new Set(dados.map(i => i.numero_processo_formatado)).size;
-            const totalOrgaos = new Set(dados.map(i => i.nome_orgao_entidade_compra)).size;
-            const totalFornecedores = new Set(dados.map(i => i.nome_empresarial_nome_fornecedor)).size;
+            const totalProcessos = new Set(dados.map(i => i['Número Processo - Formatado'])).size;
+            const totalOrgaos = new Set(dados.map(i => i['Nome Órgão/Entidade Compra'])).size;
+            const totalFornecedores = new Set(dados.map(i => i['Nome Empresarial/Nome Fornecedor'])).size;
             
-            // Extrair anos dos processos
-            const anos = new Set();
+            let totalHomologado = 0;
             dados.forEach(i => {
-                const ano = extrairAnoProcesso(i.numero_processo_formatado);
-                if (ano) anos.add(ano);
+                const valor = i['Valor Total Homologado'];
+                if (valor) {
+                    const num = parseFloat(valor.toString().replace(',', '.'));
+                    if (!isNaN(num)) totalHomologado += num;
+                }
             });
             
             return {
                 totalProcessos,
                 totalOrgaos,
                 totalFornecedores,
-                totalRegistros: dados.length,
-                anos: Array.from(anos).sort().reverse()
+                totalHomologado,
+                totalRegistros: dados.length
             };
         }
 
         function obterOpcoesFiltro(dados) {
-            const anos = [...new Set(dados.map(i => extrairAnoProcesso(i.numero_processo_formatado)))].filter(Boolean).sort().reverse();
-            const modalidades = [...new Set(dados.map(i => i.procedimento_contratacao_detalhamento_1))].filter(Boolean).sort();
-            const orgaos = [...new Set(dados.map(i => i.nome_orgao_entidade_compra))].filter(Boolean).sort();
-            const situacoes = [...new Set(dados.map(i => i.situacao_processo))].filter(Boolean).sort();
-            const criterios = [...new Set(dados.map(i => i.criterio_julgamento))].filter(Boolean).sort();
+            const anos = [...new Set(dados.map(i => i['Ano Criação Pedido']))].filter(Boolean).sort().reverse();
+            const modalidades = [...new Set(dados.map(i => i['Procedimento Contratação - Detalhamento 1']))].filter(Boolean).sort();
+            const orgaos = [...new Set(dados.map(i => i['Nome Órgão/Entidade Compra']))].filter(Boolean).sort();
+            const situacoes = [...new Set(dados.map(i => i['Situação Processo']))].filter(Boolean).sort();
+            const criterios = [...new Set(dados.map(i => i['Critério Julgamento']))].filter(Boolean).sort();
+            const grupos = [...new Set(dados.map(i => i['Procedimento Contratação - Grupo']))].filter(Boolean).sort();
             
-            return { anos, modalidades, orgaos, situacoes, criterios };
+            return { anos, modalidades, orgaos, situacoes, criterios, grupos };
         }
 
         function agruparPorModalidade(dados) {
             const mapa = new Map();
             for (const i of dados) {
-                const modalidade = i.procedimento_contratacao_detalhamento_1 || 'Não informado';
+                const modalidade = i['Procedimento Contratação - Detalhamento 1'] || 'Não informado';
                 if (!mapa.has(modalidade)) {
                     mapa.set(modalidade, { modalidade, total: 0, processos: new Set() });
                 }
                 const m = mapa.get(modalidade);
-                if (i.numero_processo_formatado) m.processos.add(i.numero_processo_formatado);
+                if (i['Número Processo - Formatado']) m.processos.add(i['Número Processo - Formatado']);
             }
             return Array.from(mapa.values()).map(m => ({ 
                 modalidade: m.modalidade, 
@@ -883,12 +983,12 @@ let anosDisponiveis = [2026, 2025];
         function agruparPorSituacao(dados) {
             const mapa = new Map();
             for (const i of dados) {
-                const situacao = i.situacao_processo || 'Não informado';
+                const situacao = i['Situação Processo'] || 'Não informado';
                 if (!mapa.has(situacao)) {
                     mapa.set(situacao, { situacao, total: 0, processos: new Set() });
                 }
                 const s = mapa.get(situacao);
-                if (i.numero_processo_formatado) s.processos.add(i.numero_processo_formatado);
+                if (i['Número Processo - Formatado']) s.processos.add(i['Número Processo - Formatado']);
             }
             return Array.from(mapa.values()).map(s => ({ 
                 situacao: s.situacao, 
@@ -896,216 +996,142 @@ let anosDisponiveis = [2026, 2025];
             }));
         }
 
-        function agruparPorMes(dados) {
-            const mapa = new Map();
-            for (const i of dados) {
-                if (!i.data_criacao_pedido) continue;
-                const partes = i.data_criacao_pedido.split(' ')[0].split('-');
-                if (partes.length < 2) continue;
-                const anoMes = partes[0] + partes[1];
-                if (!mapa.has(anoMes)) {
-                    mapa.set(anoMes, { anoMes, label: formatarAnoMes(anoMes), total: 0 });
+        // ============================================
+        // FUNÇÕES DE ORDENAÇÃO
+        // ============================================
+        function ordenarDados(dados, tipo, coluna, direcao) {
+            return [...dados].sort((a, b) => {
+                let valorA = a[coluna] !== undefined && a[coluna] !== null ? a[coluna] : '';
+                let valorB = b[coluna] !== undefined && b[coluna] !== null ? b[coluna] : '';
+                
+                // Tratamento especial para valores numéricos
+                if (coluna.includes('Valor') || coluna.includes('Quantidade')) {
+                    valorA = parseFloat(valorA.toString().replace(',', '.')) || 0;
+                    valorB = parseFloat(valorB.toString().replace(',', '.')) || 0;
+                } 
+                // Tratamento para datas
+                else if (coluna.includes('Data') || coluna.includes('Ano')) {
+                    valorA = valorA.toString();
+                    valorB = valorB.toString();
                 }
-                mapa.get(anoMes).total++;
-            }
-            return Array.from(mapa.values()).sort((a,b) => a.anoMes.localeCompare(b.anoMes));
+                // Strings
+                else {
+                    valorA = valorA.toString().toLowerCase();
+                    valorB = valorB.toString().toLowerCase();
+                }
+                
+                if (direcao === 'asc') {
+                    if (valorA < valorB) return -1;
+                    if (valorA > valorB) return 1;
+                    return 0;
+                } else {
+                    if (valorA > valorB) return -1;
+                    if (valorA < valorB) return 1;
+                    return 0;
+                }
+            });
         }
 
-        function verificarEdital(processo) {
-            // Verifica se é pregão (simplificado - ajustar conforme dados reais)
-            const modalidade = processo.procedimento_contratacao_detalhamento_1 || '';
-            return modalidade.toLowerCase().includes('pregão');
+        function toggleSort(tipo, coluna) {
+            if (sortConfig[tipo].column === coluna) {
+                sortConfig[tipo].direction = sortConfig[tipo].direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortConfig[tipo].column = coluna;
+                sortConfig[tipo].direction = 'asc';
+            }
+            
+            if (tipo === 'licitacoes') {
+                window.licitacoesFiltradas = ordenarDados(window.licitacoesFiltradas, tipo, coluna, sortConfig[tipo].direction);
+                paginacao.licitacoes.paginaAtual = 1;
+                atualizarTabelaConsultaLicitacao();
+            } else {
+                window.itensFiltrados = ordenarDados(window.itensFiltrados, tipo, coluna, sortConfig[tipo].direction);
+                paginacao.itens.paginaAtual = 1;
+                atualizarTabelaItens();
+            }
         }
 
         // ============================================
         // CARREGAMENTO DE DADOS
         // ============================================
- async function carregarTodosDados() {
-    mostrarLoading(true);
-    try {
-        // Carregar dados de cada ano
-        for (const ano of anosDisponiveis) {
-            const arquivos = ARQUIVOS_POR_ANO[ano];
-            
-            // Carregar licitações do ano
+        async function carregarTodosDados() {
+            mostrarLoading(true);
             try {
-                const respLicitacoes = await fetch(GITHUB_BASE + arquivos.licitacoes);
-                if (respLicitacoes.ok) {
-                    const textLicitacoes = await respLicitacoes.text();
-                    const dadosAno = parseCSV(textLicitacoes);
-                    // Adicionar ano como campo para referência
-                    dadosAno.forEach(d => d.ano_referencia = ano);
-                    dadosConsolidados.licitacoes = [...dadosConsolidados.licitacoes, ...dadosAno];
-                    console.log(`Carregadas ${dadosAno.length} licitações de ${ano}`);
+                for (const ano of anosDisponiveis) {
+                    const arquivos = ARQUIVOS_POR_ANO[ano];
+                    
+                    // Carregar licitações
+                    try {
+                        const resp = await fetch(GITHUB_BASE + arquivos.licitacoes);
+                        if (resp.ok) {
+                            const texto = await resp.text();
+                            const dadosAno = parseCSV(texto, 'licitacoes');
+                            dadosAno.forEach(d => d.ano_referencia = ano);
+                            dadosConsolidados.licitacoes = [...dadosConsolidados.licitacoes, ...dadosAno];
+                            console.log(`✅ Carregadas ${dadosAno.length} licitações de ${ano}`);
+                        }
+                    } catch (e) {
+                        console.log(`⚠️ Arquivo de licitações ${ano} não encontrado`);
+                    }
+                    
+                    // Carregar itens
+                    try {
+                        const resp = await fetch(GITHUB_BASE + arquivos.itens);
+                        if (resp.ok) {
+                            const texto = await resp.text();
+                            const dadosAno = parseCSV(texto, 'itens');
+                            dadosAno.forEach(d => d.ano_referencia = ano);
+                            dadosConsolidados.itens = [...dadosConsolidados.itens, ...dadosAno];
+                            console.log(`✅ Carregados ${dadosAno.length} itens de ${ano}`);
+                        }
+                    } catch (e) {
+                        console.log(`⚠️ Arquivo de itens ${ano} não encontrado`);
+                    }
+                    
+                    // Carregar links
+                    try {
+                        const resp = await fetch(GITHUB_BASE + arquivos.links);
+                        if (resp.ok) {
+                            const texto = await resp.text();
+                            const dadosAno = parseCSV(texto, 'links');
+                            dadosAno.forEach(d => d.ano_referencia = ano);
+                            dadosConsolidados.links = [...dadosConsolidados.links, ...dadosAno];
+                        }
+                    } catch (e) {
+                        console.log(`⚠️ Arquivo de links ${ano} não encontrado`);
+                    }
                 }
-            } catch (e) {
-                console.log(`Arquivo de licitações ${ano} não encontrado`);
-            }
-            
-            // Carregar itens do ano
-            try {
-                const respItens = await fetch(GITHUB_BASE + arquivos.itens);
-                if (respItens.ok) {
-                    const textItens = await respItens.text();
-                    const dadosAno = parseCSV(textItens);
-                    dadosAno.forEach(d => d.ano_referencia = ano);
-                    dadosConsolidados.itens = [...dadosConsolidados.itens, ...dadosAno];
-                    console.log(`Carregados ${dadosAno.length} itens de ${ano}`);
-                }
-            } catch (e) {
-                console.log(`Arquivo de itens ${ano} não encontrado`);
-            }
-            
-            // Carregar visão geral do ano
-            try {
-                const respVG = await fetch(GITHUB_BASE + arquivos.visaoGeral);
-                if (respVG.ok) {
-                    const textVG = await respVG.text();
-                    const dadosAno = parseCSV(textVG);
-                    dadosAno.forEach(d => d.ano_referencia = ano);
-                    dadosConsolidados.visaoGeral = [...dadosConsolidados.visaoGeral, ...dadosAno];
-                }
-            } catch (e) {
-                console.log(`Arquivo de visão geral ${ano} não encontrado`);
-            }
-            
-            // Carregar links do ano
-            try {
-                const respLinks = await fetch(GITHUB_BASE + arquivos.links);
-                if (respLinks.ok) {
-                    const textLinks = await respLinks.text();
-                    const dadosAno = parseCSV(textLinks);
-                    dadosAno.forEach(d => d.ano_referencia = ano);
-                    dadosConsolidados.links = [...dadosConsolidados.links, ...dadosAno];
-                }
-            } catch (e) {
-                console.log(`Arquivo de links ${ano} não encontrado`);
+                
+                console.log(`📊 Total: ${dadosConsolidados.licitacoes.length} licitações, ${dadosConsolidados.itens.length} itens`);
+                
+                dadosFiltrados.licitacoes = [...dadosConsolidados.licitacoes];
+                dadosFiltrados.itens = [...dadosConsolidados.itens];
+                metricaGeral = calcularMetricas(dadosFiltrados.licitacoes);
+                
+                renderizarVisaoGeral();
+                renderizarConsultaLicitacao();
+                renderizarConsultaItem();
+                renderizarDownloads();
+                
+                setTimeout(iframeUpdateHeight, 500);
+            } catch (erro) {
+                console.error('❌ Erro ao carregar dados:', erro);
+                showError('Erro ao carregar dados. Recarregue a página.');
+            } finally {
+                mostrarLoading(false);
             }
         }
-        
-        // Se não carregou nenhum dado, usar simulados
-        if (dadosConsolidados.licitacoes.length === 0) {
-            console.log('Nenhum dado carregado, usando dados simulados');
-            gerarDadosSimulados();
-        } else {
-            console.log(`Total carregado: ${dadosConsolidados.licitacoes.length} licitações, ${dadosConsolidados.itens.length} itens`);
-        }
-        
-        dadosFiltrados = [...dadosConsolidados.licitacoes];
-        metricaGeral = calcularMetricas(dadosFiltrados);
-        
-        renderizarVisaoGeral();
-        renderizarConsultaLicitacao();
-        renderizarConsultaItem();
-        renderizarDownloads();
-        
-        setTimeout(iframeUpdateHeight, 500);
-    } catch (erro) {
-        console.error('Erro ao carregar dados:', erro);
-        showError('Erro ao carregar dados. Usando dados simulados para demonstração.');
-        gerarDadosSimulados();
-        renderizarVisaoGeral();
-        renderizarConsultaLicitacao();
-        renderizarConsultaItem();
-        renderizarDownloads();
-    } finally {
-        mostrarLoading(false);
-    }
-}
-
-// ============================================
-// FUNÇÃO ATUALIZADA PARA GERAR DADOS SIMULADOS
-// ============================================
-function gerarDadosSimulados() {
-    const orgaos = ['SECRETARIA DE ESTADO DE SAÚDE', 'SECRETARIA DE ESTADO DE EDUCAÇÃO', 'SECRETARIA DE ESTADO DE SEGURANÇA PÚBLICA', 'SECRETARIA DE ESTADO DE INFRAESTRUTURA', 'SECRETARIA DE ESTADO DE MEIO AMBIENTE'];
-    const modalidades = ['Pregão Eletrônico', 'Concorrência', 'Dispensa', 'Inexigibilidade', 'Tomada de Preços'];
-    const situacoes = ['Homologado', 'Em andamento', 'Adjudicado', 'Revogado', 'Anulado'];
-    const criterios = ['Menor Preço', 'Técnica e Preço', 'Maior Desconto', 'Melhor Técnica'];
-    const fornecedores = ['Empresa A Ltda', 'Empresa B SA', 'Consórcio ABC', 'Fornecedor Individual', 'Cooperativa XYZ'];
-    const tipos = ['Licitação', 'Dispensa', 'Inexigibilidade'];
-    
-    dadosConsolidados.licitacoes = [];
-    
-    // Gerar dados para 2025 e 2026
-    for (const ano of [2025, 2026]) {
-        for (let i = 1; i <= 150; i++) {
-            const processo = `${String(i).padStart(3, '0')}/${ano}`;
-            dadosConsolidados.licitacoes.push({
-                ano_criacao_processo: ano.toString(),
-                nome_orgao_entidade_compra: orgaos[Math.floor(Math.random() * orgaos.length)],
-                numero_processo_formatado: processo,
-                nome_empresarial_nome_fornecedor: fornecedores[Math.floor(Math.random() * fornecedores.length)],
-                cnpj_cpf_fornecedor_formatado: `${Math.floor(Math.random() * 100)}.${Math.floor(Math.random() * 100)}.${Math.floor(Math.random() * 100)}/${Math.floor(Math.random() * 10000)}-${Math.floor(Math.random() * 100)}`,
-                objeto_contrato: `Contratação de serviços de ${Math.random() > 0.5 ? 'limpeza' : 'informática'} para atendimento das necessidades da administração`,
-                procedimento_contratacao_grupo: tipos[Math.floor(Math.random() * tipos.length)],
-                procedimento_contratacao_detalhamento_1: modalidades[Math.floor(Math.random() * modalidades.length)],
-                criterio_julgamento: criterios[Math.floor(Math.random() * criterios.length)],
-                situacao_processo: situacoes[Math.floor(Math.random() * situacoes.length)],
-                data_criacao_processo: `${ano}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-01 00:00:00`,
-                justificativa_contratacao_emergencial: Math.random() > 0.7 ? 'Emergencial - Calamidade pública' : '',
-                ano_referencia: ano
-            });
-        }
-    }
-    
-    // Gerar itens
-    dadosConsolidados.itens = [];
-    const descricoes = ['Computador', 'Impressora', 'Papel A4', 'Cadeira', 'Mesa', 'Caneta', 'Lápis', 'Monitor', 'Teclado', 'Mouse'];
-    const elementos = ['Material de Consumo', 'Permanente', 'Serviço', 'Locação'];
-    
-    for (let i = 1; i <= 500; i++) {
-        const ano = Math.random() > 0.5 ? 2025 : 2026;
-        const processo = dadosConsolidados.licitacoes
-            .filter(l => l.ano_referencia === ano)
-            .map(l => l.numero_processo_formatado);
-        const processoEscolhido = processo[Math.floor(Math.random() * processo.length)];
-        
-        const qtd = Math.floor(Math.random() * 100) + 1;
-        const valorUnit = Math.random() * 1000;
-        dadosConsolidados.itens.push({
-            ano_criacao_processo: ano.toString(),
-            numero_processo_formatado: processoEscolhido,
-            situacao_item_processo: 'Ativo',
-            codigo_elemento_item_despesa: String(Math.floor(Math.random() * 1000)).padStart(4, '0'),
-            nome_elemento_item_despesa: elementos[Math.floor(Math.random() * elementos.length)],
-            item_material_servico: Math.random() > 0.5 ? 'M' : 'S',
-            codigo_item_material_servico_formatado: String(Math.floor(Math.random() * 100000)).padStart(6, '0'),
-            quantidade_item_pedido: qtd.toString(),
-            valor_unitario_referencia_item_pedido: valorUnit.toFixed(2).replace('.', ','),
-            valor_total_referencia_item_pedido: (qtd * valorUnit).toFixed(2).replace('.', ','),
-            unidade_medida_item: Math.random() > 0.5 ? 'UN' : 'CX',
-            descricao_item: descricoes[Math.floor(Math.random() * descricoes.length)] + ' ' + (Math.floor(Math.random() * 100)),
-            ano_referencia: ano
-        });
-    }
-    
-    dadosFiltrados = [...dadosConsolidados.licitacoes];
-    metricaGeral = calcularMetricas(dadosFiltrados);
-}
-
-// ============================================
-// FUNÇÃO AUXILIAR PARA OBTER ANOS DISPONÍVEIS
-// ============================================
-function obterAnosDisponiveis() {
-    const anos = new Set();
-    dadosConsolidados.licitacoes.forEach(l => {
-        if (l.ano_referencia) anos.add(l.ano_referencia);
-    });
-    return Array.from(anos).sort().reverse();
-}
 
         // ============================================
         // RENDERIZAÇÃO VISÃO GERAL
         // ============================================
         function renderizarVisaoGeral() {
             const container = document.getElementById('visao-geral-content');
-            const dadosMes = agruparPorMes(dadosFiltrados);
-            const dadosModalidade = agruparPorModalidade(dadosFiltrados);
-            const dadosSituacao = agruparPorSituacao(dadosFiltrados);
-            const opcoes = obterOpcoesFiltro(dadosFiltrados);
+            if (!container) return;
             
-            // Usar ano mais atual para exibição
-            const anoAtual = opcoes.anos.length > 0 ? opcoes.anos[0] : new Date().getFullYear().toString();
+            const dadosModalidade = agruparPorModalidade(dadosFiltrados.licitacoes);
+            const dadosSituacao = agruparPorSituacao(dadosFiltrados.licitacoes);
+            const opcoes = obterOpcoesFiltro(dadosFiltrados.licitacoes);
             
             let html = `
                 <!-- Filtros -->
@@ -1115,7 +1141,7 @@ function obterAnosDisponiveis() {
                             <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
                             <select class="form-select" id="filtroAnoVG">
                                 <option value="">Todos</option>
-                                ${opcoes.anos.map(a => `<option value="${a}" ${a === anoAtual ? 'selected' : ''}>${a}</option>`).join('')}
+                                ${opcoes.anos.map(a => `<option value="${a}" ${a === '2026' ? 'selected' : ''}>${a}</option>`).join('')}
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -1125,7 +1151,7 @@ function obterAnosDisponiveis() {
                                 ${opcoes.orgaos.map(o => `<option value="${o}">${o}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="filter-label"><i class="material-icons">gavel</i>Modalidade</label>
                             <select class="form-select" id="filtroModalidadeVG">
                                 <option value="">Todas</option>
@@ -1139,8 +1165,8 @@ function obterAnosDisponiveis() {
                                 ${opcoes.situacoes.map(s => `<option value="${s}">${s}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="filter-label"><i class="material-icons">star</i>Critério</label>
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">star</i>Critério Julgamento</label>
                             <select class="form-select" id="filtroCriterioVG">
                                 <option value="">Todos</option>
                                 ${opcoes.criterios.map(c => `<option value="${c}">${c}</option>`).join('')}
@@ -1149,7 +1175,22 @@ function obterAnosDisponiveis() {
                     </div>
                     
                     <div class="row mt-3">
-                        <div class="col-12 d-flex justify-content-start gap-2">
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">warning</i>Emergencial</label>
+                            <select class="form-select" id="filtroEmergencialVG">
+                                <option value="">Todos</option>
+                                <option value="sim">Sim</option>
+                                <option value="nao">Não</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">category</i>Tipo</label>
+                            <select class="form-select" id="filtroTipoVG">
+                                <option value="">Todos</option>
+                                ${opcoes.grupos.map(g => `<option value="${g}">${g}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end gap-2 align-items-end">
                             <button class="btn-pesquisa" onclick="aplicarFiltrosVG()"><i class="material-icons me-2">search</i>Pesquisar</button>
                             <button class="btn-secondary-custom" onclick="limparFiltrosVG()"><i class="material-icons me-2">clear</i>Limpar Filtros</button>
                         </div>
@@ -1161,7 +1202,7 @@ function obterAnosDisponiveis() {
                     <div class="col-md-3 col-6"><div class="metric-card"><div class="metric-label">Processos</div><div class="metric-value">${metricaGeral.totalProcessos.toLocaleString('pt-BR')}</div></div></div>
                     <div class="col-md-3 col-6"><div class="metric-card"><div class="metric-label">Órgãos</div><div class="metric-value">${metricaGeral.totalOrgaos.toLocaleString('pt-BR')}</div></div></div>
                     <div class="col-md-3 col-6"><div class="metric-card"><div class="metric-label">Fornecedores</div><div class="metric-value">${metricaGeral.totalFornecedores.toLocaleString('pt-BR')}</div></div></div>
-                    <div class="col-md-3 col-6"><div class="metric-card"><div class="metric-label">Registros</div><div class="metric-value">${metricaGeral.totalRegistros.toLocaleString('pt-BR')}</div></div></div>
+                    <div class="col-md-3 col-6"><div class="metric-card"><div class="metric-label">Valor Homologado</div><div class="metric-value">${formatarMoeda(metricaGeral.totalHomologado)}</div></div></div>
                 </div>
 
                 <!-- Gráficos -->
@@ -1177,13 +1218,7 @@ function obterAnosDisponiveis() {
                         <button class="btn-export" onclick="exportarTabelaLicitacoesPDF()"><i class="material-icons me-2">print</i>PDF</button>
                         <div class="share-dropdown">
                             <button class="btn-export" onclick="toggleShare(1)"><i class="material-icons me-2">share</i>Compartilhar</button>
-                            <div class="share-options" id="shareOptions1">
-                                <a href="#" onclick="copiarLink(event,1)"><i class="fas fa-link"></i> Copiar Link</a>
-                                <a href="#" onclick="compartilharFacebook(event,1)"><i class="fab fa-facebook-f"></i> Facebook</a>
-                                <a href="#" onclick="compartilharTwitter(event,1)"><i class="fab fa-twitter"></i> Twitter</a>
-                                <a href="#" onclick="compartilharLinkedIn(event,1)"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
-                                <a href="#" onclick="compartilharWhatsApp(event,1)"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                            </div>
+                            <div class="share-options" id="shareOptions1">...</div>
                         </div>
                     </div>
                     <span class="table-badge" id="totalProcessosBadge">${metricaGeral.totalProcessos} processos</span>
@@ -1193,9 +1228,19 @@ function obterAnosDisponiveis() {
                 <div class="table-container">
                     <div class="table-fixed-header-container">
                         <table class="table" id="processosTable">
-                            <thead><tr><th>Nº Processo</th><th>Órgão</th><th>Modalidade</th><th>Objeto</th><th>Fornecedor</th><th>Situação</th><th class="text-center">Ações</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>Nº Processo</th>
+                                    <th>Órgão</th>
+                                    <th>Modalidade</th>
+                                    <th>Objeto</th>
+                                    <th>Fornecedor</th>
+                                    <th>Situação</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
                             <tbody id="processosTableBody">
-                                ${gerarLinhasTabelaResumo(dadosFiltrados.slice(0, 15))}
+                                ${gerarLinhasTabelaResumo(dadosFiltrados.licitacoes.slice(0, 15))}
                             </tbody>
                         </table>
                     </div>
@@ -1212,20 +1257,23 @@ function obterAnosDisponiveis() {
         }
 
         function gerarLinhasTabelaResumo(dados) {
+            if (!dados || dados.length === 0) return '<tr><td colspan="7" class="text-center">Nenhum dado encontrado</td></tr>';
+            
             return dados.map(item => {
-                const temEdital = verificarEdital(item);
-                const badgeClass = item.situacao_processo?.toLowerCase().includes('homologado') ? 'badge-ativo' : 
-                                  (item.situacao_processo?.toLowerCase().includes('cancelado') || item.situacao_processo?.toLowerCase().includes('anulado') ? 'badge-cancelado' : 'badge-concluido');
+                const isEmergencial = verificarEmergencial(item);
+                const situacao = item['Situação Processo'] || '-';
+                const badgeClass = situacao.toLowerCase().includes('homologado') ? 'badge-ativo' : 
+                                  (situacao.toLowerCase().includes('cancelado') || situacao.toLowerCase().includes('anulado') ? 'badge-cancelado' : 'badge-concluido');
                 return `
                     <tr>
-                        <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${item.numero_processo_formatado}'); return false;">${item.numero_processo_formatado || '-'}</a></td>
-                        <td>${item.nome_orgao_entidade_compra || '-'}</td>
-                        <td>${item.procedimento_contratacao_detalhamento_1 || '-'}</td>
-                        <td>${(item.objeto_contrato || '').substring(0, 50)}${(item.objeto_contrato || '').length > 50 ? '...' : ''}</td>
-                        <td>${item.nome_empresarial_nome_fornecedor || '-'}</td>
-                        <td><span class="badge-situacao ${badgeClass}">${item.situacao_processo || '-'}</span></td>
+                        <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${item['Número Processo - Formatado']}'); return false;">${item['Número Processo - Formatado'] || '-'}</a></td>
+                        <td>${item['Nome Órgão/Entidade Compra'] || '-'}</td>
+                        <td>${item['Procedimento Contratação - Detalhamento 1'] || '-'} ${isEmergencial ? '<span class="emergencial-badge">Emergencial</span>' : ''}</td>
+                        <td>${(item['Objeto Contrato'] || '').substring(0, 50)}${(item['Objeto Contrato'] || '').length > 50 ? '...' : ''}</td>
+                        <td>${item['Nome Empresarial/Nome Fornecedor'] || '-'}</td>
+                        <td><span class="badge-situacao ${badgeClass}">${situacao}</span></td>
                         <td class="text-center">
-                            <button class="btn-action" onclick="verDetalhesLicitacao('${item.numero_processo_formatado}')" title="Detalhes">
+                            <button class="btn-action" onclick="verDetalhesLicitacao('${item['Número Processo - Formatado']}')" title="Detalhes">
                                 <i class="material-icons">visibility</i>
                             </button>
                         </td>
@@ -1240,23 +1288,31 @@ function obterAnosDisponiveis() {
             const modalidade = document.getElementById('filtroModalidadeVG')?.value;
             const situacao = document.getElementById('filtroSituacaoVG')?.value;
             const criterio = document.getElementById('filtroCriterioVG')?.value;
+            const emergencial = document.getElementById('filtroEmergencialVG')?.value;
+            const tipo = document.getElementById('filtroTipoVG')?.value;
             
-            dadosFiltrados = dadosConsolidados.licitacoes.filter(i => {
-                if (ano && extrairAnoProcesso(i.numero_processo_formatado) !== ano) return false;
-                if (orgao && i.nome_orgao_entidade_compra !== orgao) return false;
-                if (modalidade && i.procedimento_contratacao_detalhamento_1 !== modalidade) return false;
-                if (situacao && i.situacao_processo !== situacao) return false;
-                if (criterio && i.criterio_julgamento !== criterio) return false;
+            dadosFiltrados.licitacoes = dadosConsolidados.licitacoes.filter(i => {
+                if (ano && i['Ano Criação Pedido'] != ano) return false;
+                if (orgao && i['Nome Órgão/Entidade Compra'] !== orgao) return false;
+                if (modalidade && i['Procedimento Contratação - Detalhamento 1'] !== modalidade) return false;
+                if (situacao && i['Situação Processo'] !== situacao) return false;
+                if (criterio && i['Critério Julgamento'] !== criterio) return false;
+                if (tipo && i['Procedimento Contratação - Grupo'] !== tipo) return false;
+                if (emergencial) {
+                    const isEmergencial = verificarEmergencial(i);
+                    if (emergencial === 'sim' && !isEmergencial) return false;
+                    if (emergencial === 'nao' && isEmergencial) return false;
+                }
                 return true;
             });
             
-            metricaGeral = calcularMetricas(dadosFiltrados);
+            metricaGeral = calcularMetricas(dadosFiltrados.licitacoes);
             renderizarVisaoGeral();
         };
 
         window.limparFiltrosVG = function() {
-            dadosFiltrados = [...dadosConsolidados.licitacoes];
-            metricaGeral = calcularMetricas(dadosFiltrados);
+            dadosFiltrados.licitacoes = [...dadosConsolidados.licitacoes];
+            metricaGeral = calcularMetricas(dadosFiltrados.licitacoes);
             renderizarVisaoGeral();
         };
 
@@ -1312,17 +1368,18 @@ function obterAnosDisponiveis() {
         // RENDERIZAÇÃO CONSULTA POR LICITAÇÃO
         // ============================================
         function renderizarConsultaLicitacao() {
-            const opcoes = obterOpcoesFiltro(dadosConsolidados.licitacoes);
-            const licitacoesUnicas = agruparLicitacoesUnicas(dadosConsolidados.licitacoes);
-            
             const container = document.getElementById('consulta-licitacao-content');
+            if (!container) return;
+            
+            const opcoes = obterOpcoesFiltro(dadosConsolidados.licitacoes);
+            
             container.innerHTML = `
-                <!-- Filtros -->
+                <!-- Filtros (mesma estrutura anterior) -->
                 <div class="filter-container">
                     <div class="row g-3">
                         <div class="col-md-2">
                             <label class="filter-label"><i class="material-icons">receipt</i>Nº Processo</label>
-                            <input type="text" class="form-control" id="filtroProcessoCL" placeholder="Ex: 001/2023">
+                            <input type="text" class="form-control" id="filtroProcessoCL" placeholder="Ex: 0500005 000001/2026">
                         </div>
                         <div class="col-md-2">
                             <label class="filter-label"><i class="material-icons">gavel</i>Modalidade</label>
@@ -1355,13 +1412,46 @@ function obterAnosDisponiveis() {
                     </div>
                     
                     <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label class="filter-label"><i class="material-icons">description</i>Objeto (palavra-chave)</label>
-                            <input type="text" class="form-control" id="filtroObjetoCL" placeholder="Buscar no objeto...">
+                        <div class="col-md-2">
+                            <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
+                            <select class="form-select" id="filtroAnoCL">
+                                <option value="">Todos</option>
+                                ${opcoes.anos.map(a => `<option value="${a}" ${a === '2026' ? 'selected' : ''}>${a}</option>`).join('')}
+                            </select>
                         </div>
-                        <div class="col-md-6 d-flex justify-content-end align-items-end gap-2">
+                        <div class="col-md-2">
+                            <label class="filter-label"><i class="material-icons">warning</i>Emergencial</label>
+                            <select class="form-select" id="filtroEmergencialCL">
+                                <option value="">Todos</option>
+                                <option value="sim">Sim</option>
+                                <option value="nao">Não</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">category</i>Tipo</label>
+                            <select class="form-select" id="filtroTipoCL">
+                                <option value="">Todos</option>
+                                ${opcoes.grupos.map(g => `<option value="${g}">${g}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-5 d-flex justify-content-end gap-2 align-items-end">
                             <button class="btn-pesquisa" onclick="aplicarFiltrosCL()"><i class="material-icons me-2">search</i>Pesquisar</button>
                             <button class="btn-secondary-custom" onclick="limparFiltrosCL()"><i class="material-icons me-2">clear</i>Limpar Filtros</button>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <label class="filter-label"><i class="material-icons">description</i>Objeto</label>
+                            <input type="text" class="form-control" id="filtroObjetoCL" placeholder="Palavra-chave no objeto...">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="filter-label"><i class="material-icons">person</i>Fornecedor</label>
+                            <input type="text" class="form-control" id="filtroFornecedorCL" placeholder="Razão social...">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="filter-label"><i class="material-icons">badge</i>CNPJ/CPF</label>
+                            <input type="text" class="form-control" id="filtroCnpjCL" placeholder="00.000.000/0000-00">
                         </div>
                     </div>
                 </div>
@@ -1372,22 +1462,15 @@ function obterAnosDisponiveis() {
                         <button class="btn-export" onclick="exportarTabelaConsultaLicitacaoPDF()"><i class="material-icons me-2">print</i>PDF</button>
                         <div class="share-dropdown">
                             <button class="btn-export" onclick="toggleShare(2)"><i class="material-icons me-2">share</i>Compartilhar</button>
-                            <div class="share-options" id="shareOptions2">
-                                <a href="#" onclick="copiarLink(event,2)"><i class="fas fa-link"></i> Copiar Link</a>
-                                <a href="#" onclick="compartilharFacebook(event,2)"><i class="fab fa-facebook-f"></i> Facebook</a>
-                                <a href="#" onclick="compartilharTwitter(event,2)"><i class="fab fa-twitter"></i> Twitter</a>
-                                <a href="#" onclick="compartilharLinkedIn(event,2)"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
-                                <a href="#" onclick="compartilharWhatsApp(event,2)"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                            </div>
+                            <div class="share-options" id="shareOptions2">...</div>
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-3">
-                        <span class="table-badge" id="totalLicitacoesBadge">${licitacoesUnicas.length} licitações</span>
-                        <select class="items-per-page" id="itensPorPaginaCL" onchange="alterarItensPorPaginaCL()">
+                        <span class="table-badge" id="totalLicitacoesBadge">${dadosConsolidados.licitacoes.length} licitações</span>
+                        <select class="items-per-page" id="itensPorPaginaCL" onchange="alterarItensPorPagina('licitacoes')">
                             <option value="25">25</option>
                             <option value="50" selected>50</option>
                             <option value="100">100</option>
-                            <option value="${licitacoesUnicas.length}">Todos</option>
                         </select>
                     </div>
                 </div>
@@ -1395,18 +1478,22 @@ function obterAnosDisponiveis() {
                 <div class="table-container">
                     <div class="table-fixed-header-container">
                         <table class="table" id="licitacoesTable">
-                            <thead><tr>
-                                <th>Nº Processo</th>
-                                <th>Órgão</th>
-                                <th>Modalidade</th>
-                                <th>Objeto</th>
-                                <th>Fornecedor</th>
-                                <th>CNPJ/CPF</th>
-                                <th>Situação</th>
-                                <th>Critério</th>
-                                <th class="text-center">Edital</th>
-                                <th class="text-center">Ações</th>
-                            </tr></thead>
+                            <thead>
+                                <tr>
+                                    <th onclick="toggleSort('licitacoes', 'Número Processo - Formatado')">Processo <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'Nome Órgão/Entidade Compra')">Órgão <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'Procedimento Contratação - Detalhamento 1')">Modalidade <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'Objeto Contrato')">Objeto <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'Nome Empresarial/Nome Fornecedor')">Fornecedor <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'CNPJ/CPF Fornecedor - Formatado')">CNPJ/CPF <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'Data Licitação')">Data <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'Situação Processo')">Situação <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'Critério Julgamento')">Critério <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'Valor Total Homologado')">Valor <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th>Emerg.</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
                             <tbody id="licitacoesTableBody"></tbody>
                         </table>
                     </div>
@@ -1414,54 +1501,34 @@ function obterAnosDisponiveis() {
                 </div>
             `;
             
-            window.licitacoesUnicas = licitacoesUnicas;
-            window.licitacoesFiltradas = [...licitacoesUnicas];
-            paginaAtual = 1;
+            window.licitacoesFiltradas = [...dadosFiltrados.licitacoes];
+            paginacao.licitacoes.paginaAtual = 1;
             atualizarTabelaConsultaLicitacao();
             setTimeout(iframeUpdateHeight, 300);
         }
 
-        function agruparLicitacoesUnicas(dados) {
-            const mapa = new Map();
-            for (const i of dados) {
-                if (!i.numero_processo_formatado) continue;
-                if (!mapa.has(i.numero_processo_formatado)) {
-                    mapa.set(i.numero_processo_formatado, {
-                        numero_processo_formatado: i.numero_processo_formatado,
-                        nome_orgao_entidade_compra: i.nome_orgao_entidade_compra,
-                        procedimento_contratacao_detalhamento_1: i.procedimento_contratacao_detalhamento_1,
-                        objeto_contrato: i.objeto_contrato,
-                        nome_empresarial_nome_fornecedor: i.nome_empresarial_nome_fornecedor,
-                        cnpj_cpf_fornecedor_formatado: i.cnpj_cpf_fornecedor_formatado || 'Não informado',
-                        situacao_processo: i.situacao_processo,
-                        criterio_julgamento: i.criterio_julgamento,
-                        data_criacao_pedido: i.data_criacao_pedido,
-                        procedimento_contratacao_grupo: i.procedimento_contratacao_grupo
-                    });
-                }
-            }
-            return Array.from(mapa.values());
-        }
-
         function gerarLinhasTabelaLicitacoes(licitacoes) {
+            if (!licitacoes || licitacoes.length === 0) return '<tr><td colspan="12" class="text-center">Nenhum registro encontrado</td></tr>';
+            
             return licitacoes.map(l => {
-                const temEdital = verificarEdital(l);
-                const badgeClass = l.situacao_processo?.toLowerCase().includes('homologado') ? 'badge-ativo' : 
-                                  (l.situacao_processo?.toLowerCase().includes('cancelado') || l.situacao_processo?.toLowerCase().includes('anulado') ? 'badge-cancelado' : 'badge-concluido');
-                const editalIcon = temEdital ? 'description' : 'block';
-                const editalColor = temEdital ? '#28a745' : '#dc3545';
+                const situacao = l['Situação Processo'] || '-';
+                const badgeClass = situacao.toLowerCase().includes('homologado') ? 'badge-ativo' : 
+                                  (situacao.toLowerCase().includes('cancelado') || situacao.toLowerCase().includes('anulado') ? 'badge-cancelado' : 'badge-concluido');
+                const isEmergencial = verificarEmergencial(l);
                 return `<tr>
-                    <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${l.numero_processo_formatado}'); return false;">${l.numero_processo_formatado}</a></td>
-                    <td>${l.nome_orgao_entidade_compra || '-'}</td>
-                    <td>${l.procedimento_contratacao_detalhamento_1 || '-'}</td>
-                    <td>${(l.objeto_contrato || '').substring(0, 60)}${(l.objeto_contrato || '').length > 60 ? '...' : ''}</td>
-                    <td>${l.nome_empresarial_nome_fornecedor || '-'}</td>
-                    <td>${l.cnpj_cpf_fornecedor_formatado || '-'}</td>
-                    <td><span class="badge-situacao ${badgeClass}">${l.situacao_processo || '-'}</span></td>
-                    <td>${l.criterio_julgamento || '-'}</td>
-                    <td class="text-center"><i class="material-icons" style="color: ${editalColor};">${editalIcon}</i></td>
+                    <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${l['Número Processo - Formatado']}'); return false;">${l['Número Processo - Formatado'] || '-'}</a></td>
+                    <td>${l['Nome Órgão/Entidade Compra'] || '-'}</td>
+                    <td>${l['Procedimento Contratação - Detalhamento 1'] || '-'}</td>
+                    <td>${(l['Objeto Contrato'] || '').substring(0, 40)}${(l['Objeto Contrato'] || '').length > 40 ? '...' : ''}</td>
+                    <td>${l['Nome Empresarial/Nome Fornecedor'] || '-'}</td>
+                    <td>${l['CNPJ/CPF Fornecedor - Formatado'] || '-'}</td>
+                    <td>${formatarData(l['Data Licitação'])}</td>
+                    <td><span class="badge-situacao ${badgeClass}">${situacao}</span></td>
+                    <td>${l['Critério Julgamento'] || '-'}</td>
+                    <td class="text-right">${formatarMoeda(l['Valor Total Homologado'])}</td>
+                    <td>${isEmergencial ? '<span class="emergencial-badge">Sim</span>' : 'Não'}</td>
                     <td class="text-center">
-                        <button class="btn-action" onclick="verDetalhesLicitacao('${l.numero_processo_formatado}')" title="Detalhes">
+                        <button class="btn-action" onclick="verDetalhesLicitacao('${l['Número Processo - Formatado']}')" title="Detalhes">
                             <i class="material-icons">visibility</i>
                         </button>
                     </td>
@@ -1475,19 +1542,34 @@ function obterAnosDisponiveis() {
             const orgao = document.getElementById('filtroOrgaoCL')?.value;
             const situacao = document.getElementById('filtroSituacaoCL')?.value;
             const criterio = document.getElementById('filtroCriterioCL')?.value;
+            const ano = document.getElementById('filtroAnoCL')?.value;
+            const emergencial = document.getElementById('filtroEmergencialCL')?.value;
+            const tipo = document.getElementById('filtroTipoCL')?.value;
             const objeto = (document.getElementById('filtroObjetoCL')?.value || '').toLowerCase();
+            const fornecedor = (document.getElementById('filtroFornecedorCL')?.value || '').toLowerCase();
+            const cnpj = (document.getElementById('filtroCnpjCL')?.value || '').toLowerCase();
             
-            window.licitacoesFiltradas = window.licitacoesUnicas.filter(l => {
-                if (processo && !l.numero_processo_formatado?.toLowerCase().includes(processo)) return false;
-                if (modalidade && l.procedimento_contratacao_detalhamento_1 !== modalidade) return false;
-                if (orgao && l.nome_orgao_entidade_compra !== orgao) return false;
-                if (situacao && l.situacao_processo !== situacao) return false;
-                if (criterio && l.criterio_julgamento !== criterio) return false;
-                if (objeto && !l.objeto_contrato?.toLowerCase().includes(objeto)) return false;
+            window.licitacoesFiltradas = dadosConsolidados.licitacoes.filter(l => {
+                if (processo && !l['Número Processo - Formatado']?.toLowerCase().includes(processo)) return false;
+                if (modalidade && l['Procedimento Contratação - Detalhamento 1'] !== modalidade) return false;
+                if (orgao && l['Nome Órgão/Entidade Compra'] !== orgao) return false;
+                if (situacao && l['Situação Processo'] !== situacao) return false;
+                if (criterio && l['Critério Julgamento'] !== criterio) return false;
+                if (ano && l['Ano Criação Pedido'] != ano) return false;
+                if (tipo && l['Procedimento Contratação - Grupo'] !== tipo) return false;
+                if (emergencial) {
+                    const isEmergencial = verificarEmergencial(l);
+                    if (emergencial === 'sim' && !isEmergencial) return false;
+                    if (emergencial === 'nao' && isEmergencial) return false;
+                }
+                if (objeto && !l['Objeto Contrato']?.toLowerCase().includes(objeto)) return false;
+                if (fornecedor && !l['Nome Empresarial/Nome Fornecedor']?.toLowerCase().includes(fornecedor)) return false;
+                if (cnpj && !l['CNPJ/CPF Fornecedor - Formatado']?.toLowerCase().includes(cnpj)) return false;
                 return true;
             });
             
-            paginaAtual = 1;
+            window.licitacoesFiltradas = ordenarDados(window.licitacoesFiltradas, 'licitacoes', sortConfig.licitacoes.column, sortConfig.licitacoes.direction);
+            paginacao.licitacoes.paginaAtual = 1;
             atualizarTabelaConsultaLicitacao();
         };
 
@@ -1497,242 +1579,87 @@ function obterAnosDisponiveis() {
             document.getElementById('filtroOrgaoCL').value = '';
             document.getElementById('filtroSituacaoCL').value = '';
             document.getElementById('filtroCriterioCL').value = '';
+            document.getElementById('filtroAnoCL').value = '2026';
+            document.getElementById('filtroEmergencialCL').value = '';
+            document.getElementById('filtroTipoCL').value = '';
             document.getElementById('filtroObjetoCL').value = '';
-            window.licitacoesFiltradas = [...window.licitacoesUnicas];
-            paginaAtual = 1;
-            atualizarTabelaConsultaLicitacao();
-        };
-
-        window.alterarItensPorPaginaCL = function() {
-            itensPorPagina = parseInt(document.getElementById('itensPorPaginaCL').value);
-            paginaAtual = 1;
+            document.getElementById('filtroFornecedorCL').value = '';
+            document.getElementById('filtroCnpjCL').value = '';
+            
+            window.licitacoesFiltradas = [...dadosConsolidados.licitacoes];
+            window.licitacoesFiltradas = ordenarDados(window.licitacoesFiltradas, 'licitacoes', 'Data Criação Pedido', 'desc');
+            paginacao.licitacoes.paginaAtual = 1;
             atualizarTabelaConsultaLicitacao();
         };
 
         function atualizarTabelaConsultaLicitacao() {
-            const inicio = (paginaAtual - 1) * itensPorPagina;
-            const fim = Math.min(inicio + itensPorPagina, window.licitacoesFiltradas.length);
+            const inicio = (paginacao.licitacoes.paginaAtual - 1) * paginacao.licitacoes.itensPorPagina;
+            const fim = Math.min(inicio + paginacao.licitacoes.itensPorPagina, window.licitacoesFiltradas.length);
             const dadosPagina = window.licitacoesFiltradas.slice(inicio, fim);
             
             document.getElementById('licitacoesTableBody').innerHTML = gerarLinhasTabelaLicitacoes(dadosPagina);
             document.getElementById('totalLicitacoesBadge').innerText = window.licitacoesFiltradas.length + ' licitações';
             
-            totalPaginas = Math.ceil(window.licitacoesFiltradas.length / itensPorPagina);
-            renderizarPaginacaoCL();
+            paginacao.licitacoes.totalPaginas = Math.ceil(window.licitacoesFiltradas.length / paginacao.licitacoes.itensPorPagina);
+            renderizarPaginacao('licitacoes');
             setTimeout(iframeUpdateHeight, 100);
         }
-
-        function renderizarPaginacaoCL() {
-            const container = document.getElementById('paginacaoContainerCL');
-            if (!container) return;
-            
-            if (window.licitacoesFiltradas.length === 0) {
-                container.innerHTML = '<div class="pagination-info">Nenhum registro encontrado</div>';
-                return;
-            }
-            
-            const inicio = (paginaAtual - 1) * itensPorPagina + 1;
-            const fim = Math.min(paginaAtual * itensPorPagina, window.licitacoesFiltradas.length);
-            
-            let html = `
-                <div class="pagination-info">
-                    Mostrando ${inicio}-${fim} de ${window.licitacoesFiltradas.length.toLocaleString('pt-BR')} registros
-                </div>
-                <nav>
-                    <ul class="pagination mb-0">
-            `;
-            
-            html += `<li class="page-item ${paginaAtual === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="mudarPaginaCL(${paginaAtual - 1}); return false;">&laquo;</a>
-            </li>`;
-            
-            let inicioPaginas = Math.max(1, paginaAtual - 2);
-            let fimPaginas = Math.min(totalPaginas, inicioPaginas + 4);
-            if (fimPaginas - inicioPaginas < 4) {
-                inicioPaginas = Math.max(1, fimPaginas - 4);
-            }
-            
-            for (let i = inicioPaginas; i <= fimPaginas; i++) {
-                html += `<li class="page-item ${i === paginaAtual ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="mudarPaginaCL(${i}); return false;">${i}</a>
-                </li>`;
-            }
-            
-            html += `<li class="page-item ${paginaAtual === totalPaginas ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="mudarPaginaCL(${paginaAtual + 1}); return false;">&raquo;</a>
-            </li>`;
-            
-            html += '</ul></nav>';
-            container.innerHTML = html;
-        }
-
-        window.mudarPaginaCL = function(pagina) {
-            if (pagina < 1 || pagina > totalPaginas) return;
-            paginaAtual = pagina;
-            atualizarTabelaConsultaLicitacao();
-        };
-
-        window.verDetalhesLicitacao = function(processo) {
-            const dados = dadosConsolidados.licitacoes.filter(l => l.numero_processo_formatado === processo);
-            if (!dados.length) return;
-            
-            const licitacao = dados[0];
-            const contratoRelacionado = dadosConsolidados.contratos.find(c => c.numero_processo_formatado === processo);
-            const participantesRelacionados = dadosConsolidados.participantes.filter(p => p.numero_processo_formatado === processo);
-            const itensRelacionados = dadosConsolidados.itens.filter(i => i.numero_processo_formatado === processo);
-            const temEdital = verificarEdital(licitacao);
-            
-            let editalInfo = '';
-            if (!temEdital) {
-                editalInfo = '<div class="edital-info"><i class="material-icons me-2" style="vertical-align: middle;">info</i> Este processo não é um pregão e não possui edital de licitação.</div>';
-            }
-            
-            document.getElementById('modalContent').innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="info-card primary">
-                            <div class="info-label">Processo</div>
-                            <div class="info-value highlight">${licitacao.numero_processo_formatado}</div>
-                            <div class="info-label mt-3">Órgão</div>
-                            <div class="info-value">${licitacao.nome_orgao_entidade_compra || '-'}</div>
-                            <div class="info-label mt-3">Objeto</div>
-                            <div class="info-value">${licitacao.objeto_contrato || '-'}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="info-card">
-                            <div class="info-label">Modalidade</div>
-                            <div class="info-value">${licitacao.procedimento_contratacao_detalhamento_1 || '-'}</div>
-                            <div class="info-label mt-3">Critério de Julgamento</div>
-                            <div class="info-value">${licitacao.criterio_julgamento || '-'}</div>
-                            <div class="info-label mt-3">Situação</div>
-                            <div class="info-value"><span class="badge-situacao ${licitacao.situacao_processo?.toLowerCase().includes('homologado') ? 'badge-ativo' : 'badge-concluido'}">${licitacao.situacao_processo || '-'}</span></div>
-                        </div>
-                    </div>
-                </div>
-                
-                ${editalInfo}
-                
-                <div class="row mt-3">
-                    <div class="col-md-12">
-                        <div class="info-card">
-                            <div class="info-label">Fornecedor</div>
-                            <div class="info-value">${licitacao.nome_empresarial_nome_fornecedor || 'Não informado'}</div>
-                            <div class="info-label mt-3">CNPJ/CPF</div>
-                            <div class="info-value">${licitacao.cnpj_cpf_fornecedor_formatado || 'Não informado'}</div>
-                            <div class="info-label mt-3">Data de Criação</div>
-                            <div class="info-value">${formatarData(licitacao.data_criacao_pedido)}</div>
-                        </div>
-                    </div>
-                </div>
-                
-                ${contratoRelacionado ? `
-                <h6 class="mt-4 fw-bold">Contrato</h6>
-                <div class="info-card">
-                    <div class="row">
-                        <div class="col-md-4"><span class="info-label">Nº Contrato</span><div class="info-value">${contratoRelacionado.numero_contrato || '-'}</div></div>
-                        <div class="col-md-4"><span class="info-label">Tipo</span><div class="info-value">${contratoRelacionado.descricao_tipo_de_contrato || '-'}</div></div>
-                        <div class="col-md-4"><span class="info-label">Parecer Jurídico</span><div class="info-value">${contratoRelacionado.numero_parecer_juridico || '-'}</div></div>
-                    </div>
-                </div>` : ''}
-                
-                ${itensRelacionados.length > 0 ? `
-                <h6 class="mt-4 fw-bold">Itens da Licitação</h6>
-                <div style="max-height:250px; overflow-y:auto;">
-                    <table class="table table-sm">
-                        <thead class="bg-light">
-                            <tr>
-                                <th>Descrição</th>
-                                <th>Quantidade</th>
-                                <th>Unidade</th>
-                                <th class="text-right">Valor Unitário</th>
-                                <th class="text-right">Valor Total</th>
-                                <th class="text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itensRelacionados.map(item => `
-                                <tr>
-                                    <td>${item.descricao_item || '-'}</td>
-                                    <td>${item.quantidade_item || '-'}</td>
-                                    <td>${item.unidade_medida_item || '-'}</td>
-                                    <td class="text-right">${formatarMoeda(item.valor_unitario_item)}</td>
-                                    <td class="text-right">${formatarMoeda(item.valor_total_item)}</td>
-                                    <td class="text-center">
-                                        <button class="btn-action" onclick="verDetalhesItem('${item.numero_processo_formatado}', '${item.descricao_item}')">
-                                            <i class="material-icons">visibility</i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>` : ''}
-                
-                ${participantesRelacionados.length > 0 ? `
-                <h6 class="mt-4 fw-bold">Participantes</h6>
-                <div style="max-height:200px; overflow-y:auto;">
-                    <table class="table table-sm">
-                        <thead class="bg-light">
-                            <tr>
-                                <th>Fornecedor</th>
-                                <th>CNPJ/CPF</th>
-                                <th>Valor Proposto</th>
-                                <th>Situação</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${participantesRelacionados.map(p => `
-                                <tr>
-                                    <td>${p.nome_empresarial_nome_fornecedor || '-'}</td>
-                                    <td>${p.cnpj_cpf_fornecedor_formatado || '-'}</td>
-                                    <td class="text-right">${formatarMoeda(p.valor_proposta)}</td>
-                                    <td>${p.situacao_participante || '-'}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>` : ''}
-            `;
-            
-            new bootstrap.Modal(document.getElementById('detailModal')).show();
-        };
 
         // ============================================
         // RENDERIZAÇÃO CONSULTA POR ITEM
         // ============================================
         function renderizarConsultaItem() {
-            const itens = dadosConsolidados.itens.length > 0 ? dadosConsolidados.itens : gerarItensSimulados();
-            
             const container = document.getElementById('consulta-item-content');
+            if (!container) return;
+            
             container.innerHTML = `
                 <!-- Filtros -->
                 <div class="filter-container">
                     <div class="row g-3">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="filter-label"><i class="material-icons">receipt</i>Nº Processo</label>
-                            <input type="text" class="form-control" id="filtroProcessoCI" placeholder="Ex: 001/2023">
+                            <input type="text" class="form-control" id="filtroProcessoCI" placeholder="Ex: 0500005 000001/2026">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="filter-label"><i class="material-icons">code</i>Código Item</label>
+                            <input type="text" class="form-control" id="filtroCodigoCI" placeholder="00003482-7">
                         </div>
                         <div class="col-md-3">
-                            <label class="filter-label"><i class="material-icons">business</i>Razão Social</label>
-                            <input type="text" class="form-control" id="filtroRazaoCI" placeholder="Nome do fornecedor">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="filter-label"><i class="material-icons">badge</i>CPF/CNPJ</label>
-                            <input type="text" class="form-control" id="filtroCnpjCI" placeholder="00.000.000/0000-00">
-                        </div>
-                        <div class="col-md-2">
                             <label class="filter-label"><i class="material-icons">description</i>Descrição</label>
-                            <input type="text" class="form-control" id="filtroDescricaoCI" placeholder="Item...">
+                            <input type="text" class="form-control" id="filtroDescricaoCI" placeholder="Nome do elemento...">
                         </div>
                         <div class="col-md-2">
-                            <label class="filter-label"><i class="material-icons">straighten</i>Unidade</label>
-                            <input type="text" class="form-control" id="filtroUnidadeCI" placeholder="UN, KG, etc">
+                            <label class="filter-label"><i class="material-icons">sell</i>Elemento</label>
+                            <input type="text" class="form-control" id="filtroElementoCI" placeholder="4003">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
+                            <select class="form-select" id="filtroAnoCI">
+                                <option value="">Todos</option>
+                                <option value="2026" selected>2026</option>
+                                <option value="2025">2025</option>
+                            </select>
                         </div>
                     </div>
                     
                     <div class="row mt-3">
-                        <div class="col-md-12 d-flex justify-content-end gap-2">
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">category</i>Tipo</label>
+                            <select class="form-select" id="filtroTipoCI">
+                                <option value="">Todos</option>
+                                <option value="M">Material</option>
+                                <option value="S">Serviço</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">info</i>Situação</label>
+                            <select class="form-select" id="filtroSituacaoCI">
+                                <option value="">Todas</option>
+                                <option value="Homologado/Ratificado">Homologado</option>
+                                <option value="Cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end gap-2 align-items-end">
                             <button class="btn-pesquisa" onclick="aplicarFiltrosCI()"><i class="material-icons me-2">search</i>Pesquisar</button>
                             <button class="btn-secondary-custom" onclick="limparFiltrosCI()"><i class="material-icons me-2">clear</i>Limpar Filtros</button>
                         </div>
@@ -1745,22 +1672,15 @@ function obterAnosDisponiveis() {
                         <button class="btn-export" onclick="exportarTabelaItensPDF()"><i class="material-icons me-2">print</i>PDF</button>
                         <div class="share-dropdown">
                             <button class="btn-export" onclick="toggleShare(3)"><i class="material-icons me-2">share</i>Compartilhar</button>
-                            <div class="share-options" id="shareOptions3">
-                                <a href="#" onclick="copiarLink(event,3)"><i class="fas fa-link"></i> Copiar Link</a>
-                                <a href="#" onclick="compartilharFacebook(event,3)"><i class="fab fa-facebook-f"></i> Facebook</a>
-                                <a href="#" onclick="compartilharTwitter(event,3)"><i class="fab fa-twitter"></i> Twitter</a>
-                                <a href="#" onclick="compartilharLinkedIn(event,3)"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
-                                <a href="#" onclick="compartilharWhatsApp(event,3)"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                            </div>
+                            <div class="share-options" id="shareOptions3">...</div>
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-3">
-                        <span class="table-badge" id="totalItensBadge">${itens.length} itens</span>
-                        <select class="items-per-page" id="itensPorPaginaCI" onchange="alterarItensPorPaginaCI()">
+                        <span class="table-badge" id="totalItensBadge">${dadosConsolidados.itens.length} itens</span>
+                        <select class="items-per-page" id="itensPorPaginaCI" onchange="alterarItensPorPagina('itens')">
                             <option value="25">25</option>
                             <option value="50" selected>50</option>
                             <option value="100">100</option>
-                            <option value="${itens.length}">Todos</option>
                         </select>
                     </div>
                 </div>
@@ -1768,17 +1688,21 @@ function obterAnosDisponiveis() {
                 <div class="table-container">
                     <div class="table-fixed-header-container">
                         <table class="table" id="itensTable">
-                            <thead><tr>
-                                <th>Processo</th>
-                                <th>Fornecedor</th>
-                                <th>CPF/CNPJ</th>
-                                <th>Descrição</th>
-                                <th>Quantidade</th>
-                                <th>Unidade</th>
-                                <th class="text-right">Valor Unitário</th>
-                                <th class="text-right">Valor Total</th>
-                                <th class="text-center">Ações</th>
-                            </tr></thead>
+                            <thead>
+                                <tr>
+                                    <th onclick="toggleSort('itens', 'Ano Criação Processo')">Ano <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Número Processo - Formatado')">Processo <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Situação Item Processo')">Situação <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Código Elemento Item Despesa')">Cód. Elemento <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Nome Elemento Item Despesa')">Elemento <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Código Item Material/Serviço - Formatado')">Cód. Item <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Item Material/Serviço')">Tipo <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Quantidade Item Pedido')">Quantidade <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Valor Unitário Referência Item Pedido')">Valor Unit. <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Valor Total Referência Item Pedido')">Valor Total <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
                             <tbody id="itensTableBody"></tbody>
                         </table>
                     </div>
@@ -1786,161 +1710,272 @@ function obterAnosDisponiveis() {
                 </div>
             `;
             
-            window.todosItens = itens;
-            window.itensFiltrados = [...itens];
-            paginaAtualItens = 1;
+            window.itensFiltrados = [...dadosFiltrados.itens];
+            paginacao.itens.paginaAtual = 1;
             atualizarTabelaItens();
             setTimeout(iframeUpdateHeight, 300);
         }
 
-        function gerarItensSimulados() {
-            const itens = [];
-            const descricoes = ['Computador', 'Impressora', 'Papel A4', 'Cadeira', 'Mesa', 'Caneta', 'Lápis', 'Monitor', 'Teclado', 'Mouse'];
-            const unidades = ['UN', 'CX', 'PC', 'KG', 'LT'];
-            const fornecedores = ['Empresa A Ltda', 'Empresa B SA', 'Fornecedor X', 'Comercial Y', 'Distribuidora Z'];
-            const cnpjs = ['12.345.678/0001-90', '98.765.432/0001-10', '11.222.333/0001-44', '55.666.777/0001-88', '99.888.777/0001-66'];
-            
-            for (let i = 1; i <= 150; i++) {
-                const ano = 2020 + Math.floor(Math.random() * 5);
-                const processo = `${String(Math.floor(Math.random() * 100)).padStart(3, '0')}/${ano}`;
-                const qtd = Math.floor(Math.random() * 100) + 1;
-                const valorUnit = Math.random() * 1000;
-                itens.push({
-                    numero_processo_formatado: processo,
-                    nome_empresarial_nome_fornecedor: fornecedores[Math.floor(Math.random() * fornecedores.length)],
-                    cnpj_cpf_fornecedor_formatado: cnpjs[Math.floor(Math.random() * cnpjs.length)],
-                    descricao_item: descricoes[Math.floor(Math.random() * descricoes.length)] + ' ' + (Math.floor(Math.random() * 100)),
-                    quantidade_item: qtd,
-                    unidade_medida_item: unidades[Math.floor(Math.random() * unidades.length)],
-                    valor_unitario_item: valorUnit,
-                    valor_total_item: qtd * valorUnit
-                });
-            }
-            return itens;
-        }
-
         function gerarLinhasTabelaItens(itens) {
-            return itens.map(item => `
+            if (!itens || itens.length === 0) return '<tr><td colspan="11" class="text-center">Nenhum registro encontrado</td></tr>';
+            
+            return itens.map(item => {
+                const tipo = item['Item Material/Serviço'] === 'M' ? 'Material' : item['Item Material/Serviço'] === 'S' ? 'Serviço' : '-';
+                return `
                 <tr>
-                    <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${item.numero_processo_formatado}'); return false;">${item.numero_processo_formatado}</a></td>
-                    <td>${item.nome_empresarial_nome_fornecedor || '-'}</td>
-                    <td>${item.cnpj_cpf_fornecedor_formatado || '-'}</td>
-                    <td>${item.descricao_item || '-'}</td>
-                    <td>${item.quantidade_item || '-'}</td>
-                    <td>${item.unidade_medida_item || '-'}</td>
-                    <td class="text-right">${formatarMoeda(item.valor_unitario_item)}</td>
-                    <td class="text-right">${formatarMoeda(item.valor_total_item)}</td>
+                    <td>${item['Ano Criação Processo'] || '-'}</td>
+                    <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${item['Número Processo - Formatado']}'); return false;">${item['Número Processo - Formatado'] || '-'}</a></td>
+                    <td>${item['Situação Item Processo'] || '-'}</td>
+                    <td>${item['Código Elemento Item Despesa'] || '-'}</td>
+                    <td>${item['Nome Elemento Item Despesa'] || '-'}</td>
+                    <td>${item['Código Item Material/Serviço - Formatado'] || '-'}</td>
+                    <td>${tipo}</td>
+                    <td class="text-right">${item['Quantidade Item Pedido'] || '-'}</td>
+                    <td class="text-right">${formatarMoeda(item['Valor Unitário Referência Item Pedido'])}</td>
+                    <td class="text-right">${formatarMoeda(item['Valor Total Referência Item Pedido'])}</td>
                     <td class="text-center">
-                        <button class="btn-action" onclick="verDetalhesItem('${item.numero_processo_formatado}', '${item.descricao_item}')" title="Detalhes">
+                        <button class="btn-action" onclick="verDetalhesItem('${item['Número Processo - Formatado']}', '${item['Código Item Material/Serviço - Formatado']}')" title="Detalhes">
                             <i class="material-icons">visibility</i>
                         </button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         window.aplicarFiltrosCI = function() {
             const processo = (document.getElementById('filtroProcessoCI')?.value || '').toLowerCase();
-            const razao = (document.getElementById('filtroRazaoCI')?.value || '').toLowerCase();
-            const cnpj = (document.getElementById('filtroCnpjCI')?.value || '').toLowerCase();
+            const codigo = (document.getElementById('filtroCodigoCI')?.value || '').toLowerCase();
             const descricao = (document.getElementById('filtroDescricaoCI')?.value || '').toLowerCase();
-            const unidade = (document.getElementById('filtroUnidadeCI')?.value || '').toLowerCase();
+            const elemento = (document.getElementById('filtroElementoCI')?.value || '').toLowerCase();
+            const ano = document.getElementById('filtroAnoCI')?.value;
+            const tipo = document.getElementById('filtroTipoCI')?.value;
+            const situacao = document.getElementById('filtroSituacaoCI')?.value;
             
-            window.itensFiltrados = window.todosItens.filter(item => {
-                if (processo && !item.numero_processo_formatado?.toLowerCase().includes(processo)) return false;
-                if (razao && !item.nome_empresarial_nome_fornecedor?.toLowerCase().includes(razao)) return false;
-                if (cnpj && !item.cnpj_cpf_fornecedor_formatado?.toLowerCase().includes(cnpj)) return false;
-                if (descricao && !item.descricao_item?.toLowerCase().includes(descricao)) return false;
-                if (unidade && !item.unidade_medida_item?.toLowerCase().includes(unidade)) return false;
+            window.itensFiltrados = dadosConsolidados.itens.filter(item => {
+                if (processo && !item['Número Processo - Formatado']?.toLowerCase().includes(processo)) return false;
+                if (codigo && !item['Código Item Material/Serviço - Formatado']?.toLowerCase().includes(codigo)) return false;
+                if (descricao && !item['Nome Elemento Item Despesa']?.toLowerCase().includes(descricao)) return false;
+                if (elemento && !item['Código Elemento Item Despesa']?.toLowerCase().includes(elemento)) return false;
+                if (ano && item['Ano Criação Processo'] != ano) return false;
+                if (tipo && item['Item Material/Serviço'] !== tipo) return false;
+                if (situacao && item['Situação Item Processo'] !== situacao) return false;
                 return true;
             });
             
-            paginaAtualItens = 1;
+            window.itensFiltrados = ordenarDados(window.itensFiltrados, 'itens', sortConfig.itens.column, sortConfig.itens.direction);
+            paginacao.itens.paginaAtual = 1;
             atualizarTabelaItens();
         };
 
         window.limparFiltrosCI = function() {
             document.getElementById('filtroProcessoCI').value = '';
-            document.getElementById('filtroRazaoCI').value = '';
-            document.getElementById('filtroCnpjCI').value = '';
+            document.getElementById('filtroCodigoCI').value = '';
             document.getElementById('filtroDescricaoCI').value = '';
-            document.getElementById('filtroUnidadeCI').value = '';
-            window.itensFiltrados = [...window.todosItens];
-            paginaAtualItens = 1;
-            atualizarTabelaItens();
-        };
-
-        window.alterarItensPorPaginaCI = function() {
-            itensPorPaginaItens = parseInt(document.getElementById('itensPorPaginaCI').value);
-            paginaAtualItens = 1;
+            document.getElementById('filtroElementoCI').value = '';
+            document.getElementById('filtroAnoCI').value = '2026';
+            document.getElementById('filtroTipoCI').value = '';
+            document.getElementById('filtroSituacaoCI').value = '';
+            
+            window.itensFiltrados = [...dadosConsolidados.itens];
+            window.itensFiltrados = ordenarDados(window.itensFiltrados, 'itens', 'Ano Criação Processo', 'desc');
+            paginacao.itens.paginaAtual = 1;
             atualizarTabelaItens();
         };
 
         function atualizarTabelaItens() {
-            const inicio = (paginaAtualItens - 1) * itensPorPaginaItens;
-            const fim = Math.min(inicio + itensPorPaginaItens, window.itensFiltrados.length);
+            const inicio = (paginacao.itens.paginaAtual - 1) * paginacao.itens.itensPorPagina;
+            const fim = Math.min(inicio + paginacao.itens.itensPorPagina, window.itensFiltrados.length);
             const dadosPagina = window.itensFiltrados.slice(inicio, fim);
             
             document.getElementById('itensTableBody').innerHTML = gerarLinhasTabelaItens(dadosPagina);
             document.getElementById('totalItensBadge').innerText = window.itensFiltrados.length + ' itens';
             
-            totalPaginasItens = Math.ceil(window.itensFiltrados.length / itensPorPaginaItens);
-            renderizarPaginacaoItens();
+            paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / paginacao.itens.itensPorPagina);
+            renderizarPaginacao('itens');
             setTimeout(iframeUpdateHeight, 100);
         }
 
-        function renderizarPaginacaoItens() {
-            const container = document.getElementById('paginacaoContainerCI');
+        function renderizarPaginacao(tipo) {
+            const container = document.getElementById(`paginacaoContainer${tipo === 'licitacoes' ? 'CL' : 'CI'}`);
             if (!container) return;
             
-            if (window.itensFiltrados.length === 0) {
+            const filtradas = tipo === 'licitacoes' ? window.licitacoesFiltradas : window.itensFiltrados;
+            const pagAtual = tipo === 'licitacoes' ? paginacao.licitacoes.paginaAtual : paginacao.itens.paginaAtual;
+            const totalPag = tipo === 'licitacoes' ? paginacao.licitacoes.totalPaginas : paginacao.itens.totalPaginas;
+            const itensPorPag = tipo === 'licitacoes' ? paginacao.licitacoes.itensPorPagina : paginacao.itens.itensPorPagina;
+            
+            if (filtradas.length === 0) {
                 container.innerHTML = '<div class="pagination-info">Nenhum registro encontrado</div>';
                 return;
             }
             
-            const inicio = (paginaAtualItens - 1) * itensPorPaginaItens + 1;
-            const fim = Math.min(paginaAtualItens * itensPorPaginaItens, window.itensFiltrados.length);
+            const inicio = (pagAtual - 1) * itensPorPag + 1;
+            const fim = Math.min(pagAtual * itensPorPag, filtradas.length);
             
             let html = `
                 <div class="pagination-info">
-                    Mostrando ${inicio}-${fim} de ${window.itensFiltrados.length.toLocaleString('pt-BR')} registros
+                    Mostrando ${inicio.toLocaleString('pt-BR')}-${fim.toLocaleString('pt-BR')} de ${filtradas.length.toLocaleString('pt-BR')} registros
                 </div>
                 <nav>
                     <ul class="pagination mb-0">
             `;
             
-            html += `<li class="page-item ${paginaAtualItens === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="mudarPaginaItens(${paginaAtualItens - 1}); return false;">&laquo;</a>
+            html += `<li class="page-item ${pagAtual === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="mudarPagina('${tipo}', ${pagAtual - 1}); return false;">&laquo;</a>
             </li>`;
             
-            let inicioPaginas = Math.max(1, paginaAtualItens - 2);
-            let fimPaginas = Math.min(totalPaginasItens, inicioPaginas + 4);
+            let inicioPaginas = Math.max(1, pagAtual - 2);
+            let fimPaginas = Math.min(totalPag, inicioPaginas + 4);
             if (fimPaginas - inicioPaginas < 4) {
                 inicioPaginas = Math.max(1, fimPaginas - 4);
             }
             
             for (let i = inicioPaginas; i <= fimPaginas; i++) {
-                html += `<li class="page-item ${i === paginaAtualItens ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="mudarPaginaItens(${i}); return false;">${i}</a>
+                html += `<li class="page-item ${i === pagAtual ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="mudarPagina('${tipo}', ${i}); return false;">${i}</a>
                 </li>`;
             }
             
-            html += `<li class="page-item ${paginaAtualItens === totalPaginasItens ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="mudarPaginaItens(${paginaAtualItens + 1}); return false;">&raquo;</a>
+            html += `<li class="page-item ${pagAtual === totalPag ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="mudarPagina('${tipo}', ${pagAtual + 1}); return false;">&raquo;</a>
             </li>`;
             
             html += '</ul></nav>';
             container.innerHTML = html;
         }
 
-        window.mudarPaginaItens = function(pagina) {
-            if (pagina < 1 || pagina > totalPaginasItens) return;
-            paginaAtualItens = pagina;
-            atualizarTabelaItens();
+        window.mudarPagina = function(tipo, pagina) {
+            const totalPag = tipo === 'licitacoes' ? paginacao.licitacoes.totalPaginas : paginacao.itens.totalPaginas;
+            if (pagina < 1 || pagina > totalPag) return;
+            
+            if (tipo === 'licitacoes') {
+                paginacao.licitacoes.paginaAtual = pagina;
+                atualizarTabelaConsultaLicitacao();
+            } else {
+                paginacao.itens.paginaAtual = pagina;
+                atualizarTabelaItens();
+            }
         };
 
-        window.verDetalhesItem = function(processo, descricao) {
-            const item = window.todosItens.find(i => i.numero_processo_formatado === processo && i.descricao_item === descricao);
+        window.alterarItensPorPagina = function(tipo) {
+            const valor = parseInt(document.getElementById(`itensPorPagina${tipo === 'licitacoes' ? 'CL' : 'CI'}`).value);
+            paginacao[tipo].itensPorPagina = valor;
+            paginacao[tipo].paginaAtual = 1;
+            
+            if (tipo === 'licitacoes') {
+                atualizarTabelaConsultaLicitacao();
+            } else {
+                atualizarTabelaItens();
+            }
+        };
+
+        window.verDetalhesLicitacao = function(processo) {
+            const dados = dadosConsolidados.licitacoes.filter(l => l['Número Processo - Formatado'] === processo);
+            if (!dados.length) return;
+            
+            const licitacao = dados[0];
+            const linkRelacionado = dadosConsolidados.links.find(l => l['Número Processo - Formatado'] === processo);
+            const itensRelacionados = dadosConsolidados.itens.filter(i => i['Número Processo - Formatado'] === processo);
+            
+            document.getElementById('modalContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-card primary">
+                            <div class="info-label">Processo</div>
+                            <div class="info-value highlight">${licitacao['Número Processo - Formatado']}</div>
+                            <div class="info-label mt-3">Órgão</div>
+                            <div class="info-value">${licitacao['Nome Órgão/Entidade Compra'] || '-'}</div>
+                            <div class="info-label mt-3">Objeto</div>
+                            <div class="info-value">${licitacao['Objeto Contrato'] || '-'}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <div class="info-label">Modalidade</div>
+                            <div class="info-value">${licitacao['Procedimento Contratação - Detalhamento 1'] || '-'}</div>
+                            <div class="info-label mt-3">Critério de Julgamento</div>
+                            <div class="info-value">${licitacao['Critério Julgamento'] || '-'}</div>
+                            <div class="info-label mt-3">Situação</div>
+                            <div class="info-value"><span class="badge-situacao ${licitacao['Situação Processo']?.toLowerCase().includes('homologado') ? 'badge-ativo' : 'badge-concluido'}">${licitacao['Situação Processo'] || '-'}</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <div class="info-label">Fornecedor</div>
+                            <div class="info-value">${licitacao['Nome Empresarial/Nome Fornecedor'] || 'Não informado'}</div>
+                            <div class="info-label mt-3">CNPJ/CPF</div>
+                            <div class="info-value">${licitacao['CNPJ/CPF Fornecedor - Formatado'] || 'Não informado'}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <div class="info-label">Datas</div>
+                            <div class="info-value"><strong>Criação:</strong> ${formatarData(licitacao['Data Criação Pedido'])}</div>
+                            <div class="info-value"><strong>Licitação:</strong> ${formatarData(licitacao['Data Licitação'])}</div>
+                            <div class="info-label mt-3">Valor Homologado</div>
+                            <div class="info-value highlight">${formatarMoeda(licitacao['Valor Total Homologado'])}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                ${linkRelacionado ? `
+                <h6 class="mt-4 fw-bold">Contrato / Links</h6>
+                <div class="info-card">
+                    <div class="row">
+                        <div class="col-md-4"><span class="info-label">Nº Contrato</span><div class="info-value">${linkRelacionado['Número Contrato'] || '-'}</div></div>
+                        <div class="col-md-4"><span class="info-label">Tipo Contrato</span><div class="info-value">${linkRelacionado['Descrição Tipo de Contrato'] || '-'}</div></div>
+                        <div class="col-md-4"><span class="info-label">Parecer Jurídico</span><div class="info-value">${linkRelacionado['Número Parecer Jurídico'] || '-'}</div></div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <span class="info-label">Edital</span>
+                            <div class="info-value"><a href="${linkRelacionado['Edital_Retificação Arquivos']}" target="_blank">${linkRelacionado['Edital_Retificação Arquivos'] ? 'Abrir Edital' : 'Não disponível'}</a></div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="info-label">Contrato/Aditivo</span>
+                            <div class="info-value"><a href="${linkRelacionado['Contrato_TermoAditivo Arquivos']}" target="_blank">${linkRelacionado['Contrato_TermoAditivo Arquivos'] ? 'Abrir Contrato' : 'Não disponível'}</a></div>
+                        </div>
+                    </div>
+                </div>` : ''}
+                
+                ${itensRelacionados.length > 0 ? `
+                <h6 class="mt-4 fw-bold">Itens da Licitação</h6>
+                <div style="max-height:250px; overflow-y:auto;">
+                    <table class="table table-sm">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Código</th>
+                                <th>Descrição</th>
+                                <th>Elemento</th>
+                                <th>Quantidade</th>
+                                <th class="text-right">Valor Unitário</th>
+                                <th class="text-right">Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itensRelacionados.map(item => `
+                                <tr>
+                                    <td>${item['Código Item Material/Serviço - Formatado'] || '-'}</td>
+                                    <td>${item['Nome Elemento Item Despesa'] || '-'}</td>
+                                    <td>${item['Código Elemento Item Despesa'] || '-'}</td>
+                                    <td>${item['Quantidade Item Pedido'] || '-'}</td>
+                                    <td class="text-right">${formatarMoeda(item['Valor Unitário Referência Item Pedido'])}</td>
+                                    <td class="text-right">${formatarMoeda(item['Valor Total Referência Item Pedido'])}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>` : ''}
+            `;
+            
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
+        };
+
+        window.verDetalhesItem = function(processo, codigoItem) {
+            const item = window.itensFiltrados.find(i => i['Número Processo - Formatado'] === processo && i['Código Item Material/Serviço - Formatado'] === codigoItem);
             if (!item) return;
             
             document.getElementById('itemModalContent').innerHTML = `
@@ -1948,49 +1983,51 @@ function obterAnosDisponiveis() {
                     <div class="col-md-12">
                         <div class="info-card primary">
                             <div class="info-label">Processo</div>
-                            <div class="info-value highlight">${item.numero_processo_formatado}</div>
+                            <div class="info-value highlight">${item['Número Processo - Formatado']}</div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="info-card">
-                            <div class="info-label">Fornecedor</div>
-                            <div class="info-value">${item.nome_empresarial_nome_fornecedor || '-'}</div>
-                            <div class="info-label mt-3">CPF/CNPJ</div>
-                            <div class="info-value">${item.cnpj_cpf_fornecedor_formatado || '-'}</div>
+                            <div class="info-label">Código do Item</div>
+                            <div class="info-value">${item['Código Item Material/Serviço - Formatado'] || '-'}</div>
+                            <div class="info-label mt-3">Elemento de Despesa</div>
+                            <div class="info-value">${item['Código Elemento Item Despesa'] || '-'} - ${item['Nome Elemento Item Despesa'] || '-'}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-card">
-                            <div class="info-label">Descrição do Item</div>
-                            <div class="info-value">${item.descricao_item || '-'}</div>
+                            <div class="info-label">Tipo</div>
+                            <div class="info-value">${item['Item Material/Serviço'] === 'M' ? 'Material' : item['Item Material/Serviço'] === 'S' ? 'Serviço' : '-'}</div>
+                            <div class="info-label mt-3">Situação</div>
+                            <div class="info-value">${item['Situação Item Processo'] || '-'}</div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-3">
+                        <div class="info-card">
+                            <div class="info-label">Ano</div>
+                            <div class="info-value">${item['Ano Criação Processo'] || '-'}</div>
+                        </div>
+                    </div>
                     <div class="col-md-3">
                         <div class="info-card">
                             <div class="info-label">Quantidade</div>
-                            <div class="info-value">${item.quantidade_item || '-'}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="info-card">
-                            <div class="info-label">Unidade</div>
-                            <div class="info-value">${item.unidade_medida_item || '-'}</div>
+                            <div class="info-value">${item['Quantidade Item Pedido'] || '-'}</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="info-card">
                             <div class="info-label">Valor Unitário</div>
-                            <div class="info-value">${formatarMoeda(item.valor_unitario_item)}</div>
+                            <div class="info-value">${formatarMoeda(item['Valor Unitário Referência Item Pedido'])}</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="info-card">
                             <div class="info-label">Valor Total</div>
-                            <div class="info-value highlight">${formatarMoeda(item.valor_total_item)}</div>
+                            <div class="info-value highlight">${formatarMoeda(item['Valor Total Referência Item Pedido'])}</div>
                         </div>
                     </div>
                 </div>
@@ -2007,34 +2044,43 @@ function obterAnosDisponiveis() {
                 <div class="filter-container">
                     <h3 class="filter-label mb-3"><i class="material-icons">download</i> Downloads</h3>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <div class="card-stats p-4 bg-white rounded shadow-sm h-100">
-                                <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">cloud_download</i> Dados Completos</h4>
-                                <p class="text-muted text-justify" style="font-size: 13px; text-align: justify;">
-                                    Arquivos CSV completos com todos os registros de licitações, contratos e itens do Acordo Judicial de Brumadinho.
+                                <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">cloud_download</i> Licitações</h4>
+                                <p class="text-muted text-justify" style="font-size: 13px;">
+                                    Dados completos de licitações dos anos 2025 e 2026.
                                 </p>
                                 <div class="mt-4 text-end">
-                                    <button onclick="baixarDadosCompletos()" 
-                                            class="btn-export text-decoration-none fw-bold d-inline-block px-4 py-2"
-                                            style="color: var(--primary-dark); background-color: white; border: 1px solid var(--primary-dark); border-radius: 4px; transition: all 0.3s ease; cursor: pointer;">
-                                        <i class="material-icons me-2" style="font-size: 16px; vertical-align: middle;">download</i>Baixar CSV (Licitações)
+                                    <button onclick="baixarCSV('licitacoes')" class="btn-export">
+                                        <i class="material-icons me-2">download</i>Baixar CSV
                                     </button>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <div class="card-stats p-4 bg-white rounded shadow-sm h-100">
-                                <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">open_in_new</i> Portal de Dados Abertos</h4>
-                                <p class="text-muted text-justify" style="font-size: 13px; text-align: justify;">
-                                    Acesse o conjunto de dados de Licitações no Portal de Dados Abertos de Minas Gerais.
+                                <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">cloud_download</i> Itens</h4>
+                                <p class="text-muted text-justify" style="font-size: 13px;">
+                                    Dados completos de itens de licitação dos anos 2025 e 2026.
                                 </p>
                                 <div class="mt-4 text-end">
-                                    <a href="https://dados.mg.gov.br/dataset?tags=Licita%C3%A7%C3%A3o" 
-                                       target="_blank" 
-                                       class="btn-export text-decoration-none fw-bold d-inline-block px-4 py-2"
-                                       style="color: var(--primary-dark); background-color: white; border: 1px solid var(--primary-dark); border-radius: 4px; transition: all 0.3s ease;">
-                                        <i class="material-icons me-2" style="font-size: 16px; vertical-align: middle;">launch</i>Acessar Portal de Dados MG
+                                    <button onclick="baixarCSV('itens')" class="btn-export">
+                                        <i class="material-icons me-2">download</i>Baixar CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card-stats p-4 bg-white rounded shadow-sm h-100">
+                                <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">open_in_new</i> Portal Dados Abertos</h4>
+                                <p class="text-muted text-justify" style="font-size: 13px;">
+                                    Acesse o conjunto de dados completo no Portal de Dados Abertos de Minas Gerais.
+                                </p>
+                                <div class="mt-4 text-end">
+                                    <a href="https://dados.mg.gov.br/dataset?tags=Licita%C3%A7%C3%A3o" target="_blank" class="btn-export">
+                                        <i class="material-icons me-2">launch</i>Acessar
                                     </a>
                                 </div>
                             </div>
@@ -2044,32 +2090,41 @@ function obterAnosDisponiveis() {
                     <div class="row mt-3">
                         <div class="col-md-12">
                             <div class="metadata-card">
-                                <h6 class="fw-bold mb-3"><i class="material-icons me-2">info</i> Metadados das Tabelas</h6>
+                                <h6 class="fw-bold mb-3"><i class="material-icons me-2">info</i> Metadados</h6>
                                 
                                 <h6 class="mt-3 fw-bold">Licitações</h6>
-                                <div class="metadata-item"><strong>ano_criacao_pedido:</strong> Ano de criação do pedido</div>
-                                <div class="metadata-item"><strong>nome_orgao_entidade_compra:</strong> Órgão contratante</div>
-                                <div class="metadata-item"><strong>numero_processo_formatado:</strong> Número do processo de compra</div>
-                                <div class="metadata-item"><strong>nome_empresarial_nome_fornecedor:</strong> Razão social do fornecedor</div>
-                                <div class="metadata-item"><strong>objeto_contrato:</strong> Objeto da contratação</div>
-                                <div class="metadata-item"><strong>procedimento_contratacao_grupo:</strong> Grupo do procedimento</div>
-                                <div class="metadata-item"><strong>procedimento_contratacao_detalhamento_1:</strong> Modalidade de licitação</div>
-                                <div class="metadata-item"><strong>criterio_julgamento:</strong> Tipo de julgamento</div>
-                                <div class="metadata-item"><strong>situacao_processo:</strong> Situação do processo</div>
+                                <div class="metadata-item"><strong>Ano Criação Pedido:</strong> Ano de criação do pedido</div>
+                                <div class="metadata-item"><strong>Procedimento Contratação - Grupo:</strong> Grupo (Licitação/Dispensa/Inexigibilidade)</div>
+                                <div class="metadata-item"><strong>Procedimento Contratação - Detalhamento 1:</strong> Modalidade da licitação</div>
+                                <div class="metadata-item"><strong>Nome Órgão/Entidade Compra:</strong> Órgão contratante</div>
+                                <div class="metadata-item"><strong>Número Processo - Formatado:</strong> Número do processo</div>
+                                <div class="metadata-item"><strong>Nome Empresarial/Nome Fornecedor:</strong> Razão social do fornecedor</div>
+                                <div class="metadata-item"><strong>CNPJ/CPF Fornecedor - Formatado:</strong> CPF ou CNPJ do fornecedor</div>
+                                <div class="metadata-item"><strong>Data Criação Pedido:</strong> Data de criação do pedido</div>
+                                <div class="metadata-item"><strong>Data Licitação:</strong> Data da licitação</div>
+                                <div class="metadata-item"><strong>Objeto Contrato:</strong> Objeto da contratação</div>
+                                <div class="metadata-item"><strong>Situação Processo:</strong> Situação atual do processo</div>
+                                <div class="metadata-item"><strong>Critério Julgamento:</strong> Tipo de julgamento</div>
+                                <div class="metadata-item"><strong>Valor Total Homologado:</strong> Valor total homologado</div>
                                 
                                 <h6 class="mt-3 fw-bold">Itens</h6>
-                                <div class="metadata-item"><strong>descricao_item:</strong> Descrição do item</div>
-                                <div class="metadata-item"><strong>quantidade_item:</strong> Quantidade</div>
-                                <div class="metadata-item"><strong>unidade_medida_item:</strong> Unidade de medida</div>
-                                <div class="metadata-item"><strong>valor_unitario_item:</strong> Valor unitário (R$)</div>
-                                <div class="metadata-item"><strong>valor_total_item:</strong> Valor total (R$)</div>
+                                <div class="metadata-item"><strong>Ano Criação Processo:</strong> Ano de criação do processo</div>
+                                <div class="metadata-item"><strong>Número Processo - Formatado:</strong> Número do processo</div>
+                                <div class="metadata-item"><strong>Situação Item Processo:</strong> Situação do item</div>
+                                <div class="metadata-item"><strong>Código Elemento Item Despesa:</strong> Código do elemento de despesa</div>
+                                <div class="metadata-item"><strong>Nome Elemento Item Despesa:</strong> Nome do elemento de despesa</div>
+                                <div class="metadata-item"><strong>Código Item Material/Serviço - Formatado:</strong> Código do item</div>
+                                <div class="metadata-item"><strong>Item Material/Serviço:</strong> Tipo (M=Material, S=Serviço)</div>
+                                <div class="metadata-item"><strong>Quantidade Item Pedido:</strong> Quantidade</div>
+                                <div class="metadata-item"><strong>Valor Unitário Referência Item Pedido:</strong> Valor unitário</div>
+                                <div class="metadata-item"><strong>Valor Total Referência Item Pedido:</strong> Valor total</div>
                                 
-                                <h6 class="mt-3 fw-bold">Contratos</h6>
-                                <div class="metadata-item"><strong>numero_contrato:</strong> Número do contrato</div>
-                                <div class="metadata-item"><strong>descricao_tipo_de_contrato:</strong> Lei do contrato</div>
-                                <div class="metadata-item"><strong>edital_retificacao_arquivos:</strong> Arquivos do edital</div>
-                                <div class="metadata-item"><strong>contrato_termoaditivo_arquivos:</strong> Arquivos do contrato/termo aditivo</div>
-                                <div class="metadata-item"><strong>numero_parecer_juridico:</strong> Número do parecer jurídico</div>
+                                <h6 class="mt-3 fw-bold">Links/Contratos</h6>
+                                <div class="metadata-item"><strong>Número Contrato:</strong> Número do contrato</div>
+                                <div class="metadata-item"><strong>Descrição Tipo de Contrato:</strong> Tipo de contrato</div>
+                                <div class="metadata-item"><strong>Edital_Retificação Arquivos:</strong> Link para o edital</div>
+                                <div class="metadata-item"><strong>Contrato_TermoAditivo Arquivos:</strong> Link para contrato/aditivo</div>
+                                <div class="metadata-item"><strong>Número Parecer Jurídico:</strong> Número do parecer jurídico</div>
                             </div>
                         </div>
                     </div>
@@ -2078,21 +2133,38 @@ function obterAnosDisponiveis() {
             setTimeout(iframeUpdateHeight, 300);
         }
 
-        window.baixarDadosCompletos = function() {
-            if (!dadosConsolidados.licitacoes.length) return;
+        window.baixarCSV = function(tipo) {
+            if (tipo === 'licitacoes' && !dadosConsolidados.licitacoes.length) return;
+            if (tipo === 'itens' && !dadosConsolidados.itens.length) return;
             
-            const cabecalhos = ['ano_criacao_pedido','nome_orgao_entidade_compra','numero_processo_formatado','nome_empresarial_nome_fornecedor',
-                               'objeto_contrato','procedimento_contratacao_grupo','procedimento_contratacao_detalhamento_1','criterio_julgamento','situacao_processo'];
+            let dados, cabecalhos, nomeArquivo;
             
-            const linhas = dadosConsolidados.licitacoes.map(item => 
-                cabecalhos.map(cab => `"${(item[cab] || '').toString().replace(/"/g, '""')}"`).join(';')
+            if (tipo === 'licitacoes') {
+                dados = dadosConsolidados.licitacoes;
+                cabecalhos = ['Ano Criação Pedido', 'Procedimento Contratação - Grupo', 'Procedimento Contratação - Detalhamento 1',
+                             'Procedimento Contratação - Especialização', 'Código Órgão/Entidade Compra', 'Nome Órgão/Entidade Compra',
+                             'Número Processo - Formatado', 'Nome Empresarial/Nome Fornecedor', 'CNPJ/CPF Fornecedor - Formatado',
+                             'Data Criação Pedido', 'Data Licitação', 'Objeto Contrato', 'Situação Processo', 'Critério Julgamento',
+                             'Valor Total Homologado'];
+                nomeArquivo = 'licitacoes_completas.csv';
+            } else {
+                dados = dadosConsolidados.itens;
+                cabecalhos = ['Ano Criação Processo', 'Número Processo - Formatado', 'Situação Item Processo',
+                             'Código Elemento Item Despesa', 'Nome Elemento Item Despesa', 'Código Item Material/Serviço - Formatado',
+                             'Item Material/Serviço', 'Quantidade Item Pedido', 'Valor Unitário Referência Item Pedido',
+                             'Valor Total Referência Item Pedido'];
+                nomeArquivo = 'itens_completos.csv';
+            }
+            
+            const linhas = dados.map(item => 
+                cabecalhos.map(cab => `"${(item[cab] !== undefined && item[cab] !== null ? item[cab] : '').toString().replace(/"/g, '""')}"`).join(';')
             );
             
             const csv = [cabecalhos.join(';'), ...linhas].join('\n');
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'licitacoes_brumadinho.csv';
+            link.download = nomeArquivo;
             link.click();
         };
 
@@ -2100,14 +2172,15 @@ function obterAnosDisponiveis() {
         // EXPORTAÇÕES
         // ============================================
         window.exportarTabelaLicitacoesCSV = function() {
-            const cabecalhos = ['Nº Processo', 'Órgão', 'Modalidade', 'Objeto', 'Fornecedor', 'Situação'];
-            const linhas = dadosFiltrados.slice(0, 100).map(item => [
-                item.numero_processo_formatado || '',
-                item.nome_orgao_entidade_compra || '',
-                item.procedimento_contratacao_detalhamento_1 || '',
-                item.objeto_contrato || '',
-                item.nome_empresarial_nome_fornecedor || '',
-                item.situacao_processo || ''
+            const cabecalhos = ['Nº Processo', 'Órgão', 'Modalidade', 'Objeto', 'Fornecedor', 'Situação', 'Valor Homologado'];
+            const linhas = dadosFiltrados.licitacoes.slice(0, 100).map(item => [
+                item['Número Processo - Formatado'] || '',
+                item['Nome Órgão/Entidade Compra'] || '',
+                item['Procedimento Contratação - Detalhamento 1'] || '',
+                item['Objeto Contrato'] || '',
+                item['Nome Empresarial/Nome Fornecedor'] || '',
+                item['Situação Processo'] || '',
+                formatarMoeda(item['Valor Total Homologado'])
             ].map(c => `"${String(c).replace(/"/g, '""')}"`).join(';'));
             
             const csv = [cabecalhos.join(';'), ...linhas].join('\n');
@@ -2122,12 +2195,12 @@ function obterAnosDisponiveis() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape' });
             
-            const dados = dadosFiltrados.slice(0, 50).map(item => [
-                item.numero_processo_formatado || '-',
-                item.nome_orgao_entidade_compra || '-',
-                item.procedimento_contratacao_detalhamento_1 || '-',
-                (item.objeto_contrato || '').substring(0, 40),
-                item.situacao_processo || '-'
+            const dados = dadosFiltrados.licitacoes.slice(0, 50).map(item => [
+                item['Número Processo - Formatado'] || '-',
+                item['Nome Órgão/Entidade Compra'] || '-',
+                item['Procedimento Contratação - Detalhamento 1'] || '-',
+                (item['Objeto Contrato'] || '').substring(0, 30),
+                item['Situação Processo'] || '-'
             ]);
             
             doc.autoTable({
@@ -2136,23 +2209,25 @@ function obterAnosDisponiveis() {
                 didDrawPage: (data) => {
                     doc.setFontSize(10);
                     doc.text('Licitações - Visão Geral', 14, 10);
-                    doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')} - ${window.location.href}`, 14, doc.internal.pageSize.height - 5);
+                    doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')}`, 14, doc.internal.pageSize.height - 5);
                 }
             });
             doc.save('visao_geral_licitacoes.pdf');
         };
 
         window.exportarTabelaConsultaLicitacaoCSV = function() {
-            const cabecalhos = ['Nº Processo', 'Órgão', 'Modalidade', 'Objeto', 'Fornecedor', 'CNPJ/CPF', 'Situação', 'Critério'];
-            const linhas = window.licitacoesFiltradas.map(item => [
-                item.numero_processo_formatado || '',
-                item.nome_orgao_entidade_compra || '',
-                item.procedimento_contratacao_detalhamento_1 || '',
-                item.objeto_contrato || '',
-                item.nome_empresarial_nome_fornecedor || '',
-                item.cnpj_cpf_fornecedor_formatado || '',
-                item.situacao_processo || '',
-                item.criterio_julgamento || ''
+            const cabecalhos = ['Processo', 'Órgão', 'Modalidade', 'Fornecedor', 'CNPJ/CPF', 'Data', 'Situação', 'Critério', 'Valor', 'Emergencial'];
+            const linhas = window.licitacoesFiltradas.slice(0, 100).map(item => [
+                item['Número Processo - Formatado'] || '',
+                item['Nome Órgão/Entidade Compra'] || '',
+                item['Procedimento Contratação - Detalhamento 1'] || '',
+                item['Nome Empresarial/Nome Fornecedor'] || '',
+                item['CNPJ/CPF Fornecedor - Formatado'] || '',
+                formatarData(item['Data Licitação']),
+                item['Situação Processo'] || '',
+                item['Critério Julgamento'] || '',
+                formatarMoeda(item['Valor Total Homologado']),
+                verificarEmergencial(item) ? 'Sim' : 'Não'
             ].map(c => `"${String(c).replace(/"/g, '""')}"`).join(';'));
             
             const csv = [cabecalhos.join(';'), ...linhas].join('\n');
@@ -2168,36 +2243,39 @@ function obterAnosDisponiveis() {
             const doc = new jsPDF({ orientation: 'landscape' });
             
             const dados = window.licitacoesFiltradas.slice(0, 50).map(item => [
-                item.numero_processo_formatado || '-',
-                item.nome_orgao_entidade_compra || '-',
-                item.procedimento_contratacao_detalhamento_1 || '-',
-                item.nome_empresarial_nome_fornecedor || '-',
-                item.situacao_processo || '-'
+                item['Número Processo - Formatado'] || '-',
+                item['Nome Órgão/Entidade Compra'] || '-',
+                item['Procedimento Contratação - Detalhamento 1'] || '-',
+                item['Nome Empresarial/Nome Fornecedor'] || '-',
+                item['Situação Processo'] || '-',
+                formatarMoeda(item['Valor Total Homologado'])
             ]);
             
             doc.autoTable({
-                head: [['Processo', 'Órgão', 'Modalidade', 'Fornecedor', 'Situação']],
+                head: [['Processo', 'Órgão', 'Modalidade', 'Fornecedor', 'Situação', 'Valor']],
                 body: dados,
                 didDrawPage: (data) => {
                     doc.setFontSize(10);
                     doc.text('Consulta de Licitações', 14, 10);
-                    doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')} - ${window.location.href}`, 14, doc.internal.pageSize.height - 5);
+                    doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')}`, 14, doc.internal.pageSize.height - 5);
                 }
             });
             doc.save('consulta_licitacoes.pdf');
         };
 
         window.exportarTabelaItensCSV = function() {
-            const cabecalhos = ['Processo', 'Fornecedor', 'CPF/CNPJ', 'Descrição', 'Quantidade', 'Unidade', 'Valor Unitário', 'Valor Total'];
+            const cabecalhos = ['Ano', 'Processo', 'Situação', 'Cód. Elemento', 'Elemento', 'Cód. Item', 'Tipo', 'Quantidade', 'Valor Unitário', 'Valor Total'];
             const linhas = window.itensFiltrados.slice(0, 100).map(item => [
-                item.numero_processo_formatado || '',
-                item.nome_empresarial_nome_fornecedor || '',
-                item.cnpj_cpf_fornecedor_formatado || '',
-                item.descricao_item || '',
-                item.quantidade_item || '',
-                item.unidade_medida_item || '',
-                formatarMoeda(item.valor_unitario_item),
-                formatarMoeda(item.valor_total_item)
+                item['Ano Criação Processo'] || '',
+                item['Número Processo - Formatado'] || '',
+                item['Situação Item Processo'] || '',
+                item['Código Elemento Item Despesa'] || '',
+                item['Nome Elemento Item Despesa'] || '',
+                item['Código Item Material/Serviço - Formatado'] || '',
+                item['Item Material/Serviço'] === 'M' ? 'Material' : item['Item Material/Serviço'] === 'S' ? 'Serviço' : '-',
+                item['Quantidade Item Pedido'] || '',
+                formatarMoeda(item['Valor Unitário Referência Item Pedido']),
+                formatarMoeda(item['Valor Total Referência Item Pedido'])
             ].map(c => `"${String(c).replace(/"/g, '""')}"`).join(';'));
             
             const csv = [cabecalhos.join(';'), ...linhas].join('\n');
@@ -2213,21 +2291,22 @@ function obterAnosDisponiveis() {
             const doc = new jsPDF({ orientation: 'landscape' });
             
             const dados = window.itensFiltrados.slice(0, 50).map(item => [
-                item.numero_processo_formatado || '-',
-                item.descricao_item || '-',
-                item.quantidade_item || '-',
-                item.unidade_medida_item || '-',
-                formatarMoeda(item.valor_unitario_item),
-                formatarMoeda(item.valor_total_item)
+                item['Ano Criação Processo'] || '-',
+                item['Número Processo - Formatado'] || '-',
+                item['Código Item Material/Serviço - Formatado'] || '-',
+                (item['Nome Elemento Item Despesa'] || '').substring(0, 25),
+                item['Quantidade Item Pedido'] || '-',
+                formatarMoeda(item['Valor Unitário Referência Item Pedido']),
+                formatarMoeda(item['Valor Total Referência Item Pedido'])
             ]);
             
             doc.autoTable({
-                head: [['Processo', 'Descrição', 'Qtd', 'Unid.', 'Valor Unit.', 'Valor Total']],
+                head: [['Ano', 'Processo', 'Código', 'Descrição', 'Qtd', 'Valor Unit.', 'Valor Total']],
                 body: dados,
                 didDrawPage: (data) => {
                     doc.setFontSize(10);
                     doc.text('Consulta de Itens', 14, 10);
-                    doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')} - ${window.location.href}`, 14, doc.internal.pageSize.height - 5);
+                    doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')}`, 14, doc.internal.pageSize.height - 5);
                 }
             });
             doc.save('consulta_itens.pdf');
@@ -2255,7 +2334,7 @@ function obterAnosDisponiveis() {
         
         window.compartilharTwitter = function(e, id) {
             e.preventDefault();
-            window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent('Licitações - Acordo Judicial de Brumadinho')}`, '_blank');
+            window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent('Licitações - Portal da Transparência MG')}`, '_blank');
             document.getElementById(`shareOptions${id}`).classList.remove('show');
         };
         
@@ -2267,7 +2346,7 @@ function obterAnosDisponiveis() {
         
         window.compartilharWhatsApp = function(e, id) {
             e.preventDefault();
-            window.open(`https://wa.me/?text=${encodeURIComponent('Licitações - Acordo Judicial de Brumadinho ' + window.location.href)}`, '_blank');
+            window.open(`https://wa.me/?text=${encodeURIComponent('Licitações - Portal da Transparência MG ' + window.location.href)}`, '_blank');
             document.getElementById(`shareOptions${id}`).classList.remove('show');
         };
     </script>
