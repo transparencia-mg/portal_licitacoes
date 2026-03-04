@@ -1,0 +1,388 @@
+{
+  "name": "portal_licitacoes",
+  "owner_org": "",
+  "profile": "data-package",
+  "resources": [
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "licitacoes2025",
+      "path": "data/licitacoes2025.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_criacao_pedido",
+            "type": "integer"
+          },
+          {
+            "name": "procedimento_contratacao_detalhamento_1",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_especializacao",
+            "type": "string"
+          },
+          {
+            "name": "nome_orgao_entidade_compra",
+            "type": "string"
+          },
+          {
+            "name": "numero_processo_formatado",
+            "type": "string"
+          },
+          {
+            "name": "data_criacao_pedido",
+            "type": "date"
+          },
+          {
+            "name": "objeto_contrato",
+            "type": "string"
+          },
+          {
+            "name": "situacao_processo",
+            "type": "string"
+          },
+          {
+            "name": "criterio_julgamento",
+            "type": "string"
+          },
+          {
+            "name": "nome_empresarial_nome_fornecedor",
+            "type": "string"
+          },
+          {
+            "name": "cnpj_cpf_fornecedor_formatado",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_grupo",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    },
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "licitacoes2026",
+      "path": "data/licitacoes2026.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_criacao_pedido",
+            "type": "integer"
+          },
+          {
+            "name": "procedimento_contratacao_detalhamento_1",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_especializacao",
+            "type": "string"
+          },
+          {
+            "name": "nome_orgao_entidade_compra",
+            "type": "string"
+          },
+          {
+            "name": "numero_processo_formatado",
+            "type": "string"
+          },
+          {
+            "name": "data_criacao_pedido",
+            "type": "date"
+          },
+          {
+            "name": "objeto_contrato",
+            "type": "string"
+          },
+          {
+            "name": "situacao_processo",
+            "type": "string"
+          },
+          {
+            "name": "criterio_julgamento",
+            "type": "string"
+          },
+          {
+            "name": "nome_empresarial_nome_fornecedor",
+            "type": "string"
+          },
+          {
+            "name": "cnpj_cpf_fornecedor_formatado",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_grupo",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    },
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "links2025",
+      "path": "data/links2025.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_criacao_processo",
+            "type": "integer"
+          },
+          {
+            "name": "numero_processo_formatado",
+            "type": "string"
+          },
+          {
+            "name": "numero_contrato",
+            "type": "integer"
+          },
+          {
+            "name": "descricao_tipo_de_contrato",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_detalhamento_1",
+            "type": "string"
+          },
+          {
+            "name": "edital_retificacao_arquivos",
+            "type": "string"
+          },
+          {
+            "name": "contrato_termoaditivo_arquivos",
+            "type": "string"
+          },
+          {
+            "name": "numero_parecer_juridico",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    },
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "links2026",
+      "path": "data/links2026.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_criacao_processo",
+            "type": "integer"
+          },
+          {
+            "name": "numero_processo_formatado",
+            "type": "string"
+          },
+          {
+            "name": "numero_contrato",
+            "type": "integer"
+          },
+          {
+            "name": "descricao_tipo_de_contrato",
+            "type": "any"
+          },
+          {
+            "name": "procedimento_contratacao_detalhamento_1",
+            "type": "string"
+          },
+          {
+            "name": "edital_retificacao_arquivos",
+            "type": "any"
+          },
+          {
+            "name": "contrato_termoaditivo_arquivos",
+            "type": "any"
+          },
+          {
+            "name": "numero_parecer_juridico",
+            "type": "any"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    },
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "visaogeral2025",
+      "path": "data/visaogeral2025.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_criacao_pedido",
+            "type": "string"
+          },
+          {
+            "name": "nome_orgao_entidade_compra",
+            "type": "string"
+          },
+          {
+            "name": "numero_processo_formatado",
+            "type": "string"
+          },
+          {
+            "name": "nome_empresarial_nome_fornecedor",
+            "type": "string"
+          },
+          {
+            "name": "unnamed_4",
+            "type": "any"
+          },
+          {
+            "name": "objeto_contrato",
+            "type": "string"
+          },
+          {
+            "name": "unnamed_6",
+            "type": "any"
+          },
+          {
+            "name": "unnamed_7",
+            "type": "any"
+          },
+          {
+            "name": "unnamed_8",
+            "type": "any"
+          },
+          {
+            "name": "unnamed_9",
+            "type": "any"
+          },
+          {
+            "name": "unnamed_10",
+            "type": "any"
+          },
+          {
+            "name": "procedimento_contratacao_grupo",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_detalhamento_1",
+            "type": "string"
+          },
+          {
+            "name": "criterio_julgamento",
+            "type": "string"
+          },
+          {
+            "name": "situacao_processo",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    },
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "visaogeral2026",
+      "path": "data/visaogeral2026.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_criacao_pedido",
+            "type": "integer"
+          },
+          {
+            "name": "nome_orgao_entidade_compra",
+            "type": "string"
+          },
+          {
+            "name": "numero_processo_formatado",
+            "type": "string"
+          },
+          {
+            "name": "nome_empresarial_nome_fornecedor",
+            "type": "string"
+          },
+          {
+            "name": "objeto_contrato",
+            "type": "string"
+          },
+          {
+            "name": "unnamed_5",
+            "type": "any"
+          },
+          {
+            "name": "unnamed_6",
+            "type": "any"
+          },
+          {
+            "name": "unnamed_7",
+            "type": "any"
+          },
+          {
+            "name": "unnamed_8",
+            "type": "any"
+          },
+          {
+            "name": "procedimento_contratacao_grupo",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_detalhamento_1",
+            "type": "string"
+          },
+          {
+            "name": "criterio_julgamento",
+            "type": "string"
+          },
+          {
+            "name": "situacao_processo",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    }
+  ],
+  "title": "Portal_licitacoes"
+}
