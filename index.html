@@ -37,44 +37,53 @@
             font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--background-light);
             padding-bottom: 15px;
-            overflow-y: hidden !important;
-            overflow-x: hidden !important;
-            min-height: auto !important;
+            overflow-y: auto !important;
+            overflow-x: auto !important;
+            min-height: 100vh !important;
             height: auto !important;
+            width: 100% !important;
             position: relative;
         }
 
         html {
-            overflow-y: hidden !important;
+            overflow-y: auto !important;
+            overflow-x: auto !important;
             height: auto !important;
+            width: 100% !important;
         }
 
         .main-container {
-            height: auto !important;
-            min-height: auto !important;
-            overflow: visible !important;
-            position: relative;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 15px;
+            box-sizing: border-box;
         }
 
         .container.dashboard-spacing {
-            overflow: visible !important;
-            height: auto !important;
-            min-height: auto !important;
-            position: relative;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 15px;
+            margin: 0;
+            box-sizing: border-box;
         }
 
         .tab-content {
-            overflow: visible !important;
-            height: auto !important;
-            min-height: auto !important;
-            position: relative;
+            width: 100% !important;
         }
 
         .table-container {
-            height: auto !important;
-            min-height: auto !important;
-            overflow: visible !important;
-            position: relative;
+            width: 100% !important;
+            overflow-x: auto !important;
+        }
+
+        .table-fixed-header-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .table {
+            min-width: 1200px;
+            width: 100%;
         }
 
         /* ==================== DATA ATUALIZAÇÃO ==================== */
@@ -111,6 +120,19 @@
             padding: 20px;
             margin-bottom: 20px;
             border-left: 5px solid var(--accent-red);
+            width: 100%;
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-group {
+            flex: 1 1 200px;
+            min-width: 180px;
         }
         
         .filter-label {
@@ -134,11 +156,26 @@
             font-size: 14px;
             transition: all 0.3s ease;
             height: 42px;
+            width: 100%;
         }
         
         .form-control:focus, .form-select:focus {
             border-color: var(--accent-red);
             box-shadow: 0 0 0 2px rgba(185, 60, 66, 0.15);
+        }
+        
+        /* Estilo para datalist com scroll */
+        datalist {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        select[list] {
+            overflow-y: auto;
+        }
+        
+        select.form-select option {
+            max-height: 30px;
         }
 
         /* ==================== CARDS DE MÉTRICAS ==================== */
@@ -164,6 +201,7 @@
             color: var(--primary-dark);
             margin: 8px 0;
             line-height: 1.2;
+            word-break: break-word;
         }
         
         .metric-label {
@@ -216,6 +254,7 @@
             box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
             margin-bottom: 20px;
             border: 1px solid #dee2e6;
+            width: 100%;
         }
         
         .table-header {
@@ -242,12 +281,14 @@
             border-radius: 15px;
             font-size: 15px;
             font-weight: 600;
+            white-space: nowrap;
         }
         
         .table-fixed-header-container {
             position: relative;
             max-height: 500px;
             overflow: auto;
+            width: 100%;
         }
         
         .table-fixed-header-container table thead th {
@@ -286,6 +327,7 @@
             padding: 12px 10px;
             vertical-align: middle;
             border-bottom: 1px solid #f1f1f1;
+            white-space: nowrap;
         }
         
         .table tbody tr:hover {
@@ -335,6 +377,7 @@
             gap: 6px;
             cursor: pointer;
             height: 42px;
+            white-space: nowrap;
         }
         .btn-primary-custom:hover, .btn-pesquisa:hover {
             background: linear-gradient(to right, var(--accent-red), #a32c32);
@@ -356,6 +399,7 @@
             gap: 6px;
             cursor: pointer;
             height: 42px;
+            white-space: nowrap;
         }
         .btn-secondary-custom:hover {
             background-color: var(--primary-darker);
@@ -377,6 +421,7 @@
             gap: 6px;
             cursor: pointer;
             height: 38px;
+            white-space: nowrap;
         }
         .btn-export:hover {
             background: var(--primary-darker);
@@ -408,8 +453,15 @@
             margin-bottom: 20px;
             box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
             overflow-x: auto;
+            width: 100%;
         }
-        .nav-tabs { border: none !important; gap: 4px; flex-wrap: nowrap; }
+        .nav-tabs { 
+            border: none !important; 
+            gap: 4px; 
+            flex-wrap: nowrap;
+            display: flex;
+            min-width: min-content;
+        }
         .nav-tabs .nav-link {
             border: none !important;
             border-radius: 6px !important;
@@ -457,11 +509,18 @@
             padding: 15px 20px;
             background: white;
             border-top: 1px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
         .pagination-info {
             font-size: 13px;
             color: #6c757d;
+        }
+        
+        .pagination {
+            margin: 0;
+            flex-wrap: wrap;
         }
         
         .pagination .page-link {
@@ -504,6 +563,7 @@
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
+            white-space: nowrap;
         }
         
         .contrato-link {
@@ -511,6 +571,18 @@
             text-decoration: none;
         }
         .contrato-link:hover { text-decoration: underline; }
+        
+        .nao-aplica {
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .action-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -601,22 +673,33 @@
         // ============================================
         const GITHUB_BASE = 'https://raw.githubusercontent.com/transparencia-mg/portal_licitacoes/main/dataset/data/';
 
-        // Arquivos por ano
+        // Arquivos por ano - incluindo 2023 e 2024
         const ARQUIVOS_POR_ANO = {
+            2023: {
+                licitacoes: 'licitacoes2023.csv',
+                itens: 'item2023.csv'
+            },
+            2024: {
+                licitacoes: 'licitacoes2024.csv',
+                itens: 'item2024.csv'
+            },
             2025: {
                 licitacoes: 'licitacoes2025.csv',
-                itens: 'item2025.csv',
-                links: 'links2025.csv'
+                itens: 'item2025.csv'
             },
             2026: {
                 licitacoes: 'licitacoes2026.csv',
-                itens: 'item2026.csv',
-                links: 'links2026.csv'
+                itens: 'item2026.csv'
             }
         };
 
-        // Mapeamento de colunas
+        // URLs dos portais
+        const PORTAL_COMPRAS_URL = 'https://www1.compras.mg.gov.br/processocompra/processo/consultaProcessoCompra.html';
+        const PORTAL_REGISTRO_PRECOS_URL = 'https://www.registrodeprecos.mg.gov.br/aasi/do/filtrarRPs';
+
+        // Mapeamento de colunas para licitações
         const MAPA_COLUNAS = {
+            // Licitações
             'ano_criacao_pedido': 'Ano Criação Pedido',
             'procedimento_contratacao_grupo': 'Procedimento Contratação - Grupo',
             'procedimento_contratacao_detalhamento_1': 'Procedimento Contratação - Detalhamento 1',
@@ -624,37 +707,42 @@
             'codigo_orgao_entidade_compra': 'Código Órgão/Entidade Compra',
             'nome_orgao_entidade_compra': 'Nome Órgão/Entidade Compra',
             'numero_processo_formatado': 'Número Processo - Formatado',
-            'nome_empresarial_nome_fornecedor': 'Nome Empresarial/Nome Fornecedor',
-            'cnpj_cpf_fornecedor_formatado': 'CNPJ/CPF Fornecedor - Formatado',
             'data_criacao_pedido': 'Data Criação Pedido',
             'data_licitacao': 'Data Licitação',
-            'objeto_contrato': 'Objeto Contrato',
+            'numero_contrato': 'Número Contrato',
+            'indicador_termo_de_contrato': 'Indicador Termo Contrato',
             'situacao_processo': 'Situação Processo',
             'criterio_julgamento': 'Critério Julgamento',
+            'objeto_processo': 'Objeto Processo',
+            'nome_empresarial_nome_fornecedor': 'Nome Empresarial/Nome Fornecedor',
+            'cnpj_cpf_fornecedor_formatado': 'CNPJ/CPF Fornecedor - Formatado',
+            'numero_parecer_juridico': 'Número Parecer Jurídico',
+            'data_parecer_juridico': 'Data Parecer Jurídico',
+            'edital_retificacao_arquivos': 'Edital_Retificação Arquivos',
+            'contrato_termoaditivo_arquivos': 'Contrato_TermoAditivo Arquivos',
             'valor_total_homologado': 'Valor Total Homologado',
+            'valor_total_atualizado': 'Valor Total Atualizado',
+            
+            // Itens
             'ano_criacao_processo': 'Ano Criação Processo',
+            'numero_processo_formatado': 'Número Processo - Formatado (Item)',
             'situacao_item_processo': 'Situação Item Processo',
+            'numero_item_processo': 'Número Item Processo',
             'codigo_elemento_item_despesa': 'Código Elemento Item Despesa',
             'nome_elemento_item_despesa': 'Nome Elemento Item Despesa',
-            'codigo_item_material_servico_formatado': 'Código Item Material/Serviço - Formatado',
+            'codigo_item_material_servico_numerico': 'Código Item Material/Serviço Numérico',
             'item_material_servico': 'Item Material/Serviço',
             'quantidade_item_pedido': 'Quantidade Item Pedido',
             'valor_unitario_referencia_item_pedido': 'Valor Unitário Referência Item Pedido',
-            'valor_total_referencia_item_pedido': 'Valor Total Referência Item Pedido',
-            'numero_contrato': 'Número Contrato',
-            'descricao_tipo_de_contrato': 'Descrição Tipo de Contrato',
-            'edital_retificacao_arquivos': 'Edital_Retificação Arquivos',
-            'contrato_termoaditivo_arquivos': 'Contrato_TermoAditivo Arquivos',
-            'numero_parecer_juridico': 'Número Parecer Jurídico'
+            'valor_total_referencia_item_pedido': 'Valor Total Referência Item Pedido'
         };
 
         let dadosConsolidados = {
             licitacoes: [],
-            itens: [],
-            links: []
+            itens: []
         };
 
-        let anosDisponiveis = [2026, 2025];
+        let anosDisponiveis = [2026, 2025, 2024, 2023];
         let dadosFiltrados = {
             visaoGeral: [],
             licitacoes: [],
@@ -690,51 +778,51 @@
             setupEventListeners();
             carregarTodosDados();
             setupAtualizacaoData();
-            removeAllScrollIssues();
+            ajustarLayout();
+            window.addEventListener('resize', ajustarLayout);
         });
 
-        function removeAllScrollIssues() {
-            const elements = [
-                document.body, document.documentElement,
-                document.querySelector('.main-container'),
-                document.querySelector('.container.dashboard-spacing'),
-                document.querySelector('.tab-content'),
-                ...document.querySelectorAll('.tab-pane'),
-                ...document.querySelectorAll('.table-container'),
-                ...document.querySelectorAll('.row, .col, .container, .container-fluid')
-            ];
+        function ajustarLayout() {
+            // Ajustar para ocupar toda a largura
+            document.body.style.width = '100%';
+            document.documentElement.style.width = '100%';
             
-            elements.forEach(el => {
-                if (el?.style) {
-                    el.style.overflowY = 'visible';
-                    el.style.overflowX = 'visible';
-                    el.style.overflow = 'visible';
+            // Garantir que tabelas rolem horizontalmente se necessário
+            const tables = document.querySelectorAll('.table-fixed-header-container');
+            tables.forEach(table => {
+                if (table.scrollWidth > table.clientWidth) {
+                    table.style.overflowX = 'auto';
                 }
             });
+        }
+
+        function removeAllScrollIssues() {
+            // Manter scroll habilitado para o body
+            document.body.style.overflowY = 'auto';
+            document.body.style.overflowX = 'auto';
+            document.documentElement.style.overflowY = 'auto';
+            document.documentElement.style.overflowX = 'auto';
             
-            document.body.classList.remove('overflow-auto');
-            document.documentElement.classList.remove('overflow-auto');
-            document.documentElement.style.height = 'auto';
-            document.body.style.height = 'auto';
+            // Apenas containers internos podem ter overflow controlado
+            const internalContainers = [
+                document.querySelector('.tab-content'),
+                ...document.querySelectorAll('.table-fixed-header-container')
+            ];
+            
+            internalContainers.forEach(el => {
+                if (el?.style) {
+                    el.style.overflowY = 'auto';
+                    el.style.overflowX = 'auto';
+                }
+            });
         }
 
         function iframeUpdateHeight() {
-            document.body.style.display = 'none';
-            document.body.offsetHeight;
-            document.body.style.display = '';
-            
-            const html = document.documentElement;
-            const body = document.body;
-            const scrollHeight = Math.max(
-                body.scrollHeight, html.scrollHeight,
-                body.offsetHeight, html.offsetHeight
-            );
-            
+            const height = document.documentElement.scrollHeight;
             try {
-                window.parent.postMessage({ iframeHeight: scrollHeight + 10 }, '*');
+                window.parent.postMessage({ iframeHeight: height + 20 }, '*');
             } catch (error) {}
-            
-            return scrollHeight + 10;
+            return height;
         }
 
         function setupAtualizacaoData() {
@@ -832,12 +920,6 @@
                     linhaObj[nomeAmigavel] = valor;
                 });
                 
-                if (tipo === 'licitacoes' && linhaObj['Ano Criação Pedido']) {
-                    linhaObj['Ano Referência'] = linhaObj['Ano Criação Pedido'];
-                } else if (tipo === 'itens' && linhaObj['Ano Criação Processo']) {
-                    linhaObj['Ano Referência'] = linhaObj['Ano Criação Processo'];
-                }
-                
                 dados.push(linhaObj);
             }
             return dados;
@@ -845,18 +927,64 @@
 
         function verificarEmergencial(processo) {
             if (!processo) return false;
-            // Verificar na coluna de especialização se é emergencial
             const especializacao = processo['Procedimento Contratação - Especialização'] || '';
             return especializacao.includes('Dispensa de Licitação - Casos de emergência ou de calamidade pública');
         }
 
-        function getSituacaoCorrigida(processo) {
-            // Se fornecedor for INEXISTENTE ou nulo, considera cancelado
-            if (!processo['Nome Empresarial/Nome Fornecedor'] || 
-                processo['Nome Empresarial/Nome Fornecedor'] === 'INEXISTENTE') {
-                return 'Cancelado';
+        function verificarSemEdital(processo) {
+            if (!processo) return false;
+            const modalidade = processo['Procedimento Contratação - Detalhamento 1'] || '';
+            const grupo = processo['Procedimento Contratação - Grupo'] || '';
+            
+            // Casos que não possuem edital
+            return modalidade.includes('Dispensa') || 
+                   modalidade.includes('Inexigibilidade') ||
+                   grupo.includes('Dispensa') ||
+                   grupo.includes('Inexigibilidade') ||
+                   modalidade.includes('Registro de Preços');
+        }
+
+        function getLinkContrato(processo) {
+            if (!processo) return { texto: 'NÃO SE APLICA', url: null };
+            
+            const indicador = processo['Indicador Termo Contrato'];
+            const contrato = processo['Número Contrato'];
+            
+            // Se indicador for NÃO ou não houver contrato
+            if (indicador === 'NÃO' || indicador === 'NAO' || !contrato || contrato === '0') {
+                return { texto: 'NÃO SE APLICA', url: null };
             }
-            return processo['Situação Processo'] || 'Em andamento';
+            
+            // Se tiver link nos arquivos
+            if (processo['Contrato_TermoAditivo Arquivos']) {
+                return { texto: '📄 Ver Contrato', url: processo['Contrato_TermoAditivo Arquivos'] };
+            }
+            
+            return { texto: contrato, url: null };
+        }
+
+        function getLinkEdital(processo) {
+            if (!processo) return { texto: 'NÃO SE APLICA', url: null };
+            
+            // Verificar se não possui edital
+            if (verificarSemEdital(processo)) {
+                return { texto: 'NÃO SE APLICA', url: null };
+            }
+            
+            // Se tiver link do edital
+            if (processo['Edital_Retificação Arquivos']) {
+                return { texto: '📄 Ver Edital', url: processo['Edital_Retificação Arquivos'] };
+            }
+            
+            return { texto: 'NÃO SE APLICA', url: null };
+        }
+
+        function getLinkPortalCompras(processo) {
+            if (!processo || !processo['Número Processo - Formatado']) return '#';
+            // Extrair número do processo
+            const numProcesso = processo['Número Processo - Formatado'];
+            // Aqui você pode construir a URL específica se tiver o ID
+            return PORTAL_COMPRAS_URL;
         }
 
         function calcularMetricas(dados) {
@@ -867,7 +995,7 @@
             let totalHomologado = 0;
             dados.forEach(i => {
                 const valor = i['Valor Total Homologado'];
-                if (valor && i['Nome Empresarial/Nome Fornecedor'] && i['Nome Empresarial/Nome Fornecedor'] !== 'INEXISTENTE') {
+                if (valor) {
                     const num = parseFloat(valor.toString().replace(',', '.'));
                     if (!isNaN(num)) totalHomologado += num;
                 }
@@ -897,10 +1025,11 @@
                     anos: [...new Set(dados.map(i => i['Ano Criação Pedido']))].filter(Boolean).sort().reverse(),
                     modalidades: [...new Set(dados.map(i => i['Procedimento Contratação - Detalhamento 1']))].filter(Boolean).sort(),
                     orgaos: [...new Set(dados.map(i => i['Nome Órgão/Entidade Compra']))].filter(Boolean).sort(),
-                    situacoes: [...new Set(dados.map(i => getSituacaoCorrigida(i)))].filter(Boolean).sort(),
+                    situacoes: [...new Set(dados.map(i => i['Situação Processo']))].filter(Boolean).sort(),
                     criterios: [...new Set(dados.map(i => i['Critério Julgamento']))].filter(Boolean).sort(),
                     grupos: [...new Set(dados.map(i => i['Procedimento Contratação - Grupo']))].filter(Boolean).sort(),
-                    fornecedores: [...new Set(dados.map(i => i['Nome Empresarial/Nome Fornecedor']))].filter(Boolean).sort()
+                    fornecedores: [...new Set(dados.map(i => i['Nome Empresarial/Nome Fornecedor']))].filter(Boolean).sort(),
+                    processos: [...new Set(dados.map(i => i['Número Processo - Formatado']))].filter(Boolean).sort()
                 };
             }
         }
@@ -913,9 +1042,7 @@
                     mapa.set(modalidade, { modalidade, total: 0, processos: new Set() });
                 }
                 const m = mapa.get(modalidade);
-                if (i['Número Processo - Formatado'] && i['Nome Empresarial/Nome Fornecedor'] && i['Nome Empresarial/Nome Fornecedor'] !== 'INEXISTENTE') {
-                    m.processos.add(i['Número Processo - Formatado']);
-                }
+                if (i['Número Processo - Formatado']) m.processos.add(i['Número Processo - Formatado']);
             }
             return Array.from(mapa.values()).map(m => ({ 
                 modalidade: m.modalidade, 
@@ -926,7 +1053,7 @@
         function agruparPorSituacao(dados) {
             const mapa = new Map();
             for (const i of dados) {
-                const situacao = getSituacaoCorrigida(i);
+                const situacao = i['Situação Processo'] || 'Não informado';
                 if (!mapa.has(situacao)) {
                     mapa.set(situacao, { situacao, total: 0, processos: new Set() });
                 }
@@ -1004,6 +1131,8 @@
                             dadosAno.forEach(d => d.ano_referencia = ano);
                             dadosConsolidados.licitacoes = [...dadosConsolidados.licitacoes, ...dadosAno];
                             console.log(`Carregadas ${dadosAno.length} licitações de ${ano}`);
+                        } else {
+                            console.log(`Arquivo de licitações ${ano} não encontrado (${resp.status})`);
                         }
                     } catch (e) {
                         console.log(`Erro ao carregar licitações ${ano}:`, e);
@@ -1018,22 +1147,11 @@
                             dadosAno.forEach(d => d.ano_referencia = ano);
                             dadosConsolidados.itens = [...dadosConsolidados.itens, ...dadosAno];
                             console.log(`Carregados ${dadosAno.length} itens de ${ano}`);
+                        } else {
+                            console.log(`Arquivo de itens ${ano} não encontrado (${resp.status})`);
                         }
                     } catch (e) {
                         console.log(`Erro ao carregar itens ${ano}:`, e);
-                    }
-                    
-                    // Carregar links
-                    try {
-                        const resp = await fetch(GITHUB_BASE + arquivos.links);
-                        if (resp.ok) {
-                            const texto = await resp.text();
-                            const dadosAno = parseCSV(texto, 'links');
-                            dadosAno.forEach(d => d.ano_referencia = ano);
-                            dadosConsolidados.links = [...dadosConsolidados.links, ...dadosAno];
-                        }
-                    } catch (e) {
-                        console.log(`Erro ao carregar links ${ano}:`, e);
                     }
                 }
                 
@@ -1073,36 +1191,36 @@
             
             let html = `
                 <div class="filter-container">
-                    <div class="row g-3">
-                        <div class="col-md-2">
+                    <div class="filter-row">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
-                            <select class="form-select" id="filtroAnoVG">
-                                <option value="2026" selected>2026</option>
-                                <option value="2025">2025</option>
+                            <select class="form-select" id="filtroAnoVG" size="1" style="max-height: 200px;">
+                                <option value="">Todos</option>
+                                ${opcoes.anos.map(a => `<option value="${a}" ${a === 2026 ? 'selected' : ''}>${a}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">business</i>Órgão</label>
-                            <select class="form-select" id="filtroOrgaoVG">
+                            <select class="form-select" id="filtroOrgaoVG" size="1" style="max-height: 200px;">
                                 <option value="">Todos</option>
                                 ${opcoes.orgaos.map(o => `<option value="${o}">${o}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">gavel</i>Modalidade</label>
-                            <select class="form-select" id="filtroModalidadeVG">
+                            <select class="form-select" id="filtroModalidadeVG" size="1" style="max-height: 200px;">
                                 <option value="">Todas</option>
                                 ${opcoes.modalidades.map(m => `<option value="${m}">${m}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">info</i>Situação</label>
-                            <select class="form-select" id="filtroSituacaoVG">
+                            <select class="form-select" id="filtroSituacaoVG" size="1" style="max-height: 200px;">
                                 <option value="">Todas</option>
                                 ${opcoes.situacoes.map(s => `<option value="${s}">${s}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">warning</i>Emergencial</label>
                             <select class="form-select" id="filtroEmergencialVG">
                                 <option value="">Todos</option>
@@ -1112,16 +1230,23 @@
                         </div>
                     </div>
                     
-                    <div class="row mt-3">
-                        <div class="col-md-3">
+                    <div class="filter-row">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">category</i>Tipo</label>
-                            <select class="form-select" id="filtroTipoVG">
+                            <select class="form-select" id="filtroTipoVG" size="1" style="max-height: 200px;">
                                 <option value="">Todos</option>
                                 ${opcoes.grupos.map(g => `<option value="${g}">${g}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-9 d-flex justify-content-end gap-2 align-items-end">
-                            <button class="btn-pesquisa" onclick="aplicarFiltrosVG()"><i class="material-icons me-2">search</i>Pesquisar</button>
+                        <div class="filter-group">
+                            <label class="filter-label"><i class="material-icons">receipt</i>Nº Processo</label>
+                            <input type="text" class="form-control" id="filtroProcessoVG" list="processosListVG" placeholder="Digite ou selecione...">
+                            <datalist id="processosListVG">
+                                ${opcoes.processos.map(p => `<option value="${p}">`).join('')}
+                            </datalist>
+                        </div>
+                        <div class="filter-group d-flex align-items-end gap-2">
+                            <button class="btn-pesquisa flex-grow-1" onclick="aplicarFiltrosVG()"><i class="material-icons me-2">search</i>Pesquisar</button>
                             <button class="btn-secondary-custom" onclick="limparFiltrosVG()"><i class="material-icons me-2">clear</i>Limpar</button>
                         </div>
                     </div>
@@ -1140,7 +1265,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="d-flex gap-2">
+                    <div class="action-group">
                         <button class="btn-export" onclick="exportarTabelaVisaoGeral()"><i class="material-icons me-2">print</i>Imprimir</button>
                         <button class="btn-export" onclick="exportarTabelaVisaoGeralPDF()"><i class="material-icons me-2">picture_as_pdf</i>PDF</button>
                     </div>
@@ -1214,37 +1339,37 @@
             }).join('');
         }
 
-window.irParaConsultaLicitacao = function(orgao) {
-    // Mudar para a aba de consulta de licitações
-    document.getElementById('consulta-licitacao-tab').click();
-    
-    setTimeout(() => {
-        // Capturar todos os filtros atuais da visão geral
-        const anoVG = document.getElementById('filtroAnoVG')?.value;
-        const modalidadeVG = document.getElementById('filtroModalidadeVG')?.value;
-        const situacaoVG = document.getElementById('filtroSituacaoVG')?.value;
-        const emergencialVG = document.getElementById('filtroEmergencialVG')?.value;
-        const tipoVG = document.getElementById('filtroTipoVG')?.value;
-        
-        // Aplicar os filtros na consulta de licitações
-        const selectOrgao = document.getElementById('filtroOrgaoCL');
-        const selectAno = document.getElementById('filtroAnoCL');
-        const selectModalidade = document.getElementById('filtroModalidadeCL');
-        const selectSituacao = document.getElementById('filtroSituacaoCL');
-        const selectEmergencial = document.getElementById('filtroEmergencialCL');
-        const selectTipo = document.getElementById('filtroTipoCL');
-        
-        if (selectOrgao) selectOrgao.value = orgao;
-        if (selectAno && anoVG) selectAno.value = anoVG;
-        if (selectModalidade && modalidadeVG) selectModalidade.value = modalidadeVG;
-        if (selectSituacao && situacaoVG) selectSituacao.value = situacaoVG;
-        if (selectEmergencial && emergencialVG) selectEmergencial.value = emergencialVG;
-        if (selectTipo && tipoVG) selectTipo.value = tipoVG;
-        
-        // Aplicar os filtros
-        aplicarFiltrosCL();
-    }, 300);
-};
+        window.irParaConsultaLicitacao = function(orgao) {
+            document.getElementById('consulta-licitacao-tab').click();
+            setTimeout(() => {
+                // Capturar filtros da visão geral
+                const anoVG = document.getElementById('filtroAnoVG')?.value;
+                const modalidadeVG = document.getElementById('filtroModalidadeVG')?.value;
+                const situacaoVG = document.getElementById('filtroSituacaoVG')?.value;
+                const emergencialVG = document.getElementById('filtroEmergencialVG')?.value;
+                const tipoVG = document.getElementById('filtroTipoVG')?.value;
+                const processoVG = document.getElementById('filtroProcessoVG')?.value;
+                
+                // Aplicar na consulta de licitações
+                const selectOrgao = document.getElementById('filtroOrgaoCL');
+                const selectAno = document.getElementById('filtroAnoCL');
+                const selectModalidade = document.getElementById('filtroModalidadeCL');
+                const selectSituacao = document.getElementById('filtroSituacaoCL');
+                const selectEmergencial = document.getElementById('filtroEmergencialCL');
+                const selectTipo = document.getElementById('filtroTipoCL');
+                const inputProcesso = document.getElementById('filtroProcessoCL');
+                
+                if (selectOrgao) selectOrgao.value = orgao;
+                if (selectAno && anoVG) selectAno.value = anoVG;
+                if (selectModalidade && modalidadeVG) selectModalidade.value = modalidadeVG;
+                if (selectSituacao && situacaoVG) selectSituacao.value = situacaoVG;
+                if (selectEmergencial && emergencialVG) selectEmergencial.value = emergencialVG;
+                if (selectTipo && tipoVG) selectTipo.value = tipoVG;
+                if (inputProcesso && processoVG) inputProcesso.value = processoVG;
+                
+                aplicarFiltrosCL();
+            }, 300);
+        };
 
         function atualizarMetricasVG(dados) {
             const metricas = calcularMetricas(dados);
@@ -1262,31 +1387,20 @@ window.irParaConsultaLicitacao = function(orgao) {
             const situacao = document.getElementById('filtroSituacaoVG')?.value;
             const emergencial = document.getElementById('filtroEmergencialVG')?.value;
             const tipo = document.getElementById('filtroTipoVG')?.value;
+            const processo = document.getElementById('filtroProcessoVG')?.value;
             
             dadosFiltrados.visaoGeral = dadosConsolidados.licitacoes.filter(i => {
-                // Filtro de ano
                 if (ano && i['Ano Criação Pedido'] != ano) return false;
-                
-                // Filtro de órgão
                 if (orgao && i['Nome Órgão/Entidade Compra'] !== orgao) return false;
-                
-                // Filtro de modalidade
                 if (modalidade && i['Procedimento Contratação - Detalhamento 1'] !== modalidade) return false;
-                
-                // Filtro de situação (considerando cancelados)
-                const situacaoItem = getSituacaoCorrigida(i);
-                if (situacao && situacaoItem !== situacao) return false;
-                
-                // Filtro de tipo
+                if (situacao && i['Situação Processo'] !== situacao) return false;
                 if (tipo && i['Procedimento Contratação - Grupo'] !== tipo) return false;
-                
-                // Filtro de emergencial
+                if (processo && !i['Número Processo - Formatado']?.toLowerCase().includes(processo.toLowerCase())) return false;
                 if (emergencial) {
                     const isEmergencial = verificarEmergencial(i);
                     if (emergencial === 'sim' && !isEmergencial) return false;
                     if (emergencial === 'nao' && isEmergencial) return false;
                 }
-                
                 return true;
             });
             
@@ -1316,6 +1430,7 @@ window.irParaConsultaLicitacao = function(orgao) {
             document.getElementById('filtroSituacaoVG').value = '';
             document.getElementById('filtroEmergencialVG').value = '';
             document.getElementById('filtroTipoVG').value = '';
+            document.getElementById('filtroProcessoVG').value = '';
             
             // Voltar para dados de 2026
             dadosFiltrados.visaoGeral = dadosConsolidados.licitacoes.filter(l => l['Ano Criação Pedido'] == 2026);
@@ -1403,36 +1518,36 @@ window.irParaConsultaLicitacao = function(orgao) {
             
             container.innerHTML = `
                 <div class="filter-container">
-                    <div class="row g-3">
-                        <div class="col-md-2">
+                    <div class="filter-row">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
-                            <select class="form-select" id="filtroAnoCL">
-                                <option value="2026" selected>2026</option>
-                                <option value="2025">2025</option>
+                            <select class="form-select" id="filtroAnoCL" size="1">
+                                <option value="">Todos</option>
+                                ${opcoes.anos.map(a => `<option value="${a}" ${a === 2026 ? 'selected' : ''}>${a}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">business</i>Órgão</label>
-                            <select class="form-select" id="filtroOrgaoCL">
+                            <select class="form-select" id="filtroOrgaoCL" size="1" style="max-height: 200px;">
                                 <option value="">Todos</option>
                                 ${opcoes.orgaos.map(o => `<option value="${o}">${o}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">gavel</i>Modalidade</label>
-                            <select class="form-select" id="filtroModalidadeCL">
+                            <select class="form-select" id="filtroModalidadeCL" size="1" style="max-height: 200px;">
                                 <option value="">Todas</option>
                                 ${opcoes.modalidades.map(m => `<option value="${m}">${m}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">info</i>Situação</label>
-                            <select class="form-select" id="filtroSituacaoCL">
+                            <select class="form-select" id="filtroSituacaoCL" size="1" style="max-height: 200px;">
                                 <option value="">Todas</option>
                                 ${opcoes.situacoes.map(s => `<option value="${s}">${s}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">warning</i>Emergencial</label>
                             <select class="form-select" id="filtroEmergencialCL">
                                 <option value="">Todos</option>
@@ -1442,48 +1557,48 @@ window.irParaConsultaLicitacao = function(orgao) {
                         </div>
                     </div>
                     
-                    <div class="row mt-3">
-                        <div class="col-md-3">
+                    <div class="filter-row">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">category</i>Tipo</label>
-                            <select class="form-select" id="filtroTipoCL">
+                            <select class="form-select" id="filtroTipoCL" size="1" style="max-height: 200px;">
                                 <option value="">Todos</option>
                                 ${opcoes.grupos.map(g => `<option value="${g}">${g}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <label class="filter-label"><i class="material-icons">star</i>Critério</label>
-                            <select class="form-select" id="filtroCriterioCL">
-                                <option value="">Todos</option>
-                                ${opcoes.criterios.map(c => `<option value="${c}">${c}</option>`).join('')}
-                            </select>
+                        <div class="filter-group">
+                            <label class="filter-label"><i class="material-icons">receipt</i>Nº Processo</label>
+                            <input type="text" class="form-control" id="filtroProcessoCL" list="processosListCL" placeholder="Digite ou selecione...">
+                            <datalist id="processosListCL">
+                                ${opcoes.processos.map(p => `<option value="${p}">`).join('')}
+                            </datalist>
                         </div>
-                        <div class="col-md-3">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">person</i>Fornecedor</label>
                             <input type="text" class="form-control" id="filtroFornecedorCL" list="fornecedoresList" placeholder="Digite ou selecione...">
                             <datalist id="fornecedoresList">
                                 ${opcoes.fornecedores.map(f => `<option value="${f}">`).join('')}
                             </datalist>
                         </div>
-                        <div class="col-md-3">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">badge</i>CNPJ/CPF</label>
                             <input type="text" class="form-control" id="filtroCnpjCL" placeholder="00.000.000/0000-00">
                         </div>
                     </div>
                     
-                    <div class="row mt-3">
-                        <div class="col-md-8">
+                    <div class="filter-row">
+                        <div class="filter-group" style="flex: 2;">
                             <label class="filter-label"><i class="material-icons">description</i>Objeto</label>
                             <input type="text" class="form-control" id="filtroObjetoCL" placeholder="Palavra-chave no objeto...">
                         </div>
-                        <div class="col-md-4 d-flex justify-content-end gap-2 align-items-end">
-                            <button class="btn-pesquisa" onclick="aplicarFiltrosCL()"><i class="material-icons me-2">search</i>Pesquisar</button>
+                        <div class="filter-group d-flex gap-2 align-items-end">
+                            <button class="btn-pesquisa flex-grow-1" onclick="aplicarFiltrosCL()"><i class="material-icons me-2">search</i>Pesquisar</button>
                             <button class="btn-secondary-custom" onclick="limparFiltrosCL()"><i class="material-icons me-2">clear</i>Limpar</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="d-flex gap-2">
+                    <div class="action-group">
                         <button class="btn-export" onclick="exportarTabelaLicitacao()"><i class="material-icons me-2">print</i>Imprimir</button>
                         <button class="btn-export" onclick="exportarTabelaLicitacaoPDF()"><i class="material-icons me-2">picture_as_pdf</i>PDF</button>
                     </div>
@@ -1507,10 +1622,11 @@ window.irParaConsultaLicitacao = function(orgao) {
                                     <th onclick="toggleSort('licitacoes', 'Nome Órgão/Entidade Compra')">Órgão <i class="material-icons sort-icon">unfold_more</i></th>
                                     <th onclick="toggleSort('licitacoes', 'Procedimento Contratação - Detalhamento 1')">Modalidade <i class="material-icons sort-icon">unfold_more</i></th>
                                     <th onclick="toggleSort('licitacoes', 'Data Licitação')">Data Sessão <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSort('licitacoes', 'Objeto Contrato')">Objeto <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('licitacoes', 'Objeto Processo')">Objeto <i class="material-icons sort-icon">unfold_more</i></th>
                                     <th onclick="toggleSort('licitacoes', 'Nome Empresarial/Nome Fornecedor')">Fornecedor <i class="material-icons sort-icon">unfold_more</i></th>
                                     <th onclick="toggleSort('licitacoes', 'Situação Processo')">Situação <i class="material-icons sort-icon">unfold_more</i></th>
                                     <th onclick="toggleSort('licitacoes', 'Valor Total Homologado')">Valor Total <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th>Edital</th>
                                     <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
@@ -1541,27 +1657,37 @@ window.irParaConsultaLicitacao = function(orgao) {
         }
 
         function gerarLinhasTabelaLicitacoes(licitacoes) {
-            if (!licitacoes || licitacoes.length === 0) return '<tr><td colspan="10" class="text-center">Nenhum registro encontrado</td></tr>';
+            if (!licitacoes || licitacoes.length === 0) return '<tr><td colspan="11" class="text-center">Nenhum registro encontrado</td></tr>';
             
             return licitacoes.map(l => {
-                const linkRelacionado = dadosConsolidados.links.find(link => link['Número Processo - Formatado'] === l['Número Processo - Formatado']);
-                const contrato = linkRelacionado ? linkRelacionado['Número Contrato'] : '-';
-                const situacao = getSituacaoCorrigida(l);
-                const badgeClass = situacao === 'Cancelado' ? 'badge-cancelado' :
-                                  situacao.toLowerCase().includes('homologado') ? 'badge-ativo' : 
-                                  situacao.toLowerCase().includes('concluído') ? 'badge-concluido' : 'badge-concluido';
+                const situacao = l['Situação Processo'] || '-';
+                const badgeClass = situacao.toLowerCase().includes('homologado') ? 'badge-ativo' : 
+                                  (situacao.toLowerCase().includes('cancelado') || situacao.toLowerCase().includes('anulado') ? 'badge-cancelado' : 'badge-concluido');
                 const isEmergencial = verificarEmergencial(l);
+                
+                // Tratar contrato
+                const contratoInfo = getLinkContrato(l);
+                const contratoDisplay = contratoInfo.url ? 
+                    `<a href="${contratoInfo.url}" target="_blank" class="contrato-link">${contratoInfo.texto}</a>` : 
+                    `<span class="nao-aplica">${contratoInfo.texto}</span>`;
+                
+                // Tratar edital
+                const editalInfo = getLinkEdital(l);
+                const editalDisplay = editalInfo.url ? 
+                    `<a href="${editalInfo.url}" target="_blank" class="contrato-link">${editalInfo.texto}</a>` : 
+                    `<span class="nao-aplica">${editalInfo.texto}</span>`;
                 
                 return `<tr>
                     <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${l['Número Processo - Formatado']}'); return false;">${l['Número Processo - Formatado'] || '-'}</a></td>
-                    <td>${contrato !== '0' ? contrato : '-'}</td>
+                    <td>${contratoDisplay}</td>
                     <td>${l['Nome Órgão/Entidade Compra'] || '-'}</td>
                     <td>${l['Procedimento Contratação - Detalhamento 1'] || '-'} ${isEmergencial ? '<span class="emergencial-badge">Emerg.</span>' : ''}</td>
                     <td>${formatarData(l['Data Licitação'])}</td>
-                    <td>${(l['Objeto Contrato'] || '').substring(0, 40)}${(l['Objeto Contrato'] || '').length > 40 ? '...' : ''}</td>
+                    <td>${(l['Objeto Processo'] || '').substring(0, 40)}${(l['Objeto Processo'] || '').length > 40 ? '...' : ''}</td>
                     <td>${l['Nome Empresarial/Nome Fornecedor'] || '-'}</td>
                     <td><span class="badge-situacao ${badgeClass}">${situacao}</span></td>
                     <td class="text-right">${formatarMoeda(l['Valor Total Homologado'])}</td>
+                    <td>${editalDisplay}</td>
                     <td class="text-center">
                         <button class="btn-action" onclick="verDetalhesLicitacao('${l['Número Processo - Formatado']}')" title="Detalhes">
                             <i class="material-icons">visibility</i>
@@ -1578,7 +1704,7 @@ window.irParaConsultaLicitacao = function(orgao) {
             const situacao = document.getElementById('filtroSituacaoCL')?.value;
             const emergencial = document.getElementById('filtroEmergencialCL')?.value;
             const tipo = document.getElementById('filtroTipoCL')?.value;
-            const criterio = document.getElementById('filtroCriterioCL')?.value;
+            const processo = (document.getElementById('filtroProcessoCL')?.value || '').toLowerCase();
             const fornecedor = (document.getElementById('filtroFornecedorCL')?.value || '').toLowerCase();
             const cnpj = (document.getElementById('filtroCnpjCL')?.value || '').toLowerCase();
             const objeto = (document.getElementById('filtroObjetoCL')?.value || '').toLowerCase();
@@ -1587,22 +1713,18 @@ window.irParaConsultaLicitacao = function(orgao) {
                 if (ano && l['Ano Criação Pedido'] != ano) return false;
                 if (orgao && l['Nome Órgão/Entidade Compra'] !== orgao) return false;
                 if (modalidade && l['Procedimento Contratação - Detalhamento 1'] !== modalidade) return false;
-                
-                const situacaoItem = getSituacaoCorrigida(l);
-                if (situacao && situacaoItem !== situacao) return false;
-                
+                if (situacao && l['Situação Processo'] !== situacao) return false;
                 if (tipo && l['Procedimento Contratação - Grupo'] !== tipo) return false;
-                if (criterio && l['Critério Julgamento'] !== criterio) return false;
+                if (processo && !l['Número Processo - Formatado']?.toLowerCase().includes(processo)) return false;
+                if (fornecedor && !l['Nome Empresarial/Nome Fornecedor']?.toLowerCase().includes(fornecedor)) return false;
+                if (cnpj && !l['CNPJ/CPF Fornecedor - Formatado']?.toLowerCase().includes(cnpj)) return false;
+                if (objeto && !l['Objeto Processo']?.toLowerCase().includes(objeto)) return false;
                 
                 if (emergencial) {
                     const isEmergencial = verificarEmergencial(l);
                     if (emergencial === 'sim' && !isEmergencial) return false;
                     if (emergencial === 'nao' && isEmergencial) return false;
                 }
-                
-                if (fornecedor && !l['Nome Empresarial/Nome Fornecedor']?.toLowerCase().includes(fornecedor)) return false;
-                if (cnpj && !l['CNPJ/CPF Fornecedor - Formatado']?.toLowerCase().includes(cnpj)) return false;
-                if (objeto && !l['Objeto Contrato']?.toLowerCase().includes(objeto)) return false;
                 
                 return true;
             });
@@ -1619,7 +1741,7 @@ window.irParaConsultaLicitacao = function(orgao) {
             document.getElementById('filtroSituacaoCL').value = '';
             document.getElementById('filtroEmergencialCL').value = '';
             document.getElementById('filtroTipoCL').value = '';
-            document.getElementById('filtroCriterioCL').value = '';
+            document.getElementById('filtroProcessoCL').value = '';
             document.getElementById('filtroFornecedorCL').value = '';
             document.getElementById('filtroCnpjCL').value = '';
             document.getElementById('filtroObjetoCL').value = '';
@@ -1635,10 +1757,20 @@ window.irParaConsultaLicitacao = function(orgao) {
             if (!dados.length) return;
             
             const licitacao = dados[0];
-            const linkRelacionado = dadosConsolidados.links.find(l => l['Número Processo - Formatado'] === processo);
-            const itensRelacionados = dadosConsolidados.itens.filter(i => i['Número Processo - Formatado'] === processo);
+            const itensRelacionados = dadosConsolidados.itens.filter(i => i['Número Processo - Formatado (Item)'] === processo);
             const isEmergencial = verificarEmergencial(licitacao);
-            const situacao = getSituacaoCorrigida(licitacao);
+            
+            // Tratar contrato
+            const contratoInfo = getLinkContrato(licitacao);
+            const contratoDisplay = contratoInfo.url ? 
+                `<a href="${contratoInfo.url}" target="_blank" class="contrato-link">${contratoInfo.texto}</a>` : 
+                `<span class="nao-aplica">${contratoInfo.texto}</span>`;
+            
+            // Tratar edital
+            const editalInfo = getLinkEdital(licitacao);
+            const editalDisplay = editalInfo.url ? 
+                `<a href="${editalInfo.url}" target="_blank" class="contrato-link">${editalInfo.texto}</a>` : 
+                `<span class="nao-aplica">${editalInfo.texto}</span>`;
             
             document.getElementById('modalContent').innerHTML = `
                 <div class="row">
@@ -1649,7 +1781,7 @@ window.irParaConsultaLicitacao = function(orgao) {
                             <div class="info-label mt-3">Órgão</div>
                             <div class="info-value">${licitacao['Nome Órgão/Entidade Compra'] || '-'} (${licitacao['Código Órgão/Entidade Compra'] || '-'})</div>
                             <div class="info-label mt-3">Objeto</div>
-                            <div class="info-value">${licitacao['Objeto Contrato'] || '-'}</div>
+                            <div class="info-value">${licitacao['Objeto Processo'] || '-'}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -1659,7 +1791,7 @@ window.irParaConsultaLicitacao = function(orgao) {
                             <div class="info-label mt-3">Critério de Julgamento</div>
                             <div class="info-value">${licitacao['Critério Julgamento'] || '-'}</div>
                             <div class="info-label mt-3">Situação</div>
-                            <div class="info-value"><span class="badge-situacao ${situacao === 'Cancelado' ? 'badge-cancelado' : 'badge-concluido'}">${situacao}</span></div>
+                            <div class="info-value"><span class="badge-situacao ${licitacao['Situação Processo']?.toLowerCase().includes('homologado') ? 'badge-ativo' : 'badge-concluido'}">${licitacao['Situação Processo'] || '-'}</span></div>
                         </div>
                     </div>
                 </div>
@@ -1685,25 +1817,36 @@ window.irParaConsultaLicitacao = function(orgao) {
                     </div>
                 </div>
                 
-                ${linkRelacionado ? `
-                <h6 class="mt-4 fw-bold">Contrato / Links</h6>
-                <div class="info-card">
-                    <div class="row">
-                        <div class="col-md-4"><span class="info-label">Nº Contrato</span><div class="info-value">${linkRelacionado['Número Contrato'] || '-'}</div></div>
-                        <div class="col-md-4"><span class="info-label">Tipo Contrato</span><div class="info-value">${linkRelacionado['Descrição Tipo de Contrato'] || '-'}</div></div>
-                        <div class="col-md-4"><span class="info-label">Parecer Jurídico</span><div class="info-value">${linkRelacionado['Número Parecer Jurídico'] || '-'}</div></div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <span class="info-label">Edital</span>
-                            <div class="info-value"><a href="${linkRelacionado['Edital_Retificação Arquivos']}" target="_blank" class="contrato-link">${linkRelacionado['Edital_Retificação Arquivos'] ? '📄 Abrir Edital' : 'Não disponível'}</a></div>
-                        </div>
-                        <div class="col-md-6">
-                            <span class="info-label">Contrato/Aditivo</span>
-                            <div class="info-value"><a href="${linkRelacionado['Contrato_TermoAditivo Arquivos']}" target="_blank" class="contrato-link">${linkRelacionado['Contrato_TermoAditivo Arquivos'] ? '📄 Abrir Contrato' : 'Não disponível'}</a></div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <div class="info-label">Contrato</div>
+                            <div class="info-value">${contratoDisplay}</div>
+                            <div class="info-label mt-3">Indicador</div>
+                            <div class="info-value">${licitacao['Indicador Termo Contrato'] || '-'}</div>
                         </div>
                     </div>
-                </div>` : ''}
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <div class="info-label">Edital</div>
+                            <div class="info-value">${editalDisplay}</div>
+                            <div class="info-label mt-3">Parecer Jurídico</div>
+                            <div class="info-value">${licitacao['Número Parecer Jurídico'] || '-'} ${licitacao['Data Parecer Jurídico'] ? `(${formatarData(licitacao['Data Parecer Jurídico'])})` : ''}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="info-card">
+                            <div class="info-label">Links Úteis</div>
+                            <div class="info-value">
+                                <a href="${PORTAL_COMPRAS_URL}" target="_blank" class="contrato-link me-3">🔗 Portal de Compras</a>
+                                <a href="${PORTAL_REGISTRO_PRECOS_URL}" target="_blank" class="contrato-link">📋 Registro de Preços</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 ${itensRelacionados.length > 0 ? `
                 <h6 class="mt-4 fw-bold">Itens da Licitação</h6>
@@ -1711,6 +1854,7 @@ window.irParaConsultaLicitacao = function(orgao) {
                     <table class="table table-sm">
                         <thead class="bg-light">
                             <tr>
+                                <th>Item</th>
                                 <th>Código</th>
                                 <th>Descrição</th>
                                 <th>Elemento</th>
@@ -1722,9 +1866,10 @@ window.irParaConsultaLicitacao = function(orgao) {
                         <tbody>
                             ${itensRelacionados.map(item => `
                                 <tr>
-                                    <td>${item['Código Item Material/Serviço - Formatado'] || '-'}</td>
-                                    <td>${item['Nome Elemento Item Despesa'] || '-'}</td>
-                                    <td>${item['Código Elemento Item Despesa'] || '-'}</td>
+                                    <td>${item['Número Item Processo'] || '-'}</td>
+                                    <td>${item['Código Item Material/Serviço Numérico'] || '-'}</td>
+                                    <td>${item['Item Material/Serviço'] || '-'}</td>
+                                    <td>${item['Código Elemento Item Despesa'] || '-'} - ${item['Nome Elemento Item Despesa'] || ''}</td>
                                     <td>${item['Quantidade Item Pedido'] || '-'}</td>
                                     <td class="text-right">${formatarMoeda(item['Valor Unitário Referência Item Pedido'])}</td>
                                     <td class="text-right">${formatarMoeda(item['Valor Total Referência Item Pedido'])}</td>
@@ -1749,61 +1894,65 @@ window.irParaConsultaLicitacao = function(orgao) {
             
             container.innerHTML = `
                 <div class="filter-container">
-                    <div class="row g-3">
-                        <div class="col-md-2">
+                    <div class="filter-row">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
-                            <select class="form-select" id="filtroAnoITEM">
-                                <option value="2026" selected>2026</option>
-                                <option value="2025">2025</option>
+                            <select class="form-select" id="filtroAnoITEM" size="1">
+                                <option value="">Todos</option>
+                                ${opcoes.anos.map(a => `<option value="${a}" ${a === 2026 ? 'selected' : ''}>${a}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">category</i>Tipo</label>
-                            <select class="form-select" id="filtroTipoITEM">
+                            <select class="form-select" id="filtroTipoITEM" size="1" style="max-height: 200px;">
                                 <option value="">Todos</option>
                                 ${opcoes.tipos.map(t => `<option value="${t}">${t}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">info</i>Situação</label>
-                            <select class="form-select" id="filtroSituacaoITEM">
+                            <select class="form-select" id="filtroSituacaoITEM" size="1" style="max-height: 200px;">
                                 <option value="">Todas</option>
                                 ${opcoes.situacoes.map(s => `<option value="${s}">${s}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">sell</i>Elemento</label>
                             <input type="text" class="form-control" id="filtroElementoITEM" list="elementosList" placeholder="Digite ou selecione...">
                             <datalist id="elementosList">
                                 ${opcoes.elementos.map(e => `<option value="${e}">`).join('')}
                             </datalist>
                         </div>
-                        <div class="col-md-3">
+                    </div>
+                    
+                    <div class="filter-row">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">business</i>Órgão</label>
                             <input type="text" class="form-control" id="filtroOrgaoITEM" list="orgaosItemList" placeholder="Digite ou selecione...">
                             <datalist id="orgaosItemList">
                                 ${opcoes.orgaos.map(o => `<option value="${o}">`).join('')}
                             </datalist>
                         </div>
-                    </div>
-                    
-                    <div class="row mt-3">
-                        <div class="col-md-8">
+                        <div class="filter-group">
                             <label class="filter-label"><i class="material-icons">person</i>Fornecedor</label>
                             <input type="text" class="form-control" id="filtroFornecedorITEM" list="fornecedoresItemList" placeholder="Digite ou selecione...">
                             <datalist id="fornecedoresItemList">
                                 ${opcoes.fornecedores.map(f => `<option value="${f}">`).join('')}
                             </datalist>
                         </div>
-                        <div class="col-md-4 d-flex justify-content-end gap-2 align-items-end">
-                            <button class="btn-pesquisa" onclick="aplicarFiltrosITEM()"><i class="material-icons me-2">search</i>Pesquisar</button>
+                        <div class="filter-group">
+                            <label class="filter-label"><i class="material-icons">receipt</i>Nº Processo</label>
+                            <input type="text" class="form-control" id="filtroProcessoITEM" placeholder="Digite...">
+                        </div>
+                        <div class="filter-group d-flex gap-2 align-items-end">
+                            <button class="btn-pesquisa flex-grow-1" onclick="aplicarFiltrosITEM()"><i class="material-icons me-2">search</i>Pesquisar</button>
                             <button class="btn-secondary-custom" onclick="limparFiltrosITEM()"><i class="material-icons me-2">clear</i>Limpar</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="d-flex gap-2">
+                    <div class="action-group">
                         <button class="btn-export" onclick="exportarTabelaItem()"><i class="material-icons me-2">print</i>Imprimir</button>
                         <button class="btn-export" onclick="exportarTabelaItemPDF()"><i class="material-icons me-2">picture_as_pdf</i>PDF</button>
                     </div>
@@ -1822,12 +1971,14 @@ window.irParaConsultaLicitacao = function(orgao) {
                         <table class="table" id="itensTable">
                             <thead>
                                 <tr>
-                                    <th onclick="toggleSort('itens', 'Número Processo - Formatado')">Processo <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSort('itens', 'Nome Órgão/Entidade Compra')">Órgão <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSort('itens', 'Nome Empresarial/Nome Fornecedor')">Fornecedor <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSort('itens', 'Item Material/Serviço')">Tipo <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSort('itens', 'Nome Elemento Item Despesa')">Descrição Material <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSort('itens', 'Código Item Material/Serviço - Formatado')">Código Item <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Ano Criação Processo')">Ano <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Número Processo - Formatado (Item)')">Processo <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Número Item Processo')">Item <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Situação Item Processo')">Situação <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Código Elemento Item Despesa')">Cód. Elemento <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Nome Elemento Item Despesa')">Elemento <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Código Item Material/Serviço Numérico')">Cód. Item <i class="material-icons sort-icon">unfold_more</i></th>
+                                    <th onclick="toggleSort('itens', 'Item Material/Serviço')">Descrição <i class="material-icons sort-icon">unfold_more</i></th>
                                     <th onclick="toggleSort('itens', 'Quantidade Item Pedido')">Quantidade <i class="material-icons sort-icon">unfold_more</i></th>
                                     <th onclick="toggleSort('itens', 'Valor Unitário Referência Item Pedido')">Valor Unit. <i class="material-icons sort-icon">unfold_more</i></th>
                                     <th onclick="toggleSort('itens', 'Valor Total Referência Item Pedido')">Valor Total <i class="material-icons sort-icon">unfold_more</i></th>
@@ -1861,27 +2012,26 @@ window.irParaConsultaLicitacao = function(orgao) {
         }
 
         function gerarLinhasTabelaItens(itens) {
-            if (!itens || itens.length === 0) return '<tr><td colspan="10" class="text-center">Nenhum registro encontrado</td></tr>';
+            if (!itens || itens.length === 0) return '<tr><td colspan="12" class="text-center">Nenhum registro encontrado</td></tr>';
             
             return itens.map(item => {
                 const tipo = item['Item Material/Serviço'] === 'M' ? 'Material' : item['Item Material/Serviço'] === 'S' ? 'Serviço' : '-';
-                const licitacaoRelacionada = dadosConsolidados.licitacoes.find(l => l['Número Processo - Formatado'] === item['Número Processo - Formatado']);
-                const orgao = licitacaoRelacionada ? licitacaoRelacionada['Nome Órgão/Entidade Compra'] : '-';
-                const fornecedor = licitacaoRelacionada ? licitacaoRelacionada['Nome Empresarial/Nome Fornecedor'] : '-';
                 
                 return `
                 <tr>
-                    <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${item['Número Processo - Formatado']}'); return false;">${item['Número Processo - Formatado'] || '-'}</a></td>
-                    <td>${orgao}</td>
-                    <td>${fornecedor}</td>
-                    <td>${tipo}</td>
+                    <td>${item['Ano Criação Processo'] || '-'}</td>
+                    <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${item['Número Processo - Formatado (Item)']}'); return false;">${item['Número Processo - Formatado (Item)'] || '-'}</a></td>
+                    <td>${item['Número Item Processo'] || '-'}</td>
+                    <td>${item['Situação Item Processo'] || '-'}</td>
+                    <td>${item['Código Elemento Item Despesa'] || '-'}</td>
                     <td>${item['Nome Elemento Item Despesa'] || '-'}</td>
-                    <td>${item['Código Item Material/Serviço - Formatado'] || '-'}</td>
+                    <td>${item['Código Item Material/Serviço Numérico'] || '-'}</td>
+                    <td>${tipo}</td>
                     <td class="text-right">${item['Quantidade Item Pedido'] || '-'}</td>
                     <td class="text-right">${formatarMoeda(item['Valor Unitário Referência Item Pedido'])}</td>
                     <td class="text-right">${formatarMoeda(item['Valor Total Referência Item Pedido'])}</td>
                     <td class="text-center">
-                        <button class="btn-action" onclick="verDetalhesLicitacao('${item['Número Processo - Formatado']}')" title="Detalhes do Contrato">
+                        <button class="btn-action" onclick="verDetalhesLicitacao('${item['Número Processo - Formatado (Item)']}')" title="Detalhes do Contrato">
                             <i class="material-icons">visibility</i>
                         </button>
                     </td>
@@ -1896,9 +2046,11 @@ window.irParaConsultaLicitacao = function(orgao) {
             const elemento = (document.getElementById('filtroElementoITEM')?.value || '').toLowerCase();
             const orgao = (document.getElementById('filtroOrgaoITEM')?.value || '').toLowerCase();
             const fornecedor = (document.getElementById('filtroFornecedorITEM')?.value || '').toLowerCase();
+            const processo = (document.getElementById('filtroProcessoITEM')?.value || '').toLowerCase();
             
             window.itensFiltrados = dadosConsolidados.itens.filter(item => {
-                const licitacaoRelacionada = dadosConsolidados.licitacoes.find(l => l['Número Processo - Formatado'] === item['Número Processo - Formatado']);
+                // Buscar licitação relacionada para filtros de órgão e fornecedor
+                const licitacaoRelacionada = dadosConsolidados.licitacoes.find(l => l['Número Processo - Formatado'] === item['Número Processo - Formatado (Item)']);
                 const orgaoItem = licitacaoRelacionada ? licitacaoRelacionada['Nome Órgão/Entidade Compra'] || '' : '';
                 const fornecedorItem = licitacaoRelacionada ? licitacaoRelacionada['Nome Empresarial/Nome Fornecedor'] || '' : '';
                 const tipoItem = item['Item Material/Serviço'] === 'M' ? 'Material' : item['Item Material/Serviço'] === 'S' ? 'Serviço' : '';
@@ -1910,6 +2062,7 @@ window.irParaConsultaLicitacao = function(orgao) {
                     !item['Nome Elemento Item Despesa']?.toLowerCase().includes(elemento)) return false;
                 if (orgao && !orgaoItem.toLowerCase().includes(orgao)) return false;
                 if (fornecedor && !fornecedorItem.toLowerCase().includes(fornecedor)) return false;
+                if (processo && !item['Número Processo - Formatado (Item)']?.toLowerCase().includes(processo)) return false;
                 return true;
             });
             
@@ -1925,6 +2078,7 @@ window.irParaConsultaLicitacao = function(orgao) {
             document.getElementById('filtroElementoITEM').value = '';
             document.getElementById('filtroOrgaoITEM').value = '';
             document.getElementById('filtroFornecedorITEM').value = '';
+            document.getElementById('filtroProcessoITEM').value = '';
             
             window.itensFiltrados = dadosConsolidados.itens.filter(i => i['Ano Criação Processo'] == 2026);
             window.itensFiltrados = ordenarDados(window.itensFiltrados, 'itens', sortConfig.itens.column, sortConfig.itens.direction);
@@ -2089,23 +2243,22 @@ window.irParaConsultaLicitacao = function(orgao) {
             const cabecalho = getCabecalhoPDF('Consulta de Licitações');
             
             const dados = window.licitacoesFiltradas.slice(0, 100).map(item => {
-                const linkRelacionado = dadosConsolidados.links.find(l => l['Número Processo - Formatado'] === item['Número Processo - Formatado']);
-                const contrato = linkRelacionado ? linkRelacionado['Número Contrato'] : '-';
-                const situacao = getSituacaoCorrigida(item);
+                const editalInfo = getLinkEdital(item);
                 return [
                     item['Número Processo - Formatado'] || '-',
-                    contrato !== '0' ? contrato : '-',
+                    item['Número Contrato'] || '-',
                     item['Nome Órgão/Entidade Compra'] || '-',
                     item['Procedimento Contratação - Detalhamento 1'] || '-',
                     formatarData(item['Data Licitação']),
                     item['Nome Empresarial/Nome Fornecedor'] || '-',
-                    situacao,
-                    formatarMoeda(item['Valor Total Homologado'])
+                    item['Situação Processo'] || '-',
+                    formatarMoeda(item['Valor Total Homologado']),
+                    editalInfo.texto
                 ];
             });
             
             doc.autoTable({
-                head: [['Processo', 'Contrato', 'Órgão', 'Modalidade', 'Data Sessão', 'Fornecedor', 'Situação', 'Valor Total']],
+                head: [['Processo', 'Contrato', 'Órgão', 'Modalidade', 'Data Sessão', 'Fornecedor', 'Situação', 'Valor Total', 'Edital']],
                 body: dados,
                 didDrawPage: (data) => {
                     doc.setFontSize(10);
@@ -2127,16 +2280,12 @@ window.irParaConsultaLicitacao = function(orgao) {
             const cabecalho = getCabecalhoPDF('Consulta de Itens');
             
             const dados = window.itensFiltrados.slice(0, 100).map(item => {
-                const licitacaoRelacionada = dadosConsolidados.licitacoes.find(l => l['Número Processo - Formatado'] === item['Número Processo - Formatado']);
-                const orgao = licitacaoRelacionada ? licitacaoRelacionada['Nome Órgão/Entidade Compra'] : '-';
-                const fornecedor = licitacaoRelacionada ? licitacaoRelacionada['Nome Empresarial/Nome Fornecedor'] : '-';
-                const tipo = item['Item Material/Serviço'] === 'M' ? 'Material' : item['Item Material/Serviço'] === 'S' ? 'Serviço' : '-';
-                
                 return [
-                    item['Número Processo - Formatado'] || '-',
-                    orgao,
-                    fornecedor,
-                    tipo,
+                    item['Ano Criação Processo'] || '-',
+                    item['Número Processo - Formatado (Item)'] || '-',
+                    item['Número Item Processo'] || '-',
+                    item['Situação Item Processo'] || '-',
+                    item['Código Elemento Item Despesa'] || '-',
                     item['Nome Elemento Item Despesa'] || '-',
                     item['Quantidade Item Pedido'] || '-',
                     formatarMoeda(item['Valor Unitário Referência Item Pedido']),
@@ -2145,7 +2294,7 @@ window.irParaConsultaLicitacao = function(orgao) {
             });
             
             doc.autoTable({
-                head: [['Processo', 'Órgão', 'Fornecedor', 'Tipo', 'Descrição', 'Qtd', 'Valor Unit.', 'Valor Total']],
+                head: [['Ano', 'Processo', 'Item', 'Situação', 'Cód. Elemento', 'Elemento', 'Qtd', 'Valor Unit.', 'Valor Total']],
                 body: dados,
                 didDrawPage: (data) => {
                     doc.setFontSize(10);
@@ -2165,11 +2314,11 @@ window.irParaConsultaLicitacao = function(orgao) {
                 <div class="filter-container">
                     <h3 class="filter-label mb-3"><i class="material-icons">download</i> Downloads</h3>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="card-stats p-4 bg-white rounded shadow-sm h-100">
                                 <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">cloud_download</i> Licitações</h4>
                                 <p class="text-muted" style="font-size: 13px;">
-                                    Dados completos de licitações dos anos 2025 e 2026.
+                                    Dados completos de licitações dos anos 2023, 2024, 2025 e 2026.
                                 </p>
                                 <div class="mt-4 text-end">
                                     <button onclick="baixarCSV('licitacoes')" class="btn-export">
@@ -2179,30 +2328,16 @@ window.irParaConsultaLicitacao = function(orgao) {
                             </div>
                         </div>
                         
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="card-stats p-4 bg-white rounded shadow-sm h-100">
                                 <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">cloud_download</i> Itens</h4>
                                 <p class="text-muted" style="font-size: 13px;">
-                                    Dados completos de itens de licitação dos anos 2025 e 2026.
+                                    Dados completos de itens de licitação dos anos 2023, 2024, 2025 e 2026.
                                 </p>
                                 <div class="mt-4 text-end">
                                     <button onclick="baixarCSV('itens')" class="btn-export">
                                         <i class="material-icons me-2">download</i>Baixar CSV
                                     </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4 mb-3">
-                            <div class="card-stats p-4 bg-white rounded shadow-sm h-100">
-                                <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">open_in_new</i> Portal Dados Abertos</h4>
-                                <p class="text-muted" style="font-size: 13px;">
-                                    Acesse o conjunto de dados completo no Portal de Dados Abertos de Minas Gerais.
-                                </p>
-                                <div class="mt-4 text-end">
-                                    <a href="https://dados.mg.gov.br/dataset?tags=Licita%C3%A7%C3%A3o" target="_blank" class="btn-export">
-                                        <i class="material-icons me-2">launch</i>Acessar
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -2212,25 +2347,37 @@ window.irParaConsultaLicitacao = function(orgao) {
                         <div class="col-md-12">
                             <div class="metadata-card">
                                 <h6 class="fw-bold mb-3"><i class="material-icons me-2">info</i> Metadados</h6>
+                                
+                                <h6 class="mt-3 fw-bold">Licitações</h6>
                                 <div class="metadata-item"><strong>ano_criacao_pedido:</strong> Ano de criação do pedido</div>
                                 <div class="metadata-item"><strong>procedimento_contratacao_grupo:</strong> Grupo (Licitação/Dispensa/Inexigibilidade)</div>
                                 <div class="metadata-item"><strong>procedimento_contratacao_detalhamento_1:</strong> Modalidade da licitação</div>
+                                <div class="metadata-item"><strong>procedimento_contratacao_especializacao:</strong> Especialização do procedimento</div>
                                 <div class="metadata-item"><strong>nome_orgao_entidade_compra:</strong> Órgão contratante</div>
                                 <div class="metadata-item"><strong>numero_processo_formatado:</strong> Número do processo</div>
-                                <div class="metadata-item"><strong>nome_empresarial_nome_fornecedor:</strong> Razão social do fornecedor</div>
-                                <div class="metadata-item"><strong>cnpj_cpf_fornecedor_formatado:</strong> CPF ou CNPJ do fornecedor</div>
                                 <div class="metadata-item"><strong>data_criacao_pedido:</strong> Data de criação do pedido</div>
                                 <div class="metadata-item"><strong>data_licitacao:</strong> Data da licitação</div>
-                                <div class="metadata-item"><strong>objeto_contrato:</strong> Objeto da contratação</div>
+                                <div class="metadata-item"><strong>numero_contrato:</strong> Número do contrato</div>
+                                <div class="metadata-item"><strong>indicador_termo_de_contrato:</strong> Indicador de termo de contrato</div>
                                 <div class="metadata-item"><strong>situacao_processo:</strong> Situação atual do processo</div>
                                 <div class="metadata-item"><strong>criterio_julgamento:</strong> Tipo de julgamento</div>
+                                <div class="metadata-item"><strong>objeto_processo:</strong> Objeto da contratação</div>
+                                <div class="metadata-item"><strong>nome_empresarial_nome_fornecedor:</strong> Razão social do fornecedor</div>
+                                <div class="metadata-item"><strong>cnpj_cpf_fornecedor_formatado:</strong> CPF ou CNPJ do fornecedor</div>
+                                <div class="metadata-item"><strong>numero_parecer_juridico:</strong> Número do parecer jurídico</div>
+                                <div class="metadata-item"><strong>edital_retificacao_arquivos:</strong> Link para o edital</div>
+                                <div class="metadata-item"><strong>contrato_termoaditivo_arquivos:</strong> Link para contrato/aditivo</div>
                                 <div class="metadata-item"><strong>valor_total_homologado:</strong> Valor total homologado</div>
-                                <div class="metadata-item"><strong>ano_criacao_processo:</strong> Ano de criação do processo (itens)</div>
+                                
+                                <h6 class="mt-3 fw-bold">Itens</h6>
+                                <div class="metadata-item"><strong>ano_criacao_processo:</strong> Ano de criação do processo</div>
+                                <div class="metadata-item"><strong>numero_processo_formatado:</strong> Número do processo</div>
                                 <div class="metadata-item"><strong>situacao_item_processo:</strong> Situação do item</div>
+                                <div class="metadata-item"><strong>numero_item_processo:</strong> Número do item</div>
                                 <div class="metadata-item"><strong>codigo_elemento_item_despesa:</strong> Código do elemento de despesa</div>
                                 <div class="metadata-item"><strong>nome_elemento_item_despesa:</strong> Nome do elemento de despesa</div>
-                                <div class="metadata-item"><strong>codigo_item_material_servico_formatado:</strong> Código do item</div>
-                                <div class="metadata-item"><strong>item_material_servico:</strong> Tipo (M=Material, S=Serviço)</div>
+                                <div class="metadata-item"><strong>codigo_item_material_servico_numerico:</strong> Código numérico do item</div>
+                                <div class="metadata-item"><strong>item_material_servico:</strong> Descrição do item</div>
                                 <div class="metadata-item"><strong>quantidade_item_pedido:</strong> Quantidade</div>
                                 <div class="metadata-item"><strong>valor_unitario_referencia_item_pedido:</strong> Valor unitário</div>
                                 <div class="metadata-item"><strong>valor_total_referencia_item_pedido:</strong> Valor total</div>
@@ -2250,27 +2397,46 @@ window.irParaConsultaLicitacao = function(orgao) {
             
             if (tipo === 'licitacoes') {
                 dados = dadosConsolidados.licitacoes;
-                cabecalhos = Object.keys(MAPA_COLUNAS).filter(key => 
-                    !key.includes('unnamed') && 
-                    !['ano_criacao_processo', 'situacao_item_processo', 'codigo_elemento_item_despesa', 
-                      'nome_elemento_item_despesa', 'codigo_item_material_servico_formatado', 
-                      'item_material_servico', 'quantidade_item_pedido', 'valor_unitario_referencia_item_pedido',
-                      'valor_total_referencia_item_pedido', 'numero_contrato', 'descricao_tipo_de_contrato',
-                      'edital_retificacao_arquivos', 'contrato_termoaditivo_arquivos', 'numero_parecer_juridico'
-                    ].includes(key)
-                ).map(key => MAPA_COLUNAS[key]);
+                cabecalhos = [
+                    'Ano Criação Pedido',
+                    'Procedimento Contratação - Grupo',
+                    'Procedimento Contratação - Detalhamento 1',
+                    'Procedimento Contratação - Especialização',
+                    'Código Órgão/Entidade Compra',
+                    'Nome Órgão/Entidade Compra',
+                    'Número Processo - Formatado',
+                    'Data Criação Pedido',
+                    'Data Licitação',
+                    'Número Contrato',
+                    'Indicador Termo Contrato',
+                    'Situação Processo',
+                    'Critério Julgamento',
+                    'Objeto Processo',
+                    'Nome Empresarial/Nome Fornecedor',
+                    'CNPJ/CPF Fornecedor - Formatado',
+                    'Número Parecer Jurídico',
+                    'Data Parecer Jurídico',
+                    'Edital_Retificação Arquivos',
+                    'Contrato_TermoAditivo Arquivos',
+                    'Valor Total Homologado',
+                    'Valor Total Atualizado'
+                ];
                 nomeArquivo = 'licitacoes_completas.csv';
             } else {
                 dados = dadosConsolidados.itens;
-                cabecalhos = Object.keys(MAPA_COLUNAS).filter(key => 
-                    !key.includes('unnamed') && 
-                    ['ano_criacao_processo', 'numero_processo_formatado', 'situacao_item_processo',
-                     'codigo_elemento_item_despesa', 'nome_elemento_item_despesa',
-                     'codigo_item_material_servico_formatado', 'item_material_servico',
-                     'quantidade_item_pedido', 'valor_unitario_referencia_item_pedido',
-                     'valor_total_referencia_item_pedido'
-                    ].includes(key)
-                ).map(key => MAPA_COLUNAS[key]);
+                cabecalhos = [
+                    'Ano Criação Processo',
+                    'Número Processo - Formatado (Item)',
+                    'Situação Item Processo',
+                    'Número Item Processo',
+                    'Código Elemento Item Despesa',
+                    'Nome Elemento Item Despesa',
+                    'Código Item Material/Serviço Numérico',
+                    'Item Material/Serviço',
+                    'Quantidade Item Pedido',
+                    'Valor Unitário Referência Item Pedido',
+                    'Valor Total Referência Item Pedido'
+                ];
                 nomeArquivo = 'itens_completos.csv';
             }
             
