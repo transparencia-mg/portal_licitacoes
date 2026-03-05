@@ -31,6 +31,10 @@
             --warning-yellow: #ffc107;
             --info-blue: #17a2b8;
             --border-color: #dee2e6;
+            --facebook: #1877f2;
+            --twitter: #1da1f2;
+            --linkedin: #0a66c2;
+            --whatsapp: #25d366;
         }
 
         /* ==================== ESTILOS GERAIS ==================== */
@@ -481,6 +485,296 @@
         }
         .btn-action:hover { background-color: var(--accent-red); }
 
+        /* ==================== NOVOS BOTÕES ==================== */
+        .btn-share-custom {
+            background: var(--primary-dark);
+            border: 2px solid var(--primary-dark);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            height: 38px;
+            white-space: nowrap;
+        }
+        
+        .btn-share-custom:hover {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(185, 60, 66, 0.2);
+            color: white;
+        }
+
+        /* ==================== DROPDOWN DE COMPARTILHAMENTO ==================== */
+        .share-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .share-options {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            z-index: 1000;
+            margin-top: 5px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+        .share-options.show {
+            display: block;
+        }
+
+        .share-options a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            gap: 10px;
+        }
+
+        .share-options a i {
+            width: 20px;
+            font-size: 16px;
+        }
+
+        .share-options .link-share {
+            color: var(--primary-dark);
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .share-options .link-share:hover {
+            background-color: #f8f9fa;
+        }
+
+        .share-options .facebook-share {
+            color: var(--facebook);
+        }
+
+        .share-options .facebook-share:hover {
+            background-color: #f0f2f5;
+        }
+
+        .share-options .twitter-share {
+            color: var(--twitter);
+        }
+
+        .share-options .twitter-share:hover {
+            background-color: #f0f2f5;
+        }
+
+        .share-options .linkedin-share {
+            color: var(--linkedin);
+        }
+
+        .share-options .linkedin-share:hover {
+            background-color: #f0f2f5;
+        }
+
+        .share-options .whatsapp-share {
+            color: var(--whatsapp);
+        }
+
+        .share-options .whatsapp-share:hover {
+            background-color: #f0f2f5;
+        }
+
+        /* ==================== BARRA DE BUSCA ==================== */
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 0 10px;
+            height: 38px;
+            width: 300px;
+        }
+
+        .search-box i {
+            color: var(--primary-dark);
+            font-size: 18px;
+            margin-right: 8px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+            background: transparent;
+        }
+
+        .search-box input::placeholder {
+            color: #adb5bd;
+        }
+
+        .search-box .clear-search {
+            cursor: pointer;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .search-box .clear-search:hover {
+            color: var(--accent-red);
+        }
+
+        /* ==================== ACTION BUTTONS CONTAINER ==================== */
+        .action-buttons-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .total-registros-badge {
+            background: var(--primary-dark);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .total-registros-badge i {
+            font-size: 16px;
+        }
+
+        /* ==================== NOVA PAGINAÇÃO ==================== */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-size-selector select {
+            width: 70px;
+            border: 2px solid var(--primary-dark);
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 12px;
+            background-color: white;
+            color: var(--primary-dark);
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .page-size-selector select:focus {
+            border-color: var(--accent-red);
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pagination-controls button {
+            min-width: 36px;
+            height: 36px;
+            border: 1px solid #dee2e6;
+            background: white;
+            color: var(--primary-dark);
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            padding: 0 8px;
+        }
+
+        .pagination-controls button:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .pagination-controls button.active {
+            background-color: var(--primary-dark);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .pagination-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-input input {
+            width: 60px;
+            height: 36px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            padding: 0 5px;
+        }
+
+        .page-input input:focus {
+            outline: none;
+            border-color: var(--primary-dark);
+        }
+
+        .page-input button {
+            height: 36px;
+            background: var(--primary-dark);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-input button:hover {
+            background: var(--accent-red);
+        }
+
         /* ==================== NAVEGAÇÃO ==================== */
         .nav-tabs-container {
             background: white;
@@ -537,8 +831,8 @@
         .info-value { font-size: 14px; font-weight: 600; color: var(--primary-dark); word-break: break-word; }
         .info-value.highlight { font-size: 18px; color: var(--accent-red); }
 
-        /* ==================== PAGINAÇÃO ==================== */
-        .pagination-container {
+        /* ==================== PAGINAÇÃO ORIGINAL ==================== */
+        .pagination-original {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -549,7 +843,7 @@
             gap: 15px;
         }
         
-        .pagination-info {
+        .pagination-info-original {
             font-size: 13px;
             color: #6c757d;
         }
@@ -618,6 +912,52 @@
             gap: 10px;
             flex-wrap: wrap;
             align-items: center;
+        }
+
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 12px 20px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 10000;
+            border-left: 4px solid;
+            max-width: 350px;
+        }
+        
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+        
+        .toast-notification.success {
+            border-left-color: var(--success-green);
+        }
+        
+        .toast-notification.error {
+            border-left-color: var(--accent-red);
+        }
+        
+        .toast-content {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--primary-dark);
+        }
+        
+        .toast-content i {
+            font-size: 20px;
+        }
+        
+        .toast-notification.success i {
+            color: var(--success-green);
+        }
+        
+        .toast-notification.error i {
+            color: var(--accent-red);
         }
 
         /* Ajuste para coluna órgão na visão geral */
@@ -775,7 +1115,14 @@
         let chartModalidades = null;
         let chartSituacao = null;
 
-        const chartPalette = ['#1a3a5c','#2c5f8a','#3a7cb8','#5a9fd4','#7ab8e0','#9dd1ec','#bde4f5','#d4a017','#c0392b','#27ae60'];
+        // Variáveis de busca ativa
+        let buscaAtiva = {
+            visaoGeral: '',
+            licitacoes: '',
+            itens: ''
+        };
+
+        const chartPalette = ['#1a3a5c','#2c5f8a','#3a7cb8','#5a9fd4','#7ab8e0','#9dd1ec','#bde4f5','#d4a017','#c0392b','#27ae10'];
 
         // ============================================
         // FUNÇÕES DE INICIALIZAÇÃO
@@ -801,7 +1148,16 @@
             if (elementoData) elementoData.textContent = dataFormatada;
         }
 
-        function setupEventListeners() {}
+        function setupEventListeners() {
+            // Fechar dropdown de compartilhamento ao clicar fora
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.share-dropdown')) {
+                    document.querySelectorAll('.share-options').forEach(option => {
+                        option.classList.remove('show');
+                    });
+                }
+            });
+        }
 
         function mostrarLoading(show) {
             const overlay = document.getElementById('loadingOverlay');
@@ -1135,6 +1491,552 @@
         }
 
         // ============================================
+        // FUNÇÕES DE BUSCA
+        // ============================================
+        function criarBarraBusca(tipo, placeholder, valorAtual) {
+            return `
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           id="busca${tipo}" 
+                           placeholder="${placeholder}"
+                           value="${valorAtual || ''}"
+                           onkeyup="realizarBusca('${tipo.toLowerCase()}', event)">
+                    ${valorAtual ? `
+                        <i class="fas fa-times clear-search" onclick="limparBusca('${tipo.toLowerCase()}')"></i>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function realizarBusca(tipo, event) {
+            const termo = event.target.value.toLowerCase().trim();
+            buscaAtiva[tipo] = termo;
+            
+            if (tipo === 'visaogeral') {
+                filtrarVisaoGeralComBusca(termo);
+            } else if (tipo === 'licitacoes') {
+                filtrarLicitacoesComBusca(termo);
+            } else if (tipo === 'itens') {
+                filtrarItensComBusca(termo);
+            }
+            
+            atualizarURLComFiltros();
+        }
+
+        function limparBusca(tipo) {
+            buscaAtiva[tipo] = '';
+            const inputBusca = document.getElementById(`busca${tipo === 'visaogeral' ? 'VisaoGeral' : 
+                                                         (tipo === 'licitacoes' ? 'Licitacoes' : 'Itens')}`);
+            if (inputBusca) {
+                inputBusca.value = '';
+            }
+            
+            if (tipo === 'visaogeral') {
+                window.visaoGeralAgrupados = window.visaoGeralAgrupadosOriginal || window.visaoGeralAgrupados;
+                paginacao.visaoGeral.paginaAtual = 1;
+                paginacao.visaoGeral.totalPaginas = Math.ceil(window.visaoGeralAgrupados.length / paginacao.visaoGeral.itensPorPagina);
+                atualizarTabelaVisaoGeral();
+            } else if (tipo === 'licitacoes') {
+                window.licitacoesFiltradas = window.licitacoesFiltradasOriginal || window.licitacoesFiltradas;
+                paginacao.licitacoes.paginaAtual = 1;
+                paginacao.licitacoes.totalPaginas = Math.ceil(window.licitacoesFiltradas.length / paginacao.licitacoes.itensPorPagina);
+                atualizarTabelaConsultaLicitacao();
+            } else if (tipo === 'itens') {
+                window.itensFiltrados = window.itensFiltradosOriginal || window.itensFiltrados;
+                paginacao.itens.paginaAtual = 1;
+                paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / paginacao.itens.itensPorPagina);
+                atualizarTabelaItens();
+            }
+            
+            atualizarURLComFiltros();
+        }
+
+        function filtrarVisaoGeralComBusca(termo) {
+            if (!termo) {
+                window.visaoGeralAgrupados = window.visaoGeralAgrupadosOriginal || window.visaoGeralAgrupados;
+            } else {
+                window.visaoGeralAgrupadosOriginal = window.visaoGeralAgrupadosOriginal || [...window.visaoGeralAgrupados];
+                window.visaoGeralAgrupados = window.visaoGeralAgrupadosOriginal.filter(item => {
+                    return Object.values(item).some(val => 
+                        val && val.toString().toLowerCase().includes(termo)
+                    );
+                });
+            }
+            
+            paginacao.visaoGeral.paginaAtual = 1;
+            paginacao.visaoGeral.totalPaginas = Math.ceil(window.visaoGeralAgrupados.length / paginacao.visaoGeral.itensPorPagina);
+            atualizarTabelaVisaoGeral();
+        }
+
+        function filtrarLicitacoesComBusca(termo) {
+            if (!termo) {
+                window.licitacoesFiltradas = window.licitacoesFiltradasOriginal || window.licitacoesFiltradas;
+            } else {
+                window.licitacoesFiltradasOriginal = window.licitacoesFiltradasOriginal || [...window.licitacoesFiltradas];
+                window.licitacoesFiltradas = window.licitacoesFiltradasOriginal.filter(item => {
+                    return Object.values(item).some(val => 
+                        val && val.toString().toLowerCase().includes(termo)
+                    );
+                });
+            }
+            
+            paginacao.licitacoes.paginaAtual = 1;
+            paginacao.licitacoes.totalPaginas = Math.ceil(window.licitacoesFiltradas.length / paginacao.licitacoes.itensPorPagina);
+            atualizarTabelaConsultaLicitacao();
+        }
+
+        function filtrarItensComBusca(termo) {
+            if (!termo) {
+                window.itensFiltrados = window.itensFiltradosOriginal || window.itensFiltrados;
+            } else {
+                window.itensFiltradosOriginal = window.itensFiltradosOriginal || [...window.itensFiltrados];
+                window.itensFiltrados = window.itensFiltradosOriginal.filter(item => {
+                    return Object.values(item).some(val => 
+                        val && val.toString().toLowerCase().includes(termo)
+                    );
+                });
+            }
+            
+            paginacao.itens.paginaAtual = 1;
+            paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / paginacao.itens.itensPorPagina);
+            atualizarTabelaItens();
+        }
+
+        // ============================================
+        // FUNÇÕES DE COMPARTILHAMENTO
+        // ============================================
+        function toggleShareDropdown(dashboardId) {
+            document.querySelectorAll('.share-options').forEach(option => {
+                if (option.id !== `shareOptionsDashboard${dashboardId}`) {
+                    option.classList.remove('show');
+                }
+            });
+            
+            const options = document.getElementById(`shareOptionsDashboard${dashboardId}`);
+            if (options) {
+                options.classList.toggle('show');
+            }
+        }
+
+        function copiarLink() {
+            const url = gerarURLComFiltros();
+            
+            navigator.clipboard.writeText(url).then(() => {
+                mostrarToast('Link copiado para a área de transferência!', 'success');
+            }).catch(() => {
+                mostrarToast('Erro ao copiar link. Tente novamente.', 'error');
+            });
+            
+            document.querySelectorAll('.share-options').forEach(option => {
+                option.classList.remove('show');
+            });
+        }
+
+        function compartilharFacebook(e) {
+            e.preventDefault();
+            const url = encodeURIComponent(gerarURLComFiltros());
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+            
+            document.querySelectorAll('.share-options').forEach(option => {
+                option.classList.remove('show');
+            });
+        }
+
+        function compartilharTwitter(e) {
+            e.preventDefault();
+            const url = encodeURIComponent(gerarURLComFiltros());
+            const text = encodeURIComponent('Licitações - Portal da Transparência MG');
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+            
+            document.querySelectorAll('.share-options').forEach(option => {
+                option.classList.remove('show');
+            });
+        }
+
+        function compartilharLinkedIn(e) {
+            e.preventDefault();
+            const url = encodeURIComponent(gerarURLComFiltros());
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+            
+            document.querySelectorAll('.share-options').forEach(option => {
+                option.classList.remove('show');
+            });
+        }
+
+        function compartilharWhatsApp(e) {
+            e.preventDefault();
+            const url = encodeURIComponent(gerarURLComFiltros());
+            const text = encodeURIComponent('Confira as licitações do Portal da Transparência MG');
+            window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+            
+            document.querySelectorAll('.share-options').forEach(option => {
+                option.classList.remove('show');
+            });
+        }
+
+        function gerarURLComFiltros() {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams();
+            
+            const activeTab = document.querySelector('.nav-tabs .nav-link.active');
+            if (activeTab) {
+                const tabId = activeTab.id.replace('-tab', '');
+                params.set('tab', tabId);
+            }
+            
+            if (buscaAtiva.visaoGeral) params.set('buscaVG', buscaAtiva.visaoGeral);
+            if (buscaAtiva.licitacoes) params.set('buscaCL', buscaAtiva.licitacoes);
+            if (buscaAtiva.itens) params.set('buscaITEM', buscaAtiva.itens);
+            
+            const filtrosVG = {
+                ano: document.getElementById('filtroAnoVG')?.value,
+                orgao: document.getElementById('filtroOrgaoVG')?.value,
+                modalidade: document.getElementById('filtroModalidadeVG')?.value,
+                situacao: document.getElementById('filtroSituacaoVG')?.value,
+                emergencial: document.getElementById('filtroEmergencialVG')?.value,
+                tipo: document.getElementById('filtroTipoVG')?.value
+            };
+            
+            Object.entries(filtrosVG).forEach(([key, value]) => {
+                if (value) params.set(`vg_${key}`, value);
+            });
+            
+            const filtrosCL = {
+                ano: document.getElementById('filtroAnoCL')?.value,
+                orgao: document.getElementById('filtroOrgaoCL')?.value,
+                modalidade: document.getElementById('filtroModalidadeCL')?.value,
+                situacao: document.getElementById('filtroSituacaoCL')?.value,
+                emergencial: document.getElementById('filtroEmergencialCL')?.value,
+                tipo: document.getElementById('filtroTipoCL')?.value,
+                processo: document.getElementById('filtroProcessoCL')?.value,
+                fornecedor: document.getElementById('filtroFornecedorCL')?.value,
+                cnpj: document.getElementById('filtroCnpjCL')?.value,
+                objeto: document.getElementById('filtroObjetoCL')?.value
+            };
+            
+            Object.entries(filtrosCL).forEach(([key, value]) => {
+                if (value) params.set(`cl_${key}`, value);
+            });
+            
+            const filtrosITEM = {
+                ano: document.getElementById('filtroAnoITEM')?.value,
+                orgao: document.getElementById('filtroOrgaoITEM')?.value,
+                elemento: document.getElementById('filtroElementoITEM')?.value,
+                descricaoElemento: document.getElementById('filtroDescricaoElementoITEM')?.value,
+                fornecedor: document.getElementById('filtroFornecedorITEM')?.value,
+                processo: document.getElementById('filtroProcessoITEM')?.value
+            };
+            
+            Object.entries(filtrosITEM).forEach(([key, value]) => {
+                if (value) params.set(`item_${key}`, value);
+            });
+            
+            params.set('sortVG_col', sortConfig.visaoGeral.column);
+            params.set('sortVG_dir', sortConfig.visaoGeral.direction);
+            params.set('sortCL_col', sortConfig.licitacoes.column);
+            params.set('sortCL_dir', sortConfig.licitacoes.direction);
+            params.set('sortITEM_col', sortConfig.itens.column);
+            params.set('sortITEM_dir', sortConfig.itens.direction);
+            
+            params.set('pageVG', paginacao.visaoGeral.paginaAtual);
+            params.set('pageCL', paginacao.licitacoes.paginaAtual);
+            params.set('pageITEM', paginacao.itens.paginaAtual);
+            
+            params.set('perPageCL', paginacao.licitacoes.itensPorPagina);
+            params.set('perPageITEM', paginacao.itens.itensPorPagina);
+            
+            url.search = params.toString();
+            return url.toString();
+        }
+
+        function atualizarURLComFiltros() {
+            const url = gerarURLComFiltros();
+            window.history.replaceState({}, '', url);
+        }
+
+        function mostrarToast(mensagem, tipo) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${tipo}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="material-icons me-2">${tipo === 'success' ? 'check_circle' : 'error'}</i>
+                    <span>${mensagem}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function carregarFiltrosDaURL() {
+            const params = new URLSearchParams(window.location.search);
+            
+            const tab = params.get('tab');
+            if (tab) {
+                const tabElement = document.getElementById(`${tab}-tab`);
+                if (tabElement) {
+                    setTimeout(() => tabElement.click(), 100);
+                }
+            }
+            
+            buscaAtiva.visaoGeral = params.get('buscaVG') || '';
+            buscaAtiva.licitacoes = params.get('buscaCL') || '';
+            buscaAtiva.itens = params.get('buscaITEM') || '';
+            
+            const filtrosVG = ['ano', 'orgao', 'modalidade', 'situacao', 'emergencial', 'tipo'];
+            filtrosVG.forEach(filtro => {
+                const valor = params.get(`vg_${filtro}`);
+                if (valor) {
+                    const elemento = document.getElementById(`filtro${filtro.charAt(0).toUpperCase() + filtro.slice(1)}VG`);
+                    if (elemento) elemento.value = valor;
+                }
+            });
+            
+            const filtrosCL = ['ano', 'orgao', 'modalidade', 'situacao', 'emergencial', 'tipo', 'processo', 'fornecedor', 'cnpj', 'objeto'];
+            filtrosCL.forEach(filtro => {
+                const valor = params.get(`cl_${filtro}`);
+                if (valor) {
+                    const elemento = document.getElementById(`filtro${filtro.charAt(0).toUpperCase() + filtro.slice(1)}CL`);
+                    if (elemento) elemento.value = valor;
+                }
+            });
+            
+            const filtrosITEM = ['ano', 'orgao', 'elemento', 'descricaoElemento', 'fornecedor', 'processo'];
+            filtrosITEM.forEach(filtro => {
+                const valor = params.get(`item_${filtro}`);
+                if (valor) {
+                    const elemento = document.getElementById(`filtro${filtro.charAt(0).toUpperCase() + filtro.slice(1)}ITEM`);
+                    if (elemento) elemento.value = valor;
+                }
+            });
+            
+            const sortVGCol = params.get('sortVG_col');
+            const sortVGDir = params.get('sortVG_dir');
+            if (sortVGCol && sortVGDir) {
+                sortConfig.visaoGeral.column = sortVGCol;
+                sortConfig.visaoGeral.direction = sortVGDir;
+            }
+            
+            const sortCLCol = params.get('sortCL_col');
+            const sortCLDir = params.get('sortCL_dir');
+            if (sortCLCol && sortCLDir) {
+                sortConfig.licitacoes.column = sortCLCol;
+                sortConfig.licitacoes.direction = sortCLDir;
+            }
+            
+            const sortITEMCol = params.get('sortITEM_col');
+            const sortITEMDir = params.get('sortITEM_dir');
+            if (sortITEMCol && sortITEMDir) {
+                sortConfig.itens.column = sortITEMCol;
+                sortConfig.itens.direction = sortITEMDir;
+            }
+            
+            const pageVG = params.get('pageVG');
+            if (pageVG) paginacao.visaoGeral.paginaAtual = parseInt(pageVG);
+            
+            const pageCL = params.get('pageCL');
+            if (pageCL) paginacao.licitacoes.paginaAtual = parseInt(pageCL);
+            
+            const pageITEM = params.get('pageITEM');
+            if (pageITEM) paginacao.itens.paginaAtual = parseInt(pageITEM);
+            
+            const perPageCL = params.get('perPageCL');
+            if (perPageCL) {
+                paginacao.licitacoes.itensPorPagina = parseInt(perPageCL);
+                const selectCL = document.getElementById('itensPorPaginaCL');
+                if (selectCL) selectCL.value = perPageCL;
+            }
+            
+            const perPageITEM = params.get('perPageITEM');
+            if (perPageITEM) {
+                paginacao.itens.itensPorPagina = parseInt(perPageITEM);
+                const selectITEM = document.getElementById('itensPorPaginaITEM');
+                if (selectITEM) selectITEM.value = perPageITEM;
+            }
+        }
+
+        // ============================================
+        // FUNÇÕES DE PAGINAÇÃO MELHORADA
+        // ============================================
+        function renderizarPaginacao(tipo) {
+            let container, filtradas, pagAtual, totalPag, itensPorPag;
+            
+            if (tipo === 'visaoGeral') {
+                container = document.getElementById('paginacaoContainerVG');
+                filtradas = window.visaoGeralAgrupados || [];
+                pagAtual = paginacao.visaoGeral.paginaAtual;
+                totalPag = paginacao.visaoGeral.totalPaginas;
+                itensPorPag = paginacao.visaoGeral.itensPorPagina;
+            } else if (tipo === 'licitacoes') {
+                container = document.getElementById('paginacaoContainerCL');
+                filtradas = window.licitacoesFiltradas || [];
+                pagAtual = paginacao.licitacoes.paginaAtual;
+                totalPag = paginacao.licitacoes.totalPaginas;
+                itensPorPag = paginacao.licitacoes.itensPorPagina;
+            } else {
+                container = document.getElementById('paginacaoContainerITEM');
+                filtradas = window.itensFiltrados || [];
+                pagAtual = paginacao.itens.paginaAtual;
+                totalPag = paginacao.itens.totalPaginas;
+                itensPorPag = paginacao.itens.itensPorPagina;
+            }
+            
+            if (!container) return;
+            
+            if (filtradas.length === 0) {
+                container.innerHTML = '<div class="pagination-info">Nenhum registro encontrado</div>';
+                return;
+            }
+            
+            const inicio = (pagAtual - 1) * itensPorPag + 1;
+            const fim = Math.min(pagAtual * itensPorPag, filtradas.length);
+            
+            let html = `
+                <div class="pagination-info">
+                    <span>Mostrando ${inicio.toLocaleString('pt-BR')}-${fim.toLocaleString('pt-BR')} de ${filtradas.length.toLocaleString('pt-BR')} registros</span>
+                    <div class="page-size-selector">
+                        <span>Itens por página:</span>
+                        <select id="itensPorPagina${tipo === 'visaoGeral' ? 'VG' : tipo === 'licitacoes' ? 'CL' : 'ITEM'}" onchange="alterarItensPorPagina('${tipo}')">
+                            <option value="25" ${itensPorPag == 25 ? 'selected' : ''}>25</option>
+                            <option value="50" ${itensPorPag == 50 ? 'selected' : ''}>50</option>
+                            <option value="100" ${itensPorPag == 100 ? 'selected' : ''}>100</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pagination-controls">
+                    <button onclick="mudarPagina('${tipo}', 1)" ${pagAtual === 1 ? 'disabled' : ''} title="Primeira página">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button onclick="mudarPagina('${tipo}', ${pagAtual - 1})" ${pagAtual === 1 ? 'disabled' : ''} title="Página anterior">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+            `;
+            
+            let inicioPaginas = Math.max(1, pagAtual - 2);
+            let fimPaginas = Math.min(totalPag, inicioPaginas + 4);
+            
+            if (inicioPaginas > 1) {
+                html += `<button onclick="mudarPagina('${tipo}', 1)">1</button>`;
+                if (inicioPaginas > 2) {
+                    html += `<span style="padding: 0 5px;">...</span>`;
+                }
+            }
+            
+            for (let i = inicioPaginas; i <= fimPaginas; i++) {
+                html += `<button onclick="mudarPagina('${tipo}', ${i})" class="${i === pagAtual ? 'active' : ''}">${i}</button>`;
+            }
+            
+            if (fimPaginas < totalPag) {
+                if (fimPaginas < totalPag - 1) {
+                    html += `<span style="padding: 0 5px;">...</span>`;
+                }
+                html += `<button onclick="mudarPagina('${tipo}', ${totalPag})">${totalPag}</button>`;
+            }
+            
+            html += `
+                    <button onclick="mudarPagina('${tipo}', ${pagAtual + 1})" ${pagAtual === totalPag ? 'disabled' : ''} title="Próxima página">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button onclick="mudarPagina('${tipo}', ${totalPag})" ${pagAtual === totalPag ? 'disabled' : ''} title="Última página">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
+                <div class="page-input">
+                    <input type="number" id="irParaPagina${tipo === 'visaoGeral' ? 'VG' : tipo === 'licitacoes' ? 'CL' : 'ITEM'}" 
+                           min="1" max="${totalPag}" value="${pagAtual}" 
+                           onkeypress="if(event.key === 'Enter') irParaPagina('${tipo}')">
+                    <button onclick="irParaPagina('${tipo}')">Ir</button>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function irParaPagina(tipo) {
+            let inputId, totalPag;
+            
+            if (tipo === 'visaoGeral') {
+                inputId = 'irParaPaginaVG';
+                totalPag = paginacao.visaoGeral.totalPaginas;
+            } else if (tipo === 'licitacoes') {
+                inputId = 'irParaPaginaCL';
+                totalPag = paginacao.licitacoes.totalPaginas;
+            } else {
+                inputId = 'irParaPaginaITEM';
+                totalPag = paginacao.itens.totalPaginas;
+            }
+            
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            let pagina = parseInt(input.value);
+            if (isNaN(pagina) || pagina < 1) pagina = 1;
+            if (pagina > totalPag) pagina = totalPag;
+            
+            mudarPagina(tipo, pagina);
+        }
+
+        window.mudarPagina = function(tipo, pagina) {
+            let totalPag;
+            if (tipo === 'visaoGeral') totalPag = paginacao.visaoGeral.totalPaginas;
+            else if (tipo === 'licitacoes') totalPag = paginacao.licitacoes.totalPaginas;
+            else totalPag = paginacao.itens.totalPaginas;
+            
+            if (pagina < 1 || pagina > totalPag) return;
+            
+            if (tipo === 'visaoGeral') {
+                paginacao.visaoGeral.paginaAtual = pagina;
+                atualizarTabelaVisaoGeral();
+            } else if (tipo === 'licitacoes') {
+                paginacao.licitacoes.paginaAtual = pagina;
+                atualizarTabelaConsultaLicitacao();
+            } else {
+                paginacao.itens.paginaAtual = pagina;
+                atualizarTabelaItens();
+            }
+            
+            atualizarURLComFiltros();
+        };
+
+        window.alterarItensPorPagina = function(tipo) {
+            let selectId, valor;
+            
+            if (tipo === 'visaoGeral') {
+                selectId = 'itensPorPaginaVG';
+                valor = parseInt(document.getElementById(selectId).value);
+                paginacao.visaoGeral.itensPorPagina = valor;
+                paginacao.visaoGeral.paginaAtual = 1;
+                paginacao.visaoGeral.totalPaginas = Math.ceil(window.visaoGeralAgrupados.length / valor);
+                atualizarTabelaVisaoGeral();
+            } else if (tipo === 'licitacoes') {
+                selectId = 'itensPorPaginaCL';
+                valor = parseInt(document.getElementById(selectId).value);
+                paginacao.licitacoes.itensPorPagina = valor;
+                paginacao.licitacoes.paginaAtual = 1;
+                paginacao.licitacoes.totalPaginas = Math.ceil(window.licitacoesFiltradas.length / valor);
+                atualizarTabelaConsultaLicitacao();
+            } else if (tipo === 'itens') {
+                selectId = 'itensPorPaginaITEM';
+                valor = parseInt(document.getElementById(selectId).value);
+                paginacao.itens.itensPorPagina = valor;
+                paginacao.itens.paginaAtual = 1;
+                paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / valor);
+                atualizarTabelaItens();
+            }
+            
+            atualizarURLComFiltros();
+        };
+
+        // ============================================
         // CARREGAMENTO DE DADOS
         // ============================================
         async function carregarTodosDados() {
@@ -1216,6 +2118,7 @@
                 renderizarConsultaItem();
                 renderizarDownloads();
                 
+                setTimeout(carregarFiltrosDaURL, 500);
                 setTimeout(iframeUpdateHeight, 500);
             } catch (erro) {
                 console.error('❌ Erro FATAL ao carregar dados:', erro);
@@ -1306,11 +2209,40 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="action-group">
-                        <button class="btn-export" onclick="exportarTabelaVisaoGeral()"><i class="material-icons me-2">print</i>Imprimir</button>
-                        <button class="btn-export" onclick="exportarTabelaVisaoGeralPDF()"><i class="material-icons me-2">picture_as_pdf</i>PDF</button>
+                    <div class="action-buttons-container">
+                        <button class="btn-export" onclick="exportarTabelaVisaoGeral()" title="Exportar CSV">
+                            <i class="fas fa-file-csv"></i> CSV
+                        </button>
+                        <button class="btn-export" onclick="exportarTabelaVisaoGeralPDF()" title="Exportar PDF">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <div class="share-dropdown">
+                            <button class="btn-share-custom" onclick="toggleShareDropdown(1)">
+                                <i class="fas fa-share-alt"></i> Compartilhar
+                            </button>
+                            <div class="share-options" id="shareOptionsDashboard1">
+                                <a href="#" class="link-share" onclick="copiarLink()">
+                                    <i class="fas fa-link"></i> Copiar Link
+                                </a>
+                                <a href="#" class="facebook-share" onclick="compartilharFacebook(event)">
+                                    <i class="fab fa-facebook-f"></i> Facebook
+                                </a>
+                                <a href="#" class="twitter-share" onclick="compartilharTwitter(event)">
+                                    <i class="fab fa-twitter"></i> Twitter
+                                </a>
+                                <a href="#" class="linkedin-share" onclick="compartilharLinkedIn(event)">
+                                    <i class="fab fa-linkedin-in"></i> LinkedIn
+                                </a>
+                                <a href="#" class="whatsapp-share" onclick="compartilharWhatsApp(event)">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                        ${criarBarraBusca('VisaoGeral', 'Buscar em visão geral...', buscaAtiva.visaoGeral)}
                     </div>
-                    <span class="table-badge" id="totalProcessosBadge">${dadosAgrupados.length} grupos</span>
+                    <div class="total-registros-badge">
+                        <i class="fas fa-database"></i> ${dadosAgrupados.length} grupos
+                    </div>
                 </div>
 
                 <div class="table-container">
@@ -1366,9 +2298,7 @@
             const dadosPagina = window.visaoGeralAgrupados.slice(inicio, fim);
             
             document.getElementById('visaoGeralTableBody').innerHTML = gerarLinhasTabelaVisaoGeral(dadosPagina);
-            document.getElementById('totalProcessosBadge').innerText = window.visaoGeralAgrupados.length + ' grupos';
             
-            paginacao.visaoGeral.totalPaginas = Math.ceil(window.visaoGeralAgrupados.length / paginacao.visaoGeral.itensPorPagina);
             renderizarPaginacao('visaoGeral');
         }
 
@@ -1634,17 +2564,39 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="action-group">
-                        <button class="btn-export" onclick="exportarTabelaLicitacao()"><i class="material-icons me-2">print</i>Imprimir</button>
-                        <button class="btn-export" onclick="exportarTabelaLicitacaoPDF()"><i class="material-icons me-2">picture_as_pdf</i>PDF</button>
+                    <div class="action-buttons-container">
+                        <button class="btn-export" onclick="exportarTabelaLicitacao()" title="Exportar CSV">
+                            <i class="fas fa-file-csv"></i> CSV
+                        </button>
+                        <button class="btn-export" onclick="exportarTabelaLicitacaoPDF()" title="Exportar PDF">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <div class="share-dropdown">
+                            <button class="btn-share-custom" onclick="toggleShareDropdown(2)">
+                                <i class="fas fa-share-alt"></i> Compartilhar
+                            </button>
+                            <div class="share-options" id="shareOptionsDashboard2">
+                                <a href="#" class="link-share" onclick="copiarLink()">
+                                    <i class="fas fa-link"></i> Copiar Link
+                                </a>
+                                <a href="#" class="facebook-share" onclick="compartilharFacebook(event)">
+                                    <i class="fab fa-facebook-f"></i> Facebook
+                                </a>
+                                <a href="#" class="twitter-share" onclick="compartilharTwitter(event)">
+                                    <i class="fab fa-twitter"></i> Twitter
+                                </a>
+                                <a href="#" class="linkedin-share" onclick="compartilharLinkedIn(event)">
+                                    <i class="fab fa-linkedin-in"></i> LinkedIn
+                                </a>
+                                <a href="#" class="whatsapp-share" onclick="compartilharWhatsApp(event)">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                        ${criarBarraBusca('Licitacoes', 'Buscar em licitações...', buscaAtiva.licitacoes)}
                     </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="table-badge" id="totalLicitacoesBadge">${dadosFiltrados.licitacoes.length} licitações</span>
-                        <select class="items-per-page" id="itensPorPaginaCL" onchange="alterarItensPorPagina('licitacoes')">
-                            <option value="25">25</option>
-                            <option value="50" selected>50</option>
-                            <option value="100">100</option>
-                        </select>
+                    <div class="total-registros-badge">
+                        <i class="fas fa-database"></i> ${dadosFiltrados.licitacoes.length} licitações
                     </div>
                 </div>
 
@@ -1700,9 +2652,7 @@
             const dadosPagina = window.licitacoesFiltradas.slice(inicio, fim);
             
             document.getElementById('licitacoesTableBody').innerHTML = gerarLinhasTabelaLicitacoes(dadosPagina);
-            document.getElementById('totalLicitacoesBadge').innerText = window.licitacoesFiltradas.length + ' licitações';
             
-            paginacao.licitacoes.totalPaginas = Math.ceil(window.licitacoesFiltradas.length / paginacao.licitacoes.itensPorPagina);
             renderizarPaginacao('licitacoes');
         }
 
@@ -1932,7 +2882,7 @@
         };
 
         // ============================================
-        // RENDERIZAÇÃO CONSULTA ITENS - COMPLETO E FUNCIONAL
+        // RENDERIZAÇÃO CONSULTA ITENS
         // ============================================
         function renderizarConsultaItem() {
             const container = document.getElementById('consulta-item-content');
@@ -2001,17 +2951,39 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="action-group">
-                        <button class="btn-export" onclick="exportarTabelaItem()"><i class="material-icons me-2">print</i>Imprimir</button>
-                        <button class="btn-export" onclick="exportarTabelaItemPDF()"><i class="material-icons me-2">picture_as_pdf</i>PDF</button>
+                    <div class="action-buttons-container">
+                        <button class="btn-export" onclick="exportarTabelaItem()" title="Exportar CSV">
+                            <i class="fas fa-file-csv"></i> CSV
+                        </button>
+                        <button class="btn-export" onclick="exportarTabelaItemPDF()" title="Exportar PDF">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <div class="share-dropdown">
+                            <button class="btn-share-custom" onclick="toggleShareDropdown(3)">
+                                <i class="fas fa-share-alt"></i> Compartilhar
+                            </button>
+                            <div class="share-options" id="shareOptionsDashboard3">
+                                <a href="#" class="link-share" onclick="copiarLink()">
+                                    <i class="fas fa-link"></i> Copiar Link
+                                </a>
+                                <a href="#" class="facebook-share" onclick="compartilharFacebook(event)">
+                                    <i class="fab fa-facebook-f"></i> Facebook
+                                </a>
+                                <a href="#" class="twitter-share" onclick="compartilharTwitter(event)">
+                                    <i class="fab fa-twitter"></i> Twitter
+                                </a>
+                                <a href="#" class="linkedin-share" onclick="compartilharLinkedIn(event)">
+                                    <i class="fab fa-linkedin-in"></i> LinkedIn
+                                </a>
+                                <a href="#" class="whatsapp-share" onclick="compartilharWhatsApp(event)">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                        ${criarBarraBusca('Itens', 'Buscar em itens...', buscaAtiva.itens)}
                     </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="table-badge" id="totalItensBadge">${dadosFiltrados.itens.length} itens</span>
-                        <select class="items-per-page" id="itensPorPaginaITEM" onchange="alterarItensPorPagina('itens')">
-                            <option value="25">25</option>
-                            <option value="50" selected>50</option>
-                            <option value="100">100</option>
-                        </select>
+                    <div class="total-registros-badge">
+                        <i class="fas fa-database"></i> ${dadosFiltrados.itens.length} itens
                     </div>
                 </div>
 
@@ -2076,9 +3048,7 @@
             const dadosPagina = window.itensFiltrados.slice(inicio, fim);
             
             document.getElementById('itensTableBody').innerHTML = gerarLinhasTabelaItens(dadosPagina);
-            document.getElementById('totalItensBadge').innerText = window.itensFiltrados.length + ' itens';
             
-            paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / itensPorPagina) || 1;
             renderizarPaginacao('itens');
         }
 
@@ -2228,111 +3198,6 @@
         };
 
         // ============================================
-        // PAGINAÇÃO
-        // ============================================
-        function renderizarPaginacao(tipo) {
-            let container, filtradas, pagAtual, totalPag, itensPorPag;
-            
-            if (tipo === 'visaoGeral') {
-                container = document.getElementById('paginacaoContainerVG');
-                filtradas = window.visaoGeralAgrupados || [];
-                pagAtual = paginacao.visaoGeral.paginaAtual;
-                totalPag = paginacao.visaoGeral.totalPaginas;
-                itensPorPag = paginacao.visaoGeral.itensPorPagina;
-            } else if (tipo === 'licitacoes') {
-                container = document.getElementById('paginacaoContainerCL');
-                filtradas = window.licitacoesFiltradas || [];
-                pagAtual = paginacao.licitacoes.paginaAtual;
-                totalPag = paginacao.licitacoes.totalPaginas;
-                itensPorPag = paginacao.licitacoes.itensPorPagina;
-            } else {
-                container = document.getElementById('paginacaoContainerITEM');
-                filtradas = window.itensFiltrados || [];
-                pagAtual = paginacao.itens.paginaAtual;
-                totalPag = paginacao.itens.totalPaginas;
-                itensPorPag = paginacao.itens.itensPorPagina;
-            }
-            
-            if (!container) return;
-            
-            if (filtradas.length === 0) {
-                container.innerHTML = '<div class="pagination-info">Nenhum registro encontrado</div>';
-                return;
-            }
-            
-            const inicio = (pagAtual - 1) * itensPorPag + 1;
-            const fim = Math.min(pagAtual * itensPorPag, filtradas.length);
-            
-            let html = `
-                <div class="pagination-info">
-                    Mostrando ${inicio.toLocaleString('pt-BR')}-${fim.toLocaleString('pt-BR')} de ${filtradas.length.toLocaleString('pt-BR')} registros
-                </div>
-                <nav>
-                    <ul class="pagination mb-0">
-            `;
-            
-            html += `<li class="page-item ${pagAtual === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="mudarPagina('${tipo}', ${pagAtual - 1}); return false;">&laquo;</a>
-            </li>`;
-            
-            let inicioPaginas = Math.max(1, pagAtual - 2);
-            let fimPaginas = Math.min(totalPag, inicioPaginas + 4);
-            if (fimPaginas - inicioPaginas < 4) {
-                inicioPaginas = Math.max(1, fimPaginas - 4);
-            }
-            
-            for (let i = inicioPaginas; i <= fimPaginas; i++) {
-                html += `<li class="page-item ${i === pagAtual ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="mudarPagina('${tipo}', ${i}); return false;">${i}</a>
-                </li>`;
-            }
-            
-            html += `<li class="page-item ${pagAtual === totalPag ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="mudarPagina('${tipo}', ${pagAtual + 1}); return false;">&raquo;</a>
-            </li>`;
-            
-            html += '</ul></nav>';
-            container.innerHTML = html;
-        }
-
-        window.mudarPagina = function(tipo, pagina) {
-            let totalPag;
-            if (tipo === 'visaoGeral') totalPag = paginacao.visaoGeral.totalPaginas;
-            else if (tipo === 'licitacoes') totalPag = paginacao.licitacoes.totalPaginas;
-            else totalPag = paginacao.itens.totalPaginas;
-            
-            if (pagina < 1 || pagina > totalPag) return;
-            
-            if (tipo === 'visaoGeral') {
-                paginacao.visaoGeral.paginaAtual = pagina;
-                atualizarTabelaVisaoGeral();
-            } else if (tipo === 'licitacoes') {
-                paginacao.licitacoes.paginaAtual = pagina;
-                atualizarTabelaConsultaLicitacao();
-            } else {
-                paginacao.itens.paginaAtual = pagina;
-                atualizarTabelaItens();
-            }
-        };
-
-        window.alterarItensPorPagina = function(tipo) {
-            let valor;
-            if (tipo === 'licitacoes') {
-                valor = parseInt(document.getElementById('itensPorPaginaCL').value);
-                paginacao.licitacoes.itensPorPagina = valor;
-                paginacao.licitacoes.paginaAtual = 1;
-                paginacao.licitacoes.totalPaginas = Math.ceil(window.licitacoesFiltradas.length / valor);
-                atualizarTabelaConsultaLicitacao();
-            } else if (tipo === 'itens') {
-                valor = parseInt(document.getElementById('itensPorPaginaITEM').value);
-                paginacao.itens.itensPorPagina = valor;
-                paginacao.itens.paginaAtual = 1;
-                paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / valor);
-                atualizarTabelaItens();
-            }
-        };
-
-        // ============================================
         // EXPORTAÇÕES
         // ============================================
         function getCabecalhoPDF(titulo) {
@@ -2347,8 +3212,28 @@
         }
 
         window.exportarTabelaVisaoGeral = function() {
-            window.print();
+            const csvContent = gerarCSVVisaoGeral();
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'visao_geral_licitacoes.csv';
+            link.click();
         };
+
+        function gerarCSVVisaoGeral() {
+            const dados = window.visaoGeralAgrupados.map(item => [
+                item.codigo,
+                item.orgao,
+                item.modalidade,
+                item.tipo,
+                item.total_processos,
+                item.valor_total
+            ]);
+            
+            const cabecalhos = ['Código', 'Órgão', 'Modalidade', 'Tipo', 'Processos', 'Valor Total'];
+            const linhas = dados.map(linha => linha.map(celula => `"${celula}"`).join(';'));
+            return [cabecalhos.join(';'), ...linhas].join('\n');
+        }
 
         window.exportarTabelaVisaoGeralPDF = function() {
             const { jsPDF } = window.jspdf;
@@ -2378,8 +3263,31 @@
         };
 
         window.exportarTabelaLicitacao = function() {
-            window.print();
+            const csvContent = gerarCSVLicitacoes();
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'consulta_licitacoes.csv';
+            link.click();
         };
+
+        function gerarCSVLicitacoes() {
+            const dados = window.licitacoesFiltradas.map(item => [
+                item['numero_processo_formatado'],
+                item['numero_contrato'],
+                item['nome_orgao_entidade_compra'],
+                item['procedimento_contratacao_detalhamento_1'],
+                item['data_licitacao'],
+                item['nome_empresarial_nome_fornecedor'],
+                item['situacao_processo'],
+                item['valor_total_homologado'],
+                getLinkEdital(item).texto
+            ]);
+            
+            const cabecalhos = ['Processo', 'Contrato', 'Órgão', 'Modalidade', 'Data Sessão', 'Fornecedor', 'Situação', 'Valor Total', 'Edital'];
+            const linhas = dados.map(linha => linha.map(celula => `"${celula || ''}"`).join(';'));
+            return [cabecalhos.join(';'), ...linhas].join('\n');
+        }
 
         window.exportarTabelaLicitacaoPDF = function() {
             const { jsPDF } = window.jspdf;
@@ -2412,8 +3320,31 @@
         };
 
         window.exportarTabelaItem = function() {
-            window.print();
+            const csvContent = gerarCSVItens();
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'consulta_itens.csv';
+            link.click();
         };
+
+        function gerarCSVItens() {
+            const dados = window.itensFiltrados.map(item => [
+                item['ano_criacao_processo'],
+                item['numero_processo_formatado'],
+                item['numero_item_processo'],
+                item['situacao_item_processo'],
+                item['codigo_elemento_item_despesa'],
+                item['nome_elemento_item_despesa'],
+                item['quantidade_item_pedido'],
+                item['valor_unitario_referencia_item_pedido'],
+                item['valor_total_referencia_item_pedido']
+            ]);
+            
+            const cabecalhos = ['Ano', 'Processo', 'Item', 'Situação', 'Cód. Elemento', 'Elemento', 'Qtd', 'Valor Unit.', 'Valor Total'];
+            const linhas = dados.map(linha => linha.map(celula => `"${celula || ''}"`).join(';'));
+            return [cabecalhos.join(';'), ...linhas].join('\n');
+        }
 
         window.exportarTabelaItemPDF = function() {
             const { jsPDF } = window.jspdf;
