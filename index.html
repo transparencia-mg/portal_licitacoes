@@ -1214,16 +1214,37 @@
             }).join('');
         }
 
-        window.irParaConsultaLicitacao = function(orgao) {
-            document.getElementById('consulta-licitacao-tab').click();
-            setTimeout(() => {
-                const select = document.getElementById('filtroOrgaoCL');
-                if (select) {
-                    select.value = orgao;
-                    aplicarFiltrosCL();
-                }
-            }, 300);
-        };
+window.irParaConsultaLicitacao = function(orgao) {
+    // Mudar para a aba de consulta de licitações
+    document.getElementById('consulta-licitacao-tab').click();
+    
+    setTimeout(() => {
+        // Capturar todos os filtros atuais da visão geral
+        const anoVG = document.getElementById('filtroAnoVG')?.value;
+        const modalidadeVG = document.getElementById('filtroModalidadeVG')?.value;
+        const situacaoVG = document.getElementById('filtroSituacaoVG')?.value;
+        const emergencialVG = document.getElementById('filtroEmergencialVG')?.value;
+        const tipoVG = document.getElementById('filtroTipoVG')?.value;
+        
+        // Aplicar os filtros na consulta de licitações
+        const selectOrgao = document.getElementById('filtroOrgaoCL');
+        const selectAno = document.getElementById('filtroAnoCL');
+        const selectModalidade = document.getElementById('filtroModalidadeCL');
+        const selectSituacao = document.getElementById('filtroSituacaoCL');
+        const selectEmergencial = document.getElementById('filtroEmergencialCL');
+        const selectTipo = document.getElementById('filtroTipoCL');
+        
+        if (selectOrgao) selectOrgao.value = orgao;
+        if (selectAno && anoVG) selectAno.value = anoVG;
+        if (selectModalidade && modalidadeVG) selectModalidade.value = modalidadeVG;
+        if (selectSituacao && situacaoVG) selectSituacao.value = situacaoVG;
+        if (selectEmergencial && emergencialVG) selectEmergencial.value = emergencialVG;
+        if (selectTipo && tipoVG) selectTipo.value = tipoVG;
+        
+        // Aplicar os filtros
+        aplicarFiltrosCL();
+    }, 300);
+};
 
         function atualizarMetricasVG(dados) {
             const metricas = calcularMetricas(dados);
