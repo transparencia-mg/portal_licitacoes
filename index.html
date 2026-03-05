@@ -835,53 +835,77 @@
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
-        function parseCSV(texto, tipo) {
-            const linhas = texto.trim().split('\n');
-            let cabecalhos = linhas[0].split(';').map(h => h.trim().replace(/^\uFEFF/, '').replace(/"/g, ''));
+function parseCSV(texto, tipo) {
+    try {
+        const linhas = texto.trim().split('\n');
+        if (linhas.length < 2) {
+            console.warn('Arquivo CSV vazio ou inválido');
+            return [];
+        }
+        
+        // Processar cabeçalhos
+        let cabecalhos = linhas[0].split(';').map(h => {
+            return h.trim().replace(/^\uFEFF/, '').replace(/"/g, '');
+        });
+        
+        console.log(`Cabeçalhos ${tipo}:`, cabecalhos);
+        
+        const dados = [];
+        
+        for (let i = 1; i < linhas.length; i++) {
+            if (!linhas[i].trim()) continue;
             
-            const dados = [];
+            const linha = linhas[i];
+            const valores = [];
+            let campoAtual = '';
+            let dentroAspas = false;
             
-            for (let i = 1; i < linhas.length; i++) {
-                if (!linhas[i].trim()) continue;
+            // Parsing manual para lidar com aspas
+            for (let j = 0; j < linha.length; j++) {
+                const char = linha[j];
                 
-                let linha = linhas[i];
-                const valores = [];
-                let campoAtual = '';
-                let dentroAspas = false;
+                if (char === '"') {
+                    dentroAspas = !dentroAspas;
+                } else if (char === ';' && !dentroAspas) {
+                    valores.push(campoAtual);
+                    campoAtual = '';
+                } else {
+                    campoAtual += char;
+                }
+            }
+            valores.push(campoAtual); // Último campo
+            
+            const linhaObj = {};
+            
+            cabecalhos.forEach((cab, idx) => {
+                let valor = valores[idx] !== undefined ? valores[idx] : '';
                 
-                for (let char of linha) {
-                    if (char === '"') {
-                        dentroAspas = !dentroAspas;
-                    } else if (char === ';' && !dentroAspas) {
-                        valores.push(campoAtual);
-                        campoAtual = '';
-                    } else {
-                        campoAtual += char;
+                // Limpar valor
+                if (valor === 'INEXISTENTE' || valor === 'NULL' || valor === '') {
+                    valor = null;
+                }
+                
+                // Tentar converter números com vírgula
+                if (typeof valor === 'string' && valor.includes(',') && !isNaN(parseFloat(valor.replace(',', '.')))) {
+                    const num = parseFloat(valor.replace(',', '.'));
+                    if (!isNaN(num)) {
+                        valor = num;
                     }
                 }
-                valores.push(campoAtual);
                 
-                const linhaObj = {};
-                cabecalhos.forEach((cab, idx) => {
-                    let valor = valores[idx] || '';
-                    // Usar o nome original do cabeçalho como chave
-                    const nomeOriginal = cab.trim();
-                    
-                    if (valor === 'INEXISTENTE' || valor === '') valor = null;
-                    
-                    // Tentar converter números
-                    if (typeof valor === 'string' && valor.includes(',') && !isNaN(parseFloat(valor.replace(',', '.')))) {
-                        valor = parseFloat(valor.replace(',', '.'));
-                    }
-                    
-                    linhaObj[nomeOriginal] = valor;
-                });
-                
-                dados.push(linhaObj);
-            }
-            return dados;
+                // Usar nome original do cabeçalho como chave
+                linhaObj[cab] = valor;
+            });
+            
+            dados.push(linhaObj);
         }
-
+        
+        return dados;
+    } catch (e) {
+        console.error('Erro no parseCSV:', e);
+        return [];
+    }
+}
         function verificarEmergencial(processo) {
             if (!processo) return false;
             const especializacao = processo['procedimento_contratacao_especializacao'] || '';
@@ -959,29 +983,70 @@
             };
         }
 
-        function obterOpcoesFiltro(dados, tipo) {
-            if (tipo === 'itens') {
-                return {
-                    anos: [...new Set(dados.map(i => i['ano_criacao_processo']))].filter(Boolean).sort().reverse(),
-                    orgaos: [...new Set(dados.map(i => i['nome_orgao_entidade_compra']))].filter(Boolean).sort(),
-                    fornecedores: [...new Set(dados.map(i => i['nome_empresarial_nome_fornecedor']))].filter(Boolean).sort(),
-                    elementos: [...new Set(dados.map(i => i['codigo_elemento_item_despesa']))].filter(Boolean).sort(),
-                    tipos: [...new Set(dados.map(i => i['item_material_servico'] === 'M' ? 'Material' : i['item_material_servico'] === 'S' ? 'Serviço' : null))].filter(Boolean).sort(),
-                    situacoes: [...new Set(dados.map(i => i['situacao_item_processo']))].filter(Boolean).sort()
-                };
-            } else {
-                return {
-                    anos: [...new Set(dados.map(i => i['ano_criacao_pedido']))].filter(Boolean).sort().reverse(),
-                    modalidades: [...new Set(dados.map(i => i['procedimento_contratacao_detalhamento_1']))].filter(Boolean).sort(),
-                    orgaos: [...new Set(dados.map(i => i['nome_orgao_entidade_compra']))].filter(Boolean).sort(),
-                    situacoes: [...new Set(dados.map(i => i['situacao_processo']))].filter(Boolean).sort(),
-                    criterios: [...new Set(dados.map(i => i['criterio_julgamento']))].filter(Boolean).sort(),
-                    grupos: [...new Set(dados.map(i => i['procedimento_contratacao_grupo']))].filter(Boolean).sort(),
-                    fornecedores: [...new Set(dados.map(i => i['nome_empresarial_nome_fornecedor']))].filter(Boolean).sort(),
-                    processos: [...new Set(dados.map(i => i['numero_processo_formatado']))].filter(Boolean).sort()
-                };
-            }
+function obterOpcoesFiltro(dados, tipo) {
+    if (!dados || dados.length === 0) {
+        return {
+            anos: [], orgaos: [], fornecedores: [], elementos: [], tipos: [],
+            situacoes: [], modalidades: [], criterios: [], grupos: [], processos: []
+        };
+    }
+    
+    if (tipo === 'itens') {
+        // Para itens, precisamos buscar órgãos e fornecedores das licitações relacionadas
+        const orgaosSet = new Set();
+        const fornecedoresSet = new Set();
+        
+        // Mapear licitações por processo para acesso rápido
+        const licitacoesMap = {};
+        if (dadosConsolidados.licitacoes) {
+            dadosConsolidados.licitacoes.forEach(l => {
+                if (l['numero_processo_formatado']) {
+                    licitacoesMap[l['numero_processo_formatado']] = l;
+                }
+            });
         }
+        
+        // Para cada item, tenta encontrar a licitação relacionada
+        dados.forEach(item => {
+            const processo = item['numero_processo_formatado'];
+            if (processo && licitacoesMap[processo]) {
+                const lic = licitacoesMap[processo];
+                if (lic['nome_orgao_entidade_compra']) {
+                    orgaosSet.add(lic['nome_orgao_entidade_compra']);
+                }
+                if (lic['nome_empresarial_nome_fornecedor']) {
+                    fornecedoresSet.add(lic['nome_empresarial_nome_fornecedor']);
+                }
+            }
+        });
+        
+        return {
+            anos: [...new Set(dados.map(i => i['ano_criacao_processo']))].filter(Boolean).sort((a,b) => b - a),
+            orgaos: Array.from(orgaosSet).sort(),
+            fornecedores: Array.from(fornecedoresSet).sort(),
+            elementos: [...new Set(dados.map(i => i['codigo_elemento_item_despesa']))].filter(Boolean).sort(),
+            tipos: ['Material', 'Serviço'],
+            situacoes: [...new Set(dados.map(i => i['situacao_item_processo']))].filter(Boolean).sort(),
+            // Manter compatibilidade
+            modalidades: [],
+            criterios: [],
+            grupos: [],
+            processos: [...new Set(dados.map(i => i['numero_processo_formatado']))].filter(Boolean).sort()
+        };
+    } else {
+        // Licitações
+        return {
+            anos: [...new Set(dados.map(i => i['ano_criacao_pedido']))].filter(Boolean).sort((a,b) => b - a),
+            modalidades: [...new Set(dados.map(i => i['procedimento_contratacao_detalhamento_1']))].filter(Boolean).sort(),
+            orgaos: [...new Set(dados.map(i => i['nome_orgao_entidade_compra']))].filter(Boolean).sort(),
+            situacoes: [...new Set(dados.map(i => i['situacao_processo']))].filter(Boolean).sort(),
+            criterios: [...new Set(dados.map(i => i['criterio_julgamento']))].filter(Boolean).sort(),
+            grupos: [...new Set(dados.map(i => i['procedimento_contratacao_grupo']))].filter(Boolean).sort(),
+            fornecedores: [...new Set(dados.map(i => i['nome_empresarial_nome_fornecedor']))].filter(Boolean).sort(),
+            processos: [...new Set(dados.map(i => i['numero_processo_formatado']))].filter(Boolean).sort()
+        };
+    }
+}
 
         function agruparPorModalidade(dados) {
             const mapa = new Map();
@@ -1042,64 +1107,160 @@
         // ============================================
         // CARREGAMENTO DE DADOS
         // ============================================
-        async function carregarTodosDados() {
-            mostrarLoading(true);
-            try {
-                for (const ano of anosDisponiveis) {
-                    const arquivos = ARQUIVOS_POR_ANO[ano];
-                    
-                    // Carregar licitações
-                    try {
-                        const resp = await fetch(GITHUB_BASE + arquivos.licitacoes);
-                        if (resp.ok) {
-                            const texto = await resp.text();
-                            const dadosAno = parseCSV(texto, 'licitacoes');
-                            dadosAno.forEach(d => d.ano_referencia = ano);
-                            dadosConsolidados.licitacoes = [...dadosConsolidados.licitacoes, ...dadosAno];
-                            console.log(`Carregadas ${dadosAno.length} licitações de ${ano}`);
-                        }
-                    } catch (e) {
-                        console.log(`Erro ao carregar licitações ${ano}:`, e);
-                    }
-                    
-                    // Carregar itens
-                    try {
-                        const resp = await fetch(GITHUB_BASE + arquivos.itens);
-                        if (resp.ok) {
-                            const texto = await resp.text();
-                            const dadosAno = parseCSV(texto, 'itens');
-                            dadosAno.forEach(d => d.ano_referencia = ano);
-                            dadosConsolidados.itens = [...dadosConsolidados.itens, ...dadosAno];
-                            console.log(`Carregados ${dadosAno.length} itens de ${ano}`);
-                        }
-                    } catch (e) {
-                        console.log(`Erro ao carregar itens ${ano}:`, e);
-                    }
-                }
-                
-                console.log(`Total: ${dadosConsolidados.licitacoes.length} licitações, ${dadosConsolidados.itens.length} itens`);
-                
-                // Filtrar apenas dados de 2026 para exibição inicial
-                dadosFiltrados.visaoGeral = dadosConsolidados.licitacoes.filter(l => l['ano_criacao_pedido'] == 2026);
-                dadosFiltrados.licitacoes = dadosConsolidados.licitacoes.filter(l => l['ano_criacao_pedido'] == 2026);
-                dadosFiltrados.itens = dadosConsolidados.itens.filter(i => i['ano_criacao_processo'] == 2026);
-                
-                metricaGeral = calcularMetricas(dadosFiltrados.visaoGeral);
-                
-                renderizarVisaoGeral();
-                renderizarConsultaLicitacao();
-                renderizarConsultaItem();
-                renderizarDownloads();
-                
-                setTimeout(iframeUpdateHeight, 500);
-            } catch (erro) {
-                console.error('Erro ao carregar dados:', erro);
-                showError('Erro ao carregar dados. Recarregue a página.');
-            } finally {
-                mostrarLoading(false);
-            }
-        }
 
+async function carregarTodosDados() {
+    mostrarLoading(true);
+    try {
+        // Limpar dados existentes
+        dadosConsolidados = {
+            licitacoes: [],
+            itens: []
+        };
+        
+        console.log('=== INICIANDO CARREGAMENTO DE TODOS OS ANOS ===');
+        
+        // Carregar anos em paralelo para ser mais rápido
+        const promises = [];
+        
+        for (const ano of anosDisponiveis) {
+            const arquivos = ARQUIVOS_POR_ANO[ano];
+            
+            // Promise para licitações
+            promises.push(
+                fetch(GITHUB_BASE + arquivos.licitacoes)
+                    .then(async resp => {
+                        if (resp.ok) {
+                            const texto = await resp.text();
+                            console.log(`✅ Licitações ${ano}: arquivo carregado (${texto.length} bytes)`);
+                            const dados = parseCSV(texto, `licitacoes_${ano}`);
+                            console.log(`📊 Licitações ${ano}: ${dados.length} registros`);
+                            
+                            // Adicionar ano de referência
+                            dados.forEach(d => { if (d) d.ano_referencia = ano; });
+                            
+                            // Adicionar ao array principal
+                            dadosConsolidados.licitacoes = [...dadosConsolidados.licitacoes, ...dados];
+                        } else {
+                            console.warn(`⚠️ Licitações ${ano}: status ${resp.status} - arquivo não encontrado`);
+                        }
+                    })
+                    .catch(err => console.error(`❌ Erro licitações ${ano}:`, err))
+            );
+            
+            // Promise para itens
+            promises.push(
+                fetch(GITHUB_BASE + arquivos.itens)
+                    .then(async resp => {
+                        if (resp.ok) {
+                            const texto = await resp.text();
+                            console.log(`✅ Itens ${ano}: arquivo carregado (${texto.length} bytes)`);
+                            const dados = parseCSV(texto, `itens_${ano}`);
+                            console.log(`📊 Itens ${ano}: ${dados.length} registros`);
+                            
+                            // Adicionar ano de referência
+                            dados.forEach(d => { if (d) d.ano_referencia = ano; });
+                            
+                            // Adicionar ao array principal
+                            dadosConsolidados.itens = [...dadosConsolidados.itens, ...dados];
+                        } else {
+                            console.warn(`⚠️ Itens ${ano}: status ${resp.status} - arquivo não encontrado`);
+                        }
+                    })
+                    .catch(err => console.error(`❌ Erro itens ${ano}:`, err))
+            );
+        }
+        
+        // Aguardar todas as promises
+        await Promise.all(promises);
+        
+        console.log('=== RESUMO FINAL DO CARREGAMENTO ===');
+        console.log(`📊 TOTAL LICITAÇÕES: ${dadosConsolidados.licitacoes.length}`);
+        console.log(`📦 TOTAL ITENS: ${dadosConsolidados.itens.length}`);
+        
+        // Mostrar distribuição por ano
+        const licitacoesPorAno = {};
+        dadosConsolidados.licitacoes.forEach(l => {
+            const ano = l['ano_criacao_pedido'] || l.ano_referencia;
+            licitacoesPorAno[ano] = (licitacoesPorAno[ano] || 0) + 1;
+        });
+        console.log('📅 Licitações por ano:', licitacoesPorAno);
+        
+        const itensPorAno = {};
+        dadosConsolidados.itens.forEach(i => {
+            const ano = i['ano_criacao_processo'] || i.ano_referencia;
+            itensPorAno[ano] = (itensPorAno[ano] || 0) + 1;
+        });
+        console.log('📅 Itens por ano:', itensPorAno);
+        
+        // Verificar amostra dos dados
+        if (dadosConsolidados.licitacoes.length > 0) {
+            console.log('🔍 Amostra licitação (primeiro):', dadosConsolidados.licitacoes[0]);
+        }
+        if (dadosConsolidados.itens.length > 0) {
+            console.log('🔍 Amostra item (primeiro):', dadosConsolidados.itens[0]);
+        }
+        
+        // Filtrar dados de 2026 para exibição inicial
+        dadosFiltrados = {
+            visaoGeral: dadosConsolidados.licitacoes.filter(l => l && (l['ano_criacao_pedido'] == 2026 || l.ano_referencia == 2026)),
+            licitacoes: dadosConsolidados.licitacoes.filter(l => l && (l['ano_criacao_pedido'] == 2026 || l.ano_referencia == 2026)),
+            itens: dadosConsolidados.itens.filter(i => i && (i['ano_criacao_processo'] == 2026 || i.ano_referencia == 2026))
+        };
+        
+        console.log('📊 Dados filtrados 2026:', {
+            visaoGeral: dadosFiltrados.visaoGeral.length,
+            licitacoes: dadosFiltrados.licitacoes.length,
+            itens: dadosFiltrados.itens.length
+        });
+        
+        // Calcular métricas
+        metricaGeral = calcularMetricas(dadosFiltrados.visaoGeral);
+        
+        // Renderizar todas as abas
+        renderizarVisaoGeral();
+        renderizarConsultaLicitacao();
+        renderizarConsultaItem();
+        renderizarDownloads();
+        
+        setTimeout(iframeUpdateHeight, 500);
+    } catch (erro) {
+        console.error('❌ Erro FATAL ao carregar dados:', erro);
+        showError('Erro ao carregar dados. Verifique o console para mais detalhes.');
+    } finally {
+        mostrarLoading(false);
+    }
+}
+
+// ============================================
+// FUNÇÃO PARA TESTAR ACESSO AOS ARQUIVOS
+// ============================================
+window.testarAcessos = async function() {
+    console.log('=== TESTANDO ACESSO AOS ARQUIVOS ===');
+    
+    for (const ano of anosDisponiveis) {
+        const arquivos = ARQUIVOS_POR_ANO[ano];
+        
+        // Testar licitações
+        try {
+            const urlLicitacoes = GITHUB_BASE + arquivos.licitacoes;
+            console.log(`🔍 Testando: ${urlLicitacoes}`);
+            const respLicitacoes = await fetch(urlLicitacoes, { method: 'HEAD' });
+            console.log(`   Licitações ${ano}: ${respLicitacoes.status} ${respLicitacoes.statusText}`);
+        } catch (e) {
+            console.error(`   Erro licitações ${ano}:`, e.message);
+        }
+        
+        // Testar itens
+        try {
+            const urlItens = GITHUB_BASE + arquivos.itens;
+            console.log(`🔍 Testando: ${urlItens}`);
+            const respItens = await fetch(urlItens, { method: 'HEAD' });
+            console.log(`   Itens ${ano}: ${respItens.status} ${respItens.statusText}`);
+        } catch (e) {
+            console.error(`   Erro itens ${ano}:`, e.message);
+        }
+    }
+};
         // ============================================
         // RENDERIZAÇÃO VISÃO GERAL
         // ============================================
@@ -1810,221 +1971,711 @@
             new bootstrap.Modal(document.getElementById('detailModal')).show();
         };
 
-        // ============================================
-        // RENDERIZAÇÃO CONSULTA ITENS
-        // ============================================
-        function renderizarConsultaItem() {
-            const container = document.getElementById('consulta-item-content');
-            if (!container) return;
-            
-            const opcoes = obterOpcoesFiltro(dadosConsolidados.itens, 'itens');
-            
-            container.innerHTML = `
-                <div class="filter-container">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
-                            <select class="form-select" id="filtroAnoITEM">
-                                <option value="">Todos</option>
-                                ${opcoes.anos.map(a => `<option value="${a}" ${a == 2026 ? 'selected' : ''}>${a}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label"><i class="material-icons">category</i>Tipo</label>
-                            <select class="form-select" id="filtroTipoITEM">
-                                <option value="">Todos</option>
-                                ${opcoes.tipos.map(t => `<option value="${t}">${t}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label"><i class="material-icons">info</i>Situação</label>
-                            <select class="form-select" id="filtroSituacaoITEM">
-                                <option value="">Todas</option>
-                                ${opcoes.situacoes.map(s => `<option value="${s}">${s}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label"><i class="material-icons">sell</i>Elemento</label>
-                            <input type="text" class="form-control" id="filtroElementoITEM" list="elementosList" placeholder="Digite ou selecione...">
-                            <datalist id="elementosList">
-                                ${opcoes.elementos.map(e => `<option value="${e}">`).join('')}
-                            </datalist>
-                        </div>
-                    </div>
-                    
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label class="filter-label"><i class="material-icons">business</i>Órgão</label>
-                            <input type="text" class="form-control" id="filtroOrgaoITEM" list="orgaosItemList" placeholder="Digite ou selecione...">
-                            <datalist id="orgaosItemList">
-                                ${opcoes.orgaos.map(o => `<option value="${o}">`).join('')}
-                            </datalist>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label"><i class="material-icons">person</i>Fornecedor</label>
-                            <input type="text" class="form-control" id="filtroFornecedorITEM" list="fornecedoresItemList" placeholder="Digite ou selecione...">
-                            <datalist id="fornecedoresItemList">
-                                ${opcoes.fornecedores.map(f => `<option value="${f}">`).join('')}
-                            </datalist>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label"><i class="material-icons">receipt</i>Nº Processo</label>
-                            <input type="text" class="form-control" id="filtroProcessoITEM" placeholder="Digite...">
-                        </div>
-                        <div class="filter-group d-flex gap-2 align-items-end">
-                            <button class="btn-pesquisa" onclick="aplicarFiltrosITEM()"><i class="material-icons me-2">search</i>Pesquisar</button>
-                            <button class="btn-secondary-custom" onclick="limparFiltrosITEM()"><i class="material-icons me-2">clear</i>Limpar</button>
-                        </div>
-                    </div>
+// ============================================
+// DEBUG - Verificar estrutura dos dados
+// ============================================
+console.log('=== INICIANDO DEBUG ITENS ===');
+console.log('dadosConsolidados.itens existe?', !!dadosConsolidados.itens);
+if (dadosConsolidados.itens) {
+    console.log('Total itens:', dadosConsolidados.itens.length);
+    console.log('Distribuição por ano:');
+    const anos = {};
+    dadosConsolidados.itens.forEach(i => {
+        const ano = i['ano_criacao_processo'];
+        anos[ano] = (anos[ano] || 0) + 1;
+    });
+    console.log(anos);
+    
+    if (dadosConsolidados.itens.length > 0) {
+        console.log('Primeiro item completo:', dadosConsolidados.itens[0]);
+        console.log('Colunas disponíveis:', Object.keys(dadosConsolidados.itens[0]));
+    }
+}
+// ============================================
+// RENDERIZAÇÃO CONSULTA ITENS (VERSÃO COMPLETA)
+// ============================================
+function renderizarConsultaItem() {
+    const container = document.getElementById('consulta-item-content');
+    if (!container) return;
+    
+    console.log('Renderizando consulta itens...');
+    console.log('Total itens disponíveis:', dadosConsolidados.itens?.length || 0);
+    
+    // Verificar se temos dados
+    if (!dadosConsolidados.itens || dadosConsolidados.itens.length === 0) {
+        container.innerHTML = '<div class="alert alert-warning">Aguardando carregamento dos dados de itens...</div>';
+        return;
+    }
+    
+    // Garantir que dadosFiltrados.itens existe
+    if (!dadosFiltrados.itens || dadosFiltrados.itens.length === 0) {
+        dadosFiltrados.itens = dadosConsolidados.itens.filter(i => i && i['ano_criacao_processo'] == 2026);
+    }
+    
+    // Obter opções para os filtros
+    const opcoes = obterOpcoesFiltro(dadosConsolidados.itens, 'itens');
+    
+    container.innerHTML = `
+        <div class="filter-container">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
+                    <select class="form-select" id="filtroAnoITEM">
+                        <option value="">Todos</option>
+                        ${opcoes.anos.map(a => `<option value="${a}" ${a == 2026 ? 'selected' : ''}>${a}</option>`).join('')}
+                    </select>
                 </div>
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">category</i>Tipo</label>
+                    <select class="form-select" id="filtroTipoITEM">
+                        <option value="">Todos</option>
+                        <option value="Material">Material</option>
+                        <option value="Serviço">Serviço</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">info</i>Situação</label>
+                    <select class="form-select" id="filtroSituacaoITEM">
+                        <option value="">Todas</option>
+                        ${opcoes.situacoes.map(s => `<option value="${s}">${s}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">sell</i>Elemento</label>
+                    <input type="text" class="form-control" id="filtroElementoITEM" list="elementosList" placeholder="Digite ou selecione...">
+                    <datalist id="elementosList">
+                        ${opcoes.elementos.map(e => `<option value="${e}">`).join('')}
+                    </datalist>
+                </div>
+            </div>
+            
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">business</i>Órgão</label>
+                    <input type="text" class="form-control" id="filtroOrgaoITEM" list="orgaosItemList" placeholder="Digite ou selecione...">
+                    <datalist id="orgaosItemList">
+                        ${opcoes.orgaos.map(o => `<option value="${o}">`).join('')}
+                    </datalist>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">person</i>Fornecedor</label>
+                    <input type="text" class="form-control" id="filtroFornecedorITEM" list="fornecedoresItemList" placeholder="Digite ou selecione...">
+                    <datalist id="fornecedoresItemList">
+                        ${opcoes.fornecedores.map(f => `<option value="${f}">`).join('')}
+                    </datalist>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">receipt</i>Nº Processo</label>
+                    <input type="text" class="form-control" id="filtroProcessoITEM" list="processosItemList" placeholder="Digite ou selecione...">
+                    <datalist id="processosItemList">
+                        ${opcoes.processos.map(p => `<option value="${p}">`).join('')}
+                    </datalist>
+                </div>
+                <div class="filter-group d-flex gap-2 align-items-end">
+                    <button class="btn-pesquisa" onclick="aplicarFiltrosITEM()"><i class="material-icons me-2">search</i>Pesquisar</button>
+                    <button class="btn-secondary-custom" onclick="limparFiltrosITEM()"><i class="material-icons me-2">clear</i>Limpar</button>
+                </div>
+            </div>
+        </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="action-group">
-                        <button class="btn-export" onclick="exportarTabelaItem()"><i class="material-icons me-2">print</i>Imprimir</button>
-                        <button class="btn-export" onclick="exportarTabelaItemPDF()"><i class="material-icons me-2">picture_as_pdf</i>PDF</button>
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="table-badge" id="totalItensBadge">${dadosFiltrados.itens.length} itens</span>
-                        <select class="items-per-page" id="itensPorPaginaITEM" onchange="alterarItensPorPagina('itens')">
-                            <option value="25">25</option>
-                            <option value="50" selected>50</option>
-                            <option value="100">100</option>
-                        </select>
-                    </div>
-                </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="action-group">
+                <button class="btn-export" onclick="exportarTabelaItem()"><i class="material-icons me-2">print</i>Imprimir</button>
+                <button class="btn-export" onclick="exportarTabelaItemPDF()"><i class="material-icons me-2">picture_as_pdf</i>PDF</button>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="table-badge" id="totalItensBadge">${dadosFiltrados.itens.length} itens</span>
+                <select class="items-per-page" id="itensPorPaginaITEM" onchange="alterarItensPorPagina('itens')">
+                    <option value="25">25</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>
 
-                <div class="table-container">
-                    <div class="table-fixed-header-container">
-                        <table class="table" id="itensTable">
-                            <thead>
-                                <tr>
-                                    <th onclick="toggleSortITEM('ano_criacao_processo')">Ano <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('numero_processo_formatado')">Processo <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('numero_item_processo')">Item <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('situacao_item_processo')">Situação <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('codigo_elemento_item_despesa')">Cód. Elemento <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('nome_elemento_item_despesa')">Elemento <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('codigo_item_material_servico_numerico')">Cód. Item <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('item_material_servico')">Descrição <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('quantidade_item_pedido')">Quantidade <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('valor_unitario_referencia_item_pedido')">Valor Unit. <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th onclick="toggleSortITEM('valor_total_referencia_item_pedido')">Valor Total <i class="material-icons sort-icon">unfold_more</i></th>
-                                    <th class="text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="itensTableBody"></tbody>
-                        </table>
-                    </div>
-                    <div class="pagination-container" id="paginacaoContainerITEM"></div>
-                </div>
-            `;
-            
-            window.itensFiltrados = [...dadosFiltrados.itens];
-            window.itensFiltrados = ordenarDados(window.itensFiltrados, sortConfig.itens.column, sortConfig.itens.direction);
-            paginacao.itens.paginaAtual = 1;
-            atualizarTabelaItens();
-            setTimeout(iframeUpdateHeight, 300);
+        <div class="table-container">
+            <div class="table-fixed-header-container">
+                <table class="table" id="itensTable">
+                    <thead>
+                        <tr>
+                            <th onclick="toggleSortITEM('ano_criacao_processo')">Ano <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('numero_processo_formatado')">Processo <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('numero_item_processo')">Item <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('situacao_item_processo')">Situação <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('codigo_elemento_item_despesa')">Cód. Elemento <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('nome_elemento_item_despesa')">Elemento <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('codigo_item_material_servico_numerico')">Cód. Item <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('item_material_servico')">Tipo <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('quantidade_item_pedido')">Quantidade <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('valor_unitario_referencia_item_pedido')">Valor Unit. <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('valor_total_referencia_item_pedido')">Valor Total <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itensTableBody"></tbody>
+                </table>
+            </div>
+            <div class="pagination-container" id="paginacaoContainerITEM"></div>
+        </div>
+    `;
+    
+    // Inicializar dados filtrados
+    window.itensFiltrados = [...dadosFiltrados.itens];
+    window.itensFiltrados = ordenarDados(window.itensFiltrados, sortConfig.itens.column, sortConfig.itens.direction);
+    paginacao.itens.paginaAtual = 1;
+    paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / paginacao.itens.itensPorPagina);
+    
+    atualizarTabelaItens();
+    setTimeout(iframeUpdateHeight, 300);
+}
+
+// ============================================
+// DIAGNÓSTICO DOS ANOS NOS ITENS
+// ============================================
+window.diagnosticarAnosItens = function() {
+    console.log('=== DIAGNÓSTICO DE ANOS NOS ITENS ===');
+    
+    if (!dadosConsolidados.itens) {
+        console.log('Nenhum item carregado');
+        return;
+    }
+    
+    const anos = new Set();
+    const anosDetalhado = {};
+    
+    dadosConsolidados.itens.forEach(item => {
+        // Verificar todas as possíveis fontes de ano
+        const fontes = [
+            item['ano_criacao_processo'],
+            item['ano_referencia'],
+            item['AnoCriacaoProcesso'],
+            item['ano']
+        ];
+        
+        fontes.forEach(fonte => {
+            if (fonte) {
+                const anoStr = String(fonte).trim();
+                const anoNum = parseInt(anoStr);
+                if (!isNaN(anoNum)) {
+                    anos.add(anoNum);
+                    anosDetalhado[anoNum] = (anosDetalhado[anoNum] || 0) + 1;
+                }
+            }
+        });
+    });
+    
+    console.log('Anos encontrados:', Array.from(anos).sort());
+    console.log('Quantidade por ano:', anosDetalhado);
+    
+    // Verificar especificamente 2025
+    const itens2025 = dadosConsolidados.itens.filter(item => {
+        const ano = item['ano_criacao_processo'] || item['ano_referencia'];
+        return ano == 2025 || ano === '2025';
+    });
+    
+    console.log(`Itens com ano 2025: ${itens2025.length}`);
+    if (itens2025.length > 0) {
+        console.log('Amostra de item 2025:', itens2025[0]);
+        console.log('Campo ano_criacao_processo:', itens2025[0]['ano_criacao_processo']);
+        console.log('Tipo do campo:', typeof itens2025[0]['ano_criacao_processo']);
+    }
+};
+
+// ============================================
+// FUNÇÃO AUXILIAR PARA OBTER OPÇÕES DE FILTRO DE ITENS (CORRIGIDA)
+// ============================================
+
+function obterOpcoesFiltroItens(dados) {
+    if (!dados || dados.length === 0) {
+        return {
+            anos: [], orgaos: [], fornecedores: [], elementos: [], 
+            situacoes: [], processos: []
+        };
+    }
+    
+    // Extrair anos - VERSÃO CORRIGIDA
+    const anosSet = new Set();
+    dados.forEach(item => {
+        // Tenta várias fontes para o ano
+        const ano = item['ano_criacao_processo'] || item['ano_referencia'] || item['AnoCriacaoProcesso'];
+        if (ano) {
+            // Converte para número para garantir
+            const anoNum = parseInt(ano);
+            if (!isNaN(anoNum)) {
+                anosSet.add(anoNum);
+            }
         }
+    });
+    
+    const anos = Array.from(anosSet).sort((a, b) => b - a);
+    console.log('Anos encontrados nos itens:', anos);
+    
+    // Extrair elementos
+    const elementos = [...new Set(dados
+        .map(i => i['codigo_elemento_item_despesa'])
+        .filter(Boolean)
+        .sort())];
+    
+    // Extrair situações
+    const situacoes = [...new Set(dados
+        .map(i => i['situacao_item_processo'])
+        .filter(Boolean)
+        .sort())];
+    
+    // Extrair processos
+    const processos = [...new Set(dados
+        .map(i => i['numero_processo_formatado'])
+        .filter(Boolean)
+        .sort())];
+    
+    // Buscar órgãos e fornecedores das licitações relacionadas
+    const orgaosSet = new Set();
+    const fornecedoresSet = new Set();
+    
+    // Mapear licitações por processo
+    const licitacoesMap = {};
+    if (dadosConsolidados.licitacoes) {
+        dadosConsolidados.licitacoes.forEach(l => {
+            if (l && l['numero_processo_formatado']) {
+                licitacoesMap[l['numero_processo_formatado']] = l;
+            }
+        });
+    }
+    
+    // Para cada processo nos itens, buscar licitação correspondente
+    processos.forEach(processo => {
+        const lic = licitacoesMap[processo];
+        if (lic) {
+            if (lic['nome_orgao_entidade_compra']) {
+                orgaosSet.add(lic['nome_orgao_entidade_compra']);
+            }
+            if (lic['nome_empresarial_nome_fornecedor']) {
+                fornecedoresSet.add(lic['nome_empresarial_nome_fornecedor']);
+            }
+        }
+    });
+    
+    return {
+        anos: anos,
+        orgaos: Array.from(orgaosSet).sort(),
+        fornecedores: Array.from(fornecedoresSet).sort(),
+        elementos: elementos,
+        situacoes: situacoes,
+        processos: processos
+    };
+}
+// ============================================
+// FUNÇÃO AUXILIAR PARA OBTER OPÇÕES DE FILTRO DE ITENS
+// ============================================
+function obterOpcoesFiltroItens(dados) {
+    if (!dados || dados.length === 0) {
+        return {
+            anos: [], orgaos: [], fornecedores: [], elementos: [], 
+            situacoes: [], processos: []
+        };
+    }
+    
+    // Extrair anos
+    const anos = [...new Set(dados
+        .map(i => i['ano_criacao_processo'])
+        .filter(Boolean)
+        .sort((a, b) => b - a))];
+    
+    // Extrair elementos
+    const elementos = [...new Set(dados
+        .map(i => i['codigo_elemento_item_despesa'])
+        .filter(Boolean)
+        .sort())];
+    
+    // Extrair situações
+    const situacoes = [...new Set(dados
+        .map(i => i['situacao_item_processo'])
+        .filter(Boolean)
+        .sort())];
+    
+    // Extrair processos
+    const processos = [...new Set(dados
+        .map(i => i['numero_processo_formatado'])
+        .filter(Boolean)
+        .sort())];
+    
+    // Buscar órgãos e fornecedores das licitações relacionadas
+    const orgaosSet = new Set();
+    const fornecedoresSet = new Set();
+    
+    // Mapear licitações por processo
+    const licitacoesMap = {};
+    if (dadosConsolidados.licitacoes) {
+        dadosConsolidados.licitacoes.forEach(l => {
+            if (l && l['numero_processo_formatado']) {
+                licitacoesMap[l['numero_processo_formatado']] = l;
+            }
+        });
+    }
+    
+    // Para cada processo nos itens, buscar licitação correspondente
+    processos.forEach(processo => {
+        const lic = licitacoesMap[processo];
+        if (lic) {
+            if (lic['nome_orgao_entidade_compra']) {
+                orgaosSet.add(lic['nome_orgao_entidade_compra']);
+            }
+            if (lic['nome_empresarial_nome_fornecedor']) {
+                fornecedoresSet.add(lic['nome_empresarial_nome_fornecedor']);
+            }
+        }
+    });
+    
+    return {
+        anos: anos,
+        orgaos: Array.from(orgaosSet).sort(),
+        fornecedores: Array.from(fornecedoresSet).sort(),
+        elementos: elementos,
+        situacoes: situacoes,
+        processos: processos
+    };
+}
 
-        function toggleSortITEM(coluna) {
-            if (sortConfig.itens.column === coluna) {
-                sortConfig.itens.direction = sortConfig.itens.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortConfig.itens.column = coluna;
-                sortConfig.itens.direction = 'asc';
+// ============================================
+// RENDERIZAÇÃO CONSULTA ITENS (VERSÃO ÚNICA E CORRIGIDA)
+// ============================================
+function renderizarConsultaItem() {
+    const container = document.getElementById('consulta-item-content');
+    if (!container) return;
+    
+    console.log('Renderizando consulta itens...');
+    console.log('Total itens disponíveis:', dadosConsolidados.itens?.length || 0);
+    
+    // Verificar se temos dados
+    if (!dadosConsolidados.itens || dadosConsolidados.itens.length === 0) {
+        container.innerHTML = '<div class="alert alert-warning">Aguardando carregamento dos dados de itens...</div>';
+        return;
+    }
+    
+    // Filtrar itens de 2026 para exibição inicial
+    const itens2026 = dadosConsolidados.itens.filter(i => i && (
+        i['ano_criacao_processo'] == 2026 || 
+        i['ano_criacao_processo'] === '2026' || 
+        i.ano_referencia == 2026
+    ));
+    
+    console.log(`Itens 2026 encontrados: ${itens2026.length}`);
+    
+    // Atualizar dados filtrados
+    dadosFiltrados.itens = itens2026;
+    
+    // Obter opções para os filtros
+    const opcoes = obterOpcoesFiltroItens(dadosConsolidados.itens);
+    
+    container.innerHTML = `
+        <div class="filter-container">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
+                    <select class="form-select" id="filtroAnoITEM">
+                        <option value="">Todos</option>
+                        ${opcoes.anos.map(a => `<option value="${a}" ${a == 2026 ? 'selected' : ''}>${a}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">info</i>Situação</label>
+                    <select class="form-select" id="filtroSituacaoITEM">
+                        <option value="">Todas</option>
+                        ${opcoes.situacoes.map(s => `<option value="${s}">${s}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">sell</i>Elemento</label>
+                    <input type="text" class="form-control" id="filtroElementoITEM" list="elementosList" placeholder="Digite ou selecione...">
+                    <datalist id="elementosList">
+                        ${opcoes.elementos.map(e => `<option value="${e}">`).join('')}
+                    </datalist>
+                </div>
+            </div>
+            
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">business</i>Órgão</label>
+                    <input type="text" class="form-control" id="filtroOrgaoITEM" list="orgaosItemList" placeholder="Digite ou selecione...">
+                    <datalist id="orgaosItemList">
+                        ${opcoes.orgaos.map(o => `<option value="${o}">`).join('')}
+                    </datalist>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">person</i>Fornecedor</label>
+                    <input type="text" class="form-control" id="filtroFornecedorITEM" list="fornecedoresItemList" placeholder="Digite ou selecione...">
+                    <datalist id="fornecedoresItemList">
+                        ${opcoes.fornecedores.map(f => `<option value="${f}">`).join('')}
+                    </datalist>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"><i class="material-icons">receipt</i>Nº Processo</label>
+                    <input type="text" class="form-control" id="filtroProcessoITEM" list="processosItemList" placeholder="Digite ou selecione...">
+                    <datalist id="processosItemList">
+                        ${opcoes.processos.map(p => `<option value="${p}">`).join('')}
+                    </datalist>
+                </div>
+                <div class="filter-group d-flex gap-2 align-items-end">
+                    <button class="btn-pesquisa" onclick="aplicarFiltrosITEM()"><i class="material-icons me-2">search</i>Pesquisar</button>
+                    <button class="btn-secondary-custom" onclick="limparFiltrosITEM()"><i class="material-icons me-2">clear</i>Limpar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="action-group">
+                <button class="btn-export" onclick="exportarTabelaItem()"><i class="material-icons me-2">print</i>Imprimir</button>
+                <button class="btn-export" onclick="exportarTabelaItemPDF()"><i class="material-icons me-2">picture_as_pdf</i>PDF</button>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="table-badge" id="totalItensBadge">${dadosFiltrados.itens.length} itens</span>
+                <select class="items-per-page" id="itensPorPaginaITEM" onchange="alterarItensPorPagina('itens')">
+                    <option value="25">25</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-fixed-header-container">
+                <table class="table" id="itensTable">
+                    <thead>
+                        <tr>
+                            <th onclick="toggleSortITEM('ano_criacao_processo')">Ano <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('numero_processo_formatado')">Processo <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('numero_item_processo')">Item <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('situacao_item_processo')">Situação <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('codigo_elemento_item_despesa')">Cód. Elemento <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('nome_elemento_item_despesa')">Elemento <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('codigo_item_material_servico_numerico')">Cód. Item <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th>Descrição do Item</th>
+                            <th onclick="toggleSortITEM('quantidade_item_pedido')">Quantidade <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('valor_unitario_referencia_item_pedido')">Valor Unit. <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th onclick="toggleSortITEM('valor_total_referencia_item_pedido')">Valor Total <i class="material-icons sort-icon">unfold_more</i></th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itensTableBody"></tbody>
+                </table>
+            </div>
+            <div class="pagination-container" id="paginacaoContainerITEM"></div>
+        </div>
+    `;
+    
+    // Inicializar dados filtrados
+    window.itensFiltrados = [...dadosFiltrados.itens];
+    window.itensFiltrados = ordenarDados(window.itensFiltrados, sortConfig.itens.column, sortConfig.itens.direction);
+    paginacao.itens.paginaAtual = 1;
+    paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / paginacao.itens.itensPorPagina);
+    
+    atualizarTabelaItens();
+    setTimeout(iframeUpdateHeight, 300);
+}
+
+// ============================================
+// FUNÇÕES AUXILIARES PARA ITENS
+// ============================================
+function toggleSortITEM(coluna) {
+    if (!window.itensFiltrados || window.itensFiltrados.length === 0) return;
+    
+    if (sortConfig.itens.column === coluna) {
+        sortConfig.itens.direction = sortConfig.itens.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortConfig.itens.column = coluna;
+        sortConfig.itens.direction = 'asc';
+    }
+    
+    window.itensFiltrados = ordenarDados(window.itensFiltrados, sortConfig.itens.column, sortConfig.itens.direction);
+    paginacao.itens.paginaAtual = 1;
+    atualizarTabelaItens();
+}
+
+function atualizarTabelaItens() {
+    if (!window.itensFiltrados) {
+        window.itensFiltrados = [];
+    }
+    
+    const itensPorPagina = paginacao.itens.itensPorPagina || 50;
+    const inicio = (paginacao.itens.paginaAtual - 1) * itensPorPagina;
+    const fim = Math.min(inicio + itensPorPagina, window.itensFiltrados.length);
+    const dadosPagina = window.itensFiltrados.slice(inicio, fim);
+    
+    document.getElementById('itensTableBody').innerHTML = gerarLinhasTabelaItens(dadosPagina);
+    document.getElementById('totalItensBadge').innerText = window.itensFiltrados.length + ' itens';
+    
+    paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / itensPorPagina) || 1;
+    renderizarPaginacao('itens');
+}
+
+function gerarLinhasTabelaItens(itens) {
+    if (!itens || itens.length === 0) {
+        return '<tr><td colspan="12" class="text-center py-4">Nenhum registro encontrado</td></tr>';
+    }
+    
+    return itens.map(item => {
+        // Função segura para acessar propriedades
+        const getValue = (obj, prop, defaultValue = '-') => {
+            try {
+                const val = obj[prop];
+                return (val !== undefined && val !== null && val !== '') ? val : defaultValue;
+            } catch (e) {
+                return defaultValue;
+            }
+        };
+        
+        // Descrição do item
+        const descricao = getValue(item, 'item_material_servico');
+        
+        // Escapar aspas
+        const processoFormatado = (item['numero_processo_formatado'] || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        
+        return `
+        <tr>
+            <td>${getValue(item, 'ano_criacao_processo')}</td>
+            <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${processoFormatado}'); return false;">${getValue(item, 'numero_processo_formatado')}</a></td>
+            <td>${getValue(item, 'numero_item_processo')}</td>
+            <td>${getValue(item, 'situacao_item_processo')}</td>
+            <td>${getValue(item, 'codigo_elemento_item_despesa')}</td>
+            <td>${getValue(item, 'nome_elemento_item_despesa')}</td>
+            <td>${getValue(item, 'codigo_item_material_servico_numerico')}</td>
+            <td>${descricao.substring(0, 50)}${descricao.length > 50 ? '...' : ''}</td>
+            <td class="text-right">${getValue(item, 'quantidade_item_pedido')}</td>
+            <td class="text-right">${formatarMoeda(item['valor_unitario_referencia_item_pedido'])}</td>
+            <td class="text-right">${formatarMoeda(item['valor_total_referencia_item_pedido'])}</td>
+            <td class="text-center">
+                <button class="btn-action" onclick="verDetalhesLicitacao('${processoFormatado}')" title="Detalhes do Processo">
+                    <i class="material-icons">visibility</i>
+                </button>
+            </td>
+        </tr>
+    `}).join('');
+}
+
+// ============================================
+// FILTROS PARA ITENS
+// ============================================
+
+window.aplicarFiltrosITEM = function() {
+    console.log('Aplicando filtros ITEM');
+    
+    // Obter valores dos filtros
+    const ano = document.getElementById('filtroAnoITEM')?.value;
+    const situacao = document.getElementById('filtroSituacaoITEM')?.value;
+    const elemento = (document.getElementById('filtroElementoITEM')?.value || '').toLowerCase().trim();
+    const orgao = (document.getElementById('filtroOrgaoITEM')?.value || '').toLowerCase().trim();
+    const fornecedor = (document.getElementById('filtroFornecedorITEM')?.value || '').toLowerCase().trim();
+    const processo = (document.getElementById('filtroProcessoITEM')?.value || '').toLowerCase().trim();
+    
+    console.log('Filtros:', { ano, situacao, elemento, orgao, fornecedor, processo });
+    
+    if (!dadosConsolidados.itens || dadosConsolidados.itens.length === 0) {
+        window.itensFiltrados = [];
+        atualizarTabelaItens();
+        return;
+    }
+    
+    // Criar mapa de licitações
+    const licitacoesMap = {};
+    if (dadosConsolidados.licitacoes) {
+        dadosConsolidados.licitacoes.forEach(l => {
+            if (l && l['numero_processo_formatado']) {
+                licitacoesMap[l['numero_processo_formatado']] = l;
+            }
+        });
+    }
+    
+    window.itensFiltrados = dadosConsolidados.itens.filter(item => {
+        try {
+            if (!item) return false;
+            
+            const processoItem = item['numero_processo_formatado'];
+            const licRelacionada = processoItem ? licitacoesMap[processoItem] : null;
+            
+            // Converter valores para string de forma segura
+            const orgaoItem = licRelacionada ? 
+                String(licRelacionada['nome_orgao_entidade_compra'] || '').toLowerCase() : '';
+            const fornecedorItem = licRelacionada ? 
+                String(licRelacionada['nome_empresarial_nome_fornecedor'] || '').toLowerCase() : '';
+            
+            // Aplicar filtros
+            if (ano && ano !== '' && String(item['ano_criacao_processo']) !== String(ano)) return false;
+            
+            if (situacao && situacao !== '' && String(item['situacao_item_processo'] || '') !== situacao) return false;
+            
+            if (elemento && elemento !== '') {
+                const codElemento = String(item['codigo_elemento_item_despesa'] || '').toLowerCase();
+                const nomeElemento = String(item['nome_elemento_item_despesa'] || '').toLowerCase();
+                if (!codElemento.includes(elemento) && !nomeElemento.includes(elemento)) return false;
             }
             
-            window.itensFiltrados = ordenarDados(window.itensFiltrados, sortConfig.itens.column, sortConfig.itens.direction);
-            paginacao.itens.paginaAtual = 1;
-            atualizarTabelaItens();
+            if (orgao && orgao !== '' && !orgaoItem.includes(orgao)) return false;
+            
+            if (fornecedor && fornecedor !== '' && !fornecedorItem.includes(fornecedor)) return false;
+            
+            if (processo && processo !== '') {
+                const numProcesso = String(item['numero_processo_formatado'] || '').toLowerCase();
+                if (!numProcesso.includes(processo)) return false;
+            }
+            
+            return true;
+        } catch (e) {
+            console.error('Erro ao filtrar item:', e);
+            return false;
         }
+    });
+    
+    console.log('Itens após filtro:', window.itensFiltrados.length);
+    
+    window.itensFiltrados = ordenarDados(window.itensFiltrados, sortConfig.itens.column, sortConfig.itens.direction);
+    paginacao.itens.paginaAtual = 1;
+    paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / paginacao.itens.itensPorPagina);
+    
+    atualizarTabelaItens();
+};
 
-        function atualizarTabelaItens() {
-            const inicio = (paginacao.itens.paginaAtual - 1) * paginacao.itens.itensPorPagina;
-            const fim = Math.min(inicio + paginacao.itens.itensPorPagina, window.itensFiltrados.length);
-            const dadosPagina = window.itensFiltrados.slice(inicio, fim);
-            
-            document.getElementById('itensTableBody').innerHTML = gerarLinhasTabelaItens(dadosPagina);
-            document.getElementById('totalItensBadge').innerText = window.itensFiltrados.length + ' itens';
-            
-            paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / paginacao.itens.itensPorPagina);
-            renderizarPaginacao('itens');
+window.limparFiltrosITEM = function() {
+    console.log('Limpando filtros ITEM');
+    
+    document.getElementById('filtroAnoITEM').value = '2026';
+    document.getElementById('filtroSituacaoITEM').value = '';
+    document.getElementById('filtroElementoITEM').value = '';
+    document.getElementById('filtroOrgaoITEM').value = '';
+    document.getElementById('filtroFornecedorITEM').value = '';
+    document.getElementById('filtroProcessoITEM').value = '';
+    
+    window.itensFiltrados = dadosConsolidados.itens ? 
+        dadosConsolidados.itens.filter(i => i && (
+            i['ano_criacao_processo'] == 2026 || 
+            i['ano_criacao_processo'] === '2026' || 
+            i.ano_referencia == 2026
+        )) : [];
+    
+    window.itensFiltrados = ordenarDados(window.itensFiltrados, sortConfig.itens.column, sortConfig.itens.direction);
+    paginacao.itens.paginaAtual = 1;
+    paginacao.itens.totalPaginas = Math.ceil(window.itensFiltrados.length / paginacao.itens.itensPorPagina);
+    
+    atualizarTabelaItens();
+};
+
+// ============================================
+// DIAGNÓSTICO PARA VERIFICAR ITENS DE 2026
+// ============================================
+setTimeout(() => {
+    console.log('=== DIAGNÓSTICO ITENS 2026 ===');
+    if (dadosConsolidados.itens) {
+        const itens2026 = dadosConsolidados.itens.filter(i => {
+            const ano = i['ano_criacao_processo'] || i.ano_referencia;
+            return ano == 2026 || ano === '2026';
+        });
+        console.log('Itens 2026 encontrados:', itens2026.length);
+        if (itens2026.length > 0) {
+            console.log('Primeiro item 2026:', itens2026[0]);
+        } else {
+            console.log('Nenhum item de 2026 encontrado!');
         }
-
-        function gerarLinhasTabelaItens(itens) {
-            if (!itens || itens.length === 0) return '<tr><td colspan="12" class="text-center">Nenhum registro encontrado</td></tr>';
-            
-            return itens.map(item => {
-                const tipo = item['item_material_servico'] === 'M' ? 'Material' : item['item_material_servico'] === 'S' ? 'Serviço' : '-';
-                
-                return `
-                <tr>
-                    <td>${item['ano_criacao_processo'] || '-'}</td>
-                    <td><a href="#" class="processo-link" onclick="verDetalhesLicitacao('${item['numero_processo_formatado']}'); return false;">${item['numero_processo_formatado'] || '-'}</a></td>
-                    <td>${item['numero_item_processo'] || '-'}</td>
-                    <td>${item['situacao_item_processo'] || '-'}</td>
-                    <td>${item['codigo_elemento_item_despesa'] || '-'}</td>
-                    <td>${item['nome_elemento_item_despesa'] || '-'}</td>
-                    <td>${item['codigo_item_material_servico_numerico'] || '-'}</td>
-                    <td>${tipo}</td>
-                    <td class="text-right">${item['quantidade_item_pedido'] || '-'}</td>
-                    <td class="text-right">${formatarMoeda(item['valor_unitario_referencia_item_pedido'])}</td>
-                    <td class="text-right">${formatarMoeda(item['valor_total_referencia_item_pedido'])}</td>
-                    <td class="text-center">
-                        <button class="btn-action" onclick="verDetalhesLicitacao('${item['numero_processo_formatado']}')" title="Detalhes do Contrato">
-                            <i class="material-icons">visibility</i>
-                        </button>
-                    </td>
-                </tr>
-            `}).join('');
-        }
-
-        window.aplicarFiltrosITEM = function() {
-            const ano = document.getElementById('filtroAnoITEM')?.value;
-            const tipo = document.getElementById('filtroTipoITEM')?.value;
-            const situacao = document.getElementById('filtroSituacaoITEM')?.value;
-            const elemento = (document.getElementById('filtroElementoITEM')?.value || '').toLowerCase();
-            const orgao = (document.getElementById('filtroOrgaoITEM')?.value || '').toLowerCase();
-            const fornecedor = (document.getElementById('filtroFornecedorITEM')?.value || '').toLowerCase();
-            const processo = (document.getElementById('filtroProcessoITEM')?.value || '').toLowerCase();
-            
-            window.itensFiltrados = dadosConsolidados.itens.filter(item => {
-                // Buscar licitação relacionada para filtros de órgão e fornecedor
-                const licitacaoRelacionada = dadosConsolidados.licitacoes.find(l => l['numero_processo_formatado'] === item['numero_processo_formatado']);
-                const orgaoItem = licitacaoRelacionada ? licitacaoRelacionada['nome_orgao_entidade_compra'] || '' : '';
-                const fornecedorItem = licitacaoRelacionada ? licitacaoRelacionada['nome_empresarial_nome_fornecedor'] || '' : '';
-                const tipoItem = item['item_material_servico'] === 'M' ? 'Material' : item['item_material_servico'] === 'S' ? 'Serviço' : '';
-                
-                if (ano && item['ano_criacao_processo'] != ano) return false;
-                if (tipo && tipoItem !== tipo) return false;
-                if (situacao && item['situacao_item_processo'] !== situacao) return false;
-                if (elemento && !item['codigo_elemento_item_despesa']?.toLowerCase().includes(elemento) && 
-                    !item['nome_elemento_item_despesa']?.toLowerCase().includes(elemento)) return false;
-                if (orgao && !orgaoItem.toLowerCase().includes(orgao)) return false;
-                if (fornecedor && !fornecedorItem.toLowerCase().includes(fornecedor)) return false;
-                if (processo && !item['numero_processo_formatado']?.toLowerCase().includes(processo)) return false;
-                return true;
-            });
-            
-            window.itensFiltrados = ordenarDados(window.itensFiltrados, sortConfig.itens.column, sortConfig.itens.direction);
-            paginacao.itens.paginaAtual = 1;
-            atualizarTabelaItens();
-        };
-
-        window.limparFiltrosITEM = function() {
-            document.getElementById('filtroAnoITEM').value = '2026';
-            document.getElementById('filtroTipoITEM').value = '';
-            document.getElementById('filtroSituacaoITEM').value = '';
-            document.getElementById('filtroElementoITEM').value = '';
-            document.getElementById('filtroOrgaoITEM').value = '';
-            document.getElementById('filtroFornecedorITEM').value = '';
-            document.getElementById('filtroProcessoITEM').value = '';
-            
-            window.itensFiltrados = dadosConsolidados.itens.filter(i => i['ano_criacao_processo'] == 2026);
-            window.itensFiltrados = ordenarDados(window.itensFiltrados, sortConfig.itens.column, sortConfig.itens.direction);
-            paginacao.itens.paginaAtual = 1;
-            atualizarTabelaItens();
-        };
+    }
+}, 3000);
 
         // ============================================
         // PAGINAÇÃO
@@ -2246,151 +2897,150 @@
             doc.save('consulta_itens.pdf');
         };
 
-        // ============================================
-        // DOWNLOADS
-        // ============================================
-        function renderizarDownloads() {
-            document.getElementById('downloads-content').innerHTML = `
-                <div class="filter-container">
-                    <h3 class="filter-label mb-3"><i class="material-icons">download</i> Downloads</h3>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="card-stats p-4 bg-white rounded shadow-sm h-100">
-                                <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">cloud_download</i> Licitações</h4>
-                                <p class="text-muted" style="font-size: 13px;">
-                                    Dados completos de licitações dos anos 2023, 2024, 2025 e 2026.
-                                </p>
-                                <div class="mt-4 text-end">
-                                    <button onclick="baixarCSV('licitacoes')" class="btn-export">
-                                        <i class="material-icons me-2">download</i>Baixar CSV
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <div class="card-stats p-4 bg-white rounded shadow-sm h-100">
-                                <h4 class="fw-bold text-start mb-3"><i class="material-icons me-2">cloud_download</i> Itens</h4>
-                                <p class="text-muted" style="font-size: 13px;">
-                                    Dados completos de itens de licitação dos anos 2023, 2024, 2025 e 2026.
-                                </p>
-                                <div class="mt-4 text-end">
-                                    <button onclick="baixarCSV('itens')" class="btn-export">
-                                        <i class="material-icons me-2">download</i>Baixar CSV
-                                    </button>
-                                </div>
-                            </div>
+function renderizarDownloads() {
+    const portalLink = 'https://dados.mg.gov.br/dataset/portal_licitacoes';
+    
+    document.getElementById('downloads-content').innerHTML = `
+        <div class="filter-container">
+            <h3 class="filter-label mb-3"><i class="material-icons">download</i> Downloads</h3>
+            
+            <!-- CARD DOWNLOAD 2026 -->
+            <div class="card-stats p-4 bg-white rounded shadow-sm mb-4" style="border-left: 4px solid var(--primary-dark);">
+                <h4 class="fw-bold mb-3" style="color: var(--primary-dark);">
+                    <i class="material-icons me-2" style="color: var(--accent-red);">new_releases</i> Dados do Ano Atual (2026)
+                </h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="p-3 border-end">
+                            <h5 class="fw-bold mb-3"><i class="material-icons me-2" style="color: var(--accent-red);">gavel</i> Licitações 2026</h5>
+                            <p class="text-muted small mb-3">Dados completos de licitações apenas do ano de 2026.</p>
+                            <button onclick="baixarCSV('licitacoes', 2026)" class="btn-export">
+                                <i class="material-icons me-2">download</i>Baixar CSV
+                            </button>
                         </div>
                     </div>
-                    
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <div class="metadata-card">
-                                <h6 class="fw-bold mb-3"><i class="material-icons me-2">info</i> Metadados</h6>
-                                
-                                <h6 class="mt-3 fw-bold">Licitações</h6>
-                                <div class="metadata-item"><strong>ano_criacao_pedido:</strong> Ano de criação do pedido</div>
-                                <div class="metadata-item"><strong>procedimento_contratacao_grupo:</strong> Grupo (Licitação/Dispensa/Inexigibilidade)</div>
-                                <div class="metadata-item"><strong>procedimento_contratacao_detalhamento_1:</strong> Modalidade da licitação</div>
-                                <div class="metadata-item"><strong>procedimento_contratacao_especializacao:</strong> Especialização do procedimento</div>
-                                <div class="metadata-item"><strong>nome_orgao_entidade_compra:</strong> Órgão contratante</div>
-                                <div class="metadata-item"><strong>numero_processo_formatado:</strong> Número do processo de compra</div>
-                                <div class="metadata-item"><strong>data_criacao_pedido:</strong> Data de criação do pedido</div>
-                                <div class="metadata-item"><strong>data_licitacao:</strong> Data da licitação</div>
-                                <div class="metadata-item"><strong>numero_contrato:</strong> Número do contrato</div>
-                                <div class="metadata-item"><strong>indicador_termo_de_contrato:</strong> Indicador de termo de contrato</div>
-                                <div class="metadata-item"><strong>situacao_processo:</strong> Situação atual do processo</div>
-                                <div class="metadata-item"><strong>criterio_julgamento:</strong> Tipo de julgamento</div>
-                                <div class="metadata-item"><strong>objeto_processo:</strong> Objeto da contratação</div>
-                                <div class="metadata-item"><strong>nome_empresarial_nome_fornecedor:</strong> Razão social do fornecedor</div>
-                                <div class="metadata-item"><strong>cnpj_cpf_fornecedor_formatado:</strong> CPF ou CNPJ do fornecedor</div>
-                                <div class="metadata-item"><strong>numero_parecer_juridico:</strong> Número do parecer jurídico</div>
-                                <div class="metadata-item"><strong>edital_retificacao_arquivos:</strong> Link para o edital</div>
-                                <div class="metadata-item"><strong>contrato_termoaditivo_arquivos:</strong> Link para contrato/aditivo</div>
-                                <div class="metadata-item"><strong>valor_total_homologado:</strong> Valor total homologado</div>
-                                
-                                <h6 class="mt-3 fw-bold">Itens</h6>
-                                <div class="metadata-item"><strong>ano_criacao_processo:</strong> Ano de criação do processo</div>
-                                <div class="metadata-item"><strong>numero_processo_formatado:</strong> Número do processo</div>
-                                <div class="metadata-item"><strong>situacao_item_processo:</strong> Situação do item</div>
-                                <div class="metadata-item"><strong>numero_item_processo:</strong> Número do item</div>
-                                <div class="metadata-item"><strong>codigo_elemento_item_despesa:</strong> Código do elemento de despesa</div>
-                                <div class="metadata-item"><strong>nome_elemento_item_despesa:</strong> Nome do elemento de despesa</div>
-                                <div class="metadata-item"><strong>codigo_item_material_servico_numerico:</strong> Código numérico do item</div>
-                                <div class="metadata-item"><strong>item_material_servico:</strong> Descrição do item</div>
-                                <div class="metadata-item"><strong>quantidade_item_pedido:</strong> Quantidade</div>
-                                <div class="metadata-item"><strong>valor_unitario_referencia_item_pedido:</strong> Valor unitário</div>
-                                <div class="metadata-item"><strong>valor_total_referencia_item_pedido:</strong> Valor total</div>
-                            </div>
+                    <div class="col-md-6">
+                        <div class="p-3">
+                            <h5 class="fw-bold mb-3"><i class="material-icons me-2" style="color: var(--accent-red);">inventory</i> Itens 2026</h5>
+                            <p class="text-muted small mb-3">Dados completos de itens apenas do ano de 2026.</p>
+                            <button onclick="baixarCSV('itens', 2026)" class="btn-export">
+                                <i class="material-icons me-2">download</i>Baixar CSV
+                            </button>
                         </div>
                     </div>
                 </div>
-            `;
-            setTimeout(iframeUpdateHeight, 300);
-        }
+            </div>
 
-        window.baixarCSV = function(tipo) {
-            if (tipo === 'licitacoes' && !dadosConsolidados.licitacoes.length) return;
-            if (tipo === 'itens' && !dadosConsolidados.itens.length) return;
+            <!-- CARD ANOS ANTERIORES -->
+            <div class="card-stats p-4 bg-white rounded shadow-sm mb-4" style="border-left: 4px solid var(--warning-yellow);">
+                <h4 class="fw-bold mb-3" style="color: var(--primary-dark);">
+                    <i class="material-icons me-2" style="color: var(--warning-yellow);">history</i> Dados de Anos Anteriores
+                </h4>
+                <p class="text-muted mb-3">
+                    Os dados dos anos 2023, 2024, 2025 e 2026 estão disponíveis para download no Portal de Dados Abertos.
+                </p>
+                <div class="mt-3">
+                    <a href="${portalLink}" target="_blank" class="btn-primary-custom" style="text-decoration: none; display: inline-flex; align-items: center;">
+                        <i class="material-icons me-2">open_in_new</i>Acessar dados.mg.gov.br
+                    </a>
+                </div>
+            </div>
             
-            let dados, cabecalhos, nomeArquivo;
-            
-            if (tipo === 'licitacoes') {
-                dados = dadosConsolidados.licitacoes;
-                cabecalhos = [
-                    'ano_criacao_pedido',
-                    'procedimento_contratacao_grupo',
-                    'procedimento_contratacao_detalhamento_1',
-                    'procedimento_contratacao_especializacao',
-                    'codigo_orgao_entidade_compra',
-                    'nome_orgao_entidade_compra',
-                    'numero_processo_formatado',
-                    'data_criacao_pedido',
-                    'data_licitacao',
-                    'numero_contrato',
-                    'indicador_termo_de_contrato',
-                    'situacao_processo',
-                    'criterio_julgamento',
-                    'objeto_processo',
-                    'nome_empresarial_nome_fornecedor',
-                    'cnpj_cpf_fornecedor_formatado',
-                    'numero_parecer_juridico',
-                    'data_parecer_juridico',
-                    'edital_retificacao_arquivos',
-                    'contrato_termoaditivo_arquivos',
-                    'valor_total_homologado',
-                    'valor_total_atualizado'
-                ];
-                nomeArquivo = 'licitacoes_completas.csv';
-            } else {
-                dados = dadosConsolidados.itens;
-                cabecalhos = [
-                    'ano_criacao_processo',
-                    'numero_processo_formatado',
-                    'situacao_item_processo',
-                    'numero_item_processo',
-                    'codigo_elemento_item_despesa',
-                    'nome_elemento_item_despesa',
-                    'codigo_item_material_servico_numerico',
-                    'item_material_servico',
-                    'quantidade_item_pedido',
-                    'valor_unitario_referencia_item_pedido',
-                    'valor_total_referencia_item_pedido'
-                ];
-                nomeArquivo = 'itens_completos.csv';
-            }
-            
-            const linhas = dados.map(item => 
-                cabecalhos.map(cab => `"${(item[cab] !== undefined && item[cab] !== null ? item[cab] : '').toString().replace(/"/g, '""')}"`).join(';')
-            );
-            
-            const csv = [cabecalhos.join(';'), ...linhas].join('\n');
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = nomeArquivo;
-            link.click();
-        };
+            <!-- METADADOS -->
+            <div class="card-stats p-4 bg-white rounded shadow-sm" style="border-left: 4px solid var(--info-blue);">
+                <h5 class="fw-bold mb-3" style="color: var(--primary-dark);">
+                    <i class="material-icons me-2" style="color: var(--info-blue);">menu_book</i> Metadados e Estrutura
+                </h5>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-primary">📄 Licitações</h6>
+                        <div class="small">
+                            <div><strong>ano_criacao_pedido:</strong> Ano de criação do pedido</div>
+                            <div><strong>procedimento_contratacao_grupo:</strong> Grupo (Licitação/Dispensa)</div>
+                            <div><strong>procedimento_contratacao_detalhamento_1:</strong> Modalidade</div>
+                            <div><strong>nome_orgao_entidade_compra:</strong> Órgão contratante</div>
+                            <div><strong>numero_processo_formatado:</strong> Nº do processo</div>
+                            <div><strong>data_licitacao:</strong> Data da licitação</div>
+                            <div><strong>situacao_processo:</strong> Situação</div>
+                            <div><strong>valor_total_homologado:</strong> Valor homologado</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-primary">📦 Itens</h6>
+                        <div class="small">
+                            <div><strong>ano_criacao_processo:</strong> Ano do processo</div>
+                            <div><strong>numero_processo_formatado:</strong> Nº do processo</div>
+                            <div><strong>numero_item_processo:</strong> Nº do item</div>
+                            <div><strong>situacao_item_processo:</strong> Situação do item</div>
+                            <div><strong>item_material_servico:</strong> Tipo (M/S)</div>
+                            <div><strong>quantidade_item_pedido:</strong> Quantidade</div>
+                            <div><strong>valor_unitario_referencia_item_pedido:</strong> Valor unitário</div>
+                            <div><strong>valor_total_referencia_item_pedido:</strong> Valor total</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    setTimeout(iframeUpdateHeight, 300);
+}
+
+// ============================================
+// FUNÇÃO DE DOWNLOAD (COM FILTRO POR ANO)
+// ============================================
+window.baixarCSV = function(tipo, anoFiltro = null) {
+    let dados, cabecalhos, nomeArquivo;
+
+    if (tipo === 'licitacoes') {
+        dados = anoFiltro 
+            ? dadosConsolidados.licitacoes.filter(l => l && l['ano_criacao_pedido'] == anoFiltro)
+            : dadosConsolidados.licitacoes;
+        cabecalhos = [
+            'ano_criacao_pedido', 'procedimento_contratacao_grupo', 'procedimento_contratacao_detalhamento_1',
+            'procedimento_contratacao_especializacao', 'codigo_orgao_entidade_compra', 'nome_orgao_entidade_compra',
+            'numero_processo_formatado', 'data_criacao_pedido', 'data_licitacao', 'numero_contrato',
+            'indicador_termo_de_contrato', 'situacao_processo', 'criterio_julgamento', 'objeto_processo',
+            'nome_empresarial_nome_fornecedor', 'cnpj_cpf_fornecedor_formatado', 'numero_parecer_juridico',
+            'data_parecer_juridico', 'edital_retificacao_arquivos', 'contrato_termoaditivo_arquivos',
+            'valor_total_homologado', 'valor_total_atualizado'
+        ];
+        nomeArquivo = anoFiltro ? `licitacoes_${anoFiltro}.csv` : 'licitacoes_completas.csv';
+    } else if (tipo === 'itens') {
+        dados = anoFiltro 
+            ? dadosConsolidados.itens.filter(i => i && i['ano_criacao_processo'] == anoFiltro)
+            : dadosConsolidados.itens;
+        cabecalhos = [
+            'ano_criacao_processo', 'numero_processo_formatado', 'situacao_item_processo', 'numero_item_processo',
+            'codigo_elemento_item_despesa', 'nome_elemento_item_despesa', 'codigo_item_material_servico_numerico',
+            'item_material_servico', 'quantidade_item_pedido', 'valor_unitario_referencia_item_pedido',
+            'valor_total_referencia_item_pedido'
+        ];
+        nomeArquivo = anoFiltro ? `itens_${anoFiltro}.csv` : 'itens_completos.csv';
+    } else {
+        return;
+    }
+
+    if (!dados || dados.length === 0) {
+        alert('Nenhum dado encontrado para o período selecionado.');
+        return;
+    }
+
+    // Gerar CSV
+    const linhas = dados.map(item => 
+        cabecalhos.map(cab => {
+            let valor = item && item[cab] !== undefined && item[cab] !== null ? item[cab] : '';
+            return `"${valor.toString().replace(/"/g, '""')}"`;
+        }).join(';')
+    );
+    
+    const csv = [cabecalhos.join(';'), ...linhas].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = nomeArquivo;
+    link.click();
+};
     </script>
 </body>
 </html>
