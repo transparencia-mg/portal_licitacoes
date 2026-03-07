@@ -227,7 +227,7 @@ resources:
     format: csv
     hashing: md5
     name: item2025
-    path: data/item2025v
+    path: data/item2025
     profile: tabular-data-resource
     schema:
       fields:
