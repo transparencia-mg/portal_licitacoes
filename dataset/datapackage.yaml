@@ -1,8 +1,8 @@
 name: portal_licitacoes
-owner_org: ''
+owner_org: 'controladoria-geral-do-estado-cge'
 profile: data-package
 resources:
-  - description: Insira a descrição/explicação detalhada deste recurso.
+  - description: Dados sobre licitações 2023.
     dialect:
       delimiter: ;
     encoding: utf-8-sig
@@ -38,8 +38,8 @@ resources:
         - name: procedimento_contratacao_grupo
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
+    title: Licitações 2023.
+  - description: Dados sobre licitações 2024.
     dialect:
       delimiter: ;
     encoding: utf-8-sig
@@ -75,8 +75,8 @@ resources:
         - name: procedimento_contratacao_grupo
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
+    title: Licitações 2024.
+  - description: Dados sobre licitações 2025.
     dialect:
       delimiter: ;
     encoding: utf-8-sig
@@ -112,8 +112,8 @@ resources:
         - name: procedimento_contratacao_grupo
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
+    title: Licitações 2025
+  - description: Dados sobre licitações 2026.
     dialect:
       delimiter: ;
     encoding: utf-8-sig
@@ -149,8 +149,8 @@ resources:
         - name: procedimento_contratacao_grupo
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
+    title: Licitações 2026
+  - description: Itens de licitações 2023
     dialect:
       delimiter: ;
     encoding: utf-8-sig
@@ -184,8 +184,8 @@ resources:
         - name: valor_total_referencia_item_pedido
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
+    title: Itens Licitações 2023
+  - description: Itens de licitações 2024
     dialect:
       delimiter: ;
     encoding: utf-8-sig
@@ -219,8 +219,8 @@ resources:
         - name: valor_total_referencia_item_pedido
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
+    title: Itens Licitações 2024
+  - description: Itens Licitações 2025
     dialect:
       delimiter: ;
     encoding: utf-8-sig
@@ -254,8 +254,8 @@ resources:
         - name: valor_total_referencia_item_pedido
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
+    title: Itens Licitações 2025
+  - description: Itens Licitações 2026
     dialect:
       delimiter: ;
     encoding: utf-8-sig
@@ -289,5 +289,5 @@ resources:
         - name: valor_total_referencia_item_pedido
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-title: Portal_licitacoes
+    title: Itens Licitações 2026
+title: Licitações Estado de Minas Gerais
