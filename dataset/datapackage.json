@@ -1,10 +1,142 @@
 {
   "name": "portal_licitacoes",
-  "owner_org": "",
+  "owner_org": "controladoria-geral-do-estado-cge",
   "profile": "data-package",
   "resources": [
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "description": "Dados sobre licitações 2023.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "licitacoes2023",
+      "path": "data/licitacoes2023.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_criacao_pedido",
+            "type": "integer"
+          },
+          {
+            "name": "procedimento_contratacao_detalhamento_1",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_especializacao",
+            "type": "string"
+          },
+          {
+            "name": "nome_orgao_entidade_compra",
+            "type": "string"
+          },
+          {
+            "name": "numero_processo_formatado",
+            "type": "string"
+          },
+          {
+            "name": "data_criacao_pedido",
+            "type": "date"
+          },
+          {
+            "name": "objeto_contrato",
+            "type": "string"
+          },
+          {
+            "name": "situacao_processo",
+            "type": "string"
+          },
+          {
+            "name": "criterio_julgamento",
+            "type": "string"
+          },
+          {
+            "name": "nome_empresarial_nome_fornecedor",
+            "type": "string"
+          },
+          {
+            "name": "cnpj_cpf_fornecedor_formatado",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_grupo",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Licitações 2023."
+    },
+    {
+      "description": "Dados sobre licitações 2024.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "licitacoes2024",
+      "path": "data/licitacoes2024.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_criacao_pedido",
+            "type": "integer"
+          },
+          {
+            "name": "procedimento_contratacao_detalhamento_1",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_especializacao",
+            "type": "string"
+          },
+          {
+            "name": "nome_orgao_entidade_compra",
+            "type": "string"
+          },
+          {
+            "name": "numero_processo_formatado",
+            "type": "string"
+          },
+          {
+            "name": "data_criacao_pedido",
+            "type": "date"
+          },
+          {
+            "name": "objeto_contrato",
+            "type": "string"
+          },
+          {
+            "name": "situacao_processo",
+            "type": "string"
+          },
+          {
+            "name": "criterio_julgamento",
+            "type": "string"
+          },
+          {
+            "name": "nome_empresarial_nome_fornecedor",
+            "type": "string"
+          },
+          {
+            "name": "cnpj_cpf_fornecedor_formatado",
+            "type": "string"
+          },
+          {
+            "name": "procedimento_contratacao_grupo",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Licitações 2024."
+    },
+    {
+      "description": "Dados sobre licitações 2025.",
       "dialect": {
         "delimiter": ";"
       },
@@ -67,10 +199,10 @@
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Licitações 2025"
     },
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "description": "Dados sobre licitações 2026.",
       "dialect": {
         "delimiter": ";"
       },
@@ -133,18 +265,18 @@
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Licitações 2026"
     },
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "description": "Itens de licitações 2023",
       "dialect": {
         "delimiter": ";"
       },
       "encoding": "utf-8-sig",
       "format": "csv",
       "hashing": "md5",
-      "name": "links2025",
-      "path": "data/links2025.csv",
+      "name": "item2023",
+      "path": "data/item2023.csv",
       "profile": "tabular-data-resource",
       "schema": {
         "fields": [
@@ -157,44 +289,56 @@
             "type": "string"
           },
           {
-            "name": "numero_contrato",
-            "type": "integer"
-          },
-          {
-            "name": "descricao_tipo_de_contrato",
+            "name": "situacao_item_processo",
             "type": "string"
           },
           {
-            "name": "procedimento_contratacao_detalhamento_1",
+            "name": "numero_item_processo",
             "type": "string"
           },
           {
-            "name": "edital_retificacao_arquivos",
+            "name": "codigo_elemento_item_despesa",
             "type": "string"
           },
           {
-            "name": "contrato_termoaditivo_arquivos",
+            "name": "nome_elemento_item_despesa",
             "type": "string"
           },
           {
-            "name": "numero_parecer_juridico",
+            "name": "codigo_item_material_servico_numerico",
+            "type": "string"
+          },
+          {
+            "name": "item_material_servico",
+            "type": "string"
+          },
+          {
+            "name": "quantidade_item_pedido",
+            "type": "string"
+          },
+          {
+            "name": "valor_unitario_referencia_item_pedido",
+            "type": "string"
+          },
+          {
+            "name": "valor_total_referencia_item_pedido",
             "type": "string"
           }
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Itens Licitações 2023"
     },
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "description": "Itens de licitações 2024",
       "dialect": {
         "delimiter": ";"
       },
       "encoding": "utf-8-sig",
       "format": "csv",
       "hashing": "md5",
-      "name": "links2026",
-      "path": "data/links2026.csv",
+      "name": "item2024",
+      "path": "data/item2024.csv",
       "profile": "tabular-data-resource",
       "schema": {
         "fields": [
@@ -207,182 +351,170 @@
             "type": "string"
           },
           {
-            "name": "numero_contrato",
-            "type": "integer"
-          },
-          {
-            "name": "descricao_tipo_de_contrato",
-            "type": "any"
-          },
-          {
-            "name": "procedimento_contratacao_detalhamento_1",
+            "name": "situacao_item_processo",
             "type": "string"
           },
           {
-            "name": "edital_retificacao_arquivos",
-            "type": "any"
+            "name": "numero_item_processo",
+            "type": "string"
           },
           {
-            "name": "contrato_termoaditivo_arquivos",
-            "type": "any"
+            "name": "codigo_elemento_item_despesa",
+            "type": "string"
           },
           {
-            "name": "numero_parecer_juridico",
-            "type": "any"
+            "name": "nome_elemento_item_despesa",
+            "type": "string"
+          },
+          {
+            "name": "codigo_item_material_servico_numerico",
+            "type": "string"
+          },
+          {
+            "name": "item_material_servico",
+            "type": "string"
+          },
+          {
+            "name": "quantidade_item_pedido",
+            "type": "string"
+          },
+          {
+            "name": "valor_unitario_referencia_item_pedido",
+            "type": "string"
+          },
+          {
+            "name": "valor_total_referencia_item_pedido",
+            "type": "string"
           }
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Itens Licitações 2024"
     },
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "description": "Itens Licitações 2025",
       "dialect": {
         "delimiter": ";"
       },
       "encoding": "utf-8-sig",
       "format": "csv",
       "hashing": "md5",
-      "name": "visaogeral2025",
-      "path": "data/visaogeral2025.csv",
+      "name": "item2025",
+      "path": "data/item2025.csv",
       "profile": "tabular-data-resource",
       "schema": {
         "fields": [
           {
-            "name": "ano_criacao_pedido",
-            "type": "string"
-          },
-          {
-            "name": "nome_orgao_entidade_compra",
-            "type": "string"
+            "name": "ano_criacao_processo",
+            "type": "integer"
           },
           {
             "name": "numero_processo_formatado",
             "type": "string"
           },
           {
-            "name": "nome_empresarial_nome_fornecedor",
+            "name": "situacao_item_processo",
             "type": "string"
           },
           {
-            "name": "unnamed_4",
-            "type": "any"
-          },
-          {
-            "name": "objeto_contrato",
+            "name": "numero_item_processo",
             "type": "string"
           },
           {
-            "name": "unnamed_6",
-            "type": "any"
-          },
-          {
-            "name": "unnamed_7",
-            "type": "any"
-          },
-          {
-            "name": "unnamed_8",
-            "type": "any"
-          },
-          {
-            "name": "unnamed_9",
-            "type": "any"
-          },
-          {
-            "name": "unnamed_10",
-            "type": "any"
-          },
-          {
-            "name": "procedimento_contratacao_grupo",
+            "name": "codigo_elemento_item_despesa",
             "type": "string"
           },
           {
-            "name": "procedimento_contratacao_detalhamento_1",
+            "name": "nome_elemento_item_despesa",
             "type": "string"
           },
           {
-            "name": "criterio_julgamento",
+            "name": "codigo_item_material_servico_numerico",
             "type": "string"
           },
           {
-            "name": "situacao_processo",
+            "name": "item_material_servico",
+            "type": "string"
+          },
+          {
+            "name": "quantidade_item_pedido",
+            "type": "string"
+          },
+          {
+            "name": "valor_unitario_referencia_item_pedido",
+            "type": "string"
+          },
+          {
+            "name": "valor_total_referencia_item_pedido",
             "type": "string"
           }
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Itens Licitações 2025"
     },
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "description": "Itens Licitações 2026",
       "dialect": {
         "delimiter": ";"
       },
       "encoding": "utf-8-sig",
       "format": "csv",
       "hashing": "md5",
-      "name": "visaogeral2026",
-      "path": "data/visaogeral2026.csv",
+      "name": "item2026",
+      "path": "data/item2026.csv",
       "profile": "tabular-data-resource",
       "schema": {
         "fields": [
           {
-            "name": "ano_criacao_pedido",
+            "name": "ano_criacao_processo",
             "type": "integer"
-          },
-          {
-            "name": "nome_orgao_entidade_compra",
-            "type": "string"
           },
           {
             "name": "numero_processo_formatado",
             "type": "string"
           },
           {
-            "name": "nome_empresarial_nome_fornecedor",
+            "name": "situacao_item_processo",
             "type": "string"
           },
           {
-            "name": "objeto_contrato",
+            "name": "numero_item_processo",
             "type": "string"
           },
           {
-            "name": "unnamed_5",
-            "type": "any"
-          },
-          {
-            "name": "unnamed_6",
-            "type": "any"
-          },
-          {
-            "name": "unnamed_7",
-            "type": "any"
-          },
-          {
-            "name": "unnamed_8",
-            "type": "any"
-          },
-          {
-            "name": "procedimento_contratacao_grupo",
+            "name": "codigo_elemento_item_despesa",
             "type": "string"
           },
           {
-            "name": "procedimento_contratacao_detalhamento_1",
+            "name": "nome_elemento_item_despesa",
             "type": "string"
           },
           {
-            "name": "criterio_julgamento",
+            "name": "codigo_item_material_servico_numerico",
             "type": "string"
           },
           {
-            "name": "situacao_processo",
+            "name": "item_material_servico",
+            "type": "string"
+          },
+          {
+            "name": "quantidade_item_pedido",
+            "type": "string"
+          },
+          {
+            "name": "valor_unitario_referencia_item_pedido",
+            "type": "string"
+          },
+          {
+            "name": "valor_total_referencia_item_pedido",
             "type": "string"
           }
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Itens Licitações 2026"
     }
   ],
-  "title": "Portal_licitacoes"
+  "title": "Licitações Estado de Minas Gerais"
 }
