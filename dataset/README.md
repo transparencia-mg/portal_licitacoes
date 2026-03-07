@@ -1,5 +1,3 @@
-# 📊 Portal de Licitações – Governo de Minas Gerais
-
 Dashboard interativo para **visualização, consulta e download de dados públicos sobre licitações** realizadas pelos órgãos e entidades do Poder Executivo do Estado de Minas Gerais.
 
 A solução organiza e disponibiliza dados públicos em formato aberto, permitindo análise, reutilização e acompanhamento das contratações públicas realizadas pelo governo.
@@ -72,3 +70,4 @@ Os conjuntos seguem padrões utilizados em portais de dados abertos, possibilita
 Este projeto integra as iniciativas de **transparência ativa do Governo do Estado de Minas Gerais**, ampliando o acesso às informações públicas e fortalecendo o controle social sobre as ações governamentais.
 
 O objetivo é facilitar a consulta e promover maior compreensão sobre **os processos de contratação pública realizados pelo Estado**.
+
